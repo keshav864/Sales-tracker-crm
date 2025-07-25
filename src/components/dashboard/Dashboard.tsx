@@ -108,14 +108,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
               value={stats.totalEmployees}
               icon={Users}
               color="blue"
-              trend={{ value: 12, isPositive: true }}
+              trend={{ value: 25, isPositive: true }}
             />
             <StatsCard
               title="Present Today"
               value={stats.presentToday}
               icon={UserCheck}
               color="green"
-              trend={{ value: 8, isPositive: true }}
+              trend={{ value: 18, isPositive: true }}
             />
             <StatsCard
               title="Total Sales Today"
