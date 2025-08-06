@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { FileText, Upload, Calendar, DollarSign, User, Building, Phone, Mail, MapPin, CreditCard, Star, Clock } from 'lucide-react';
-import { SalesRecord, User as UserType } from '../../types';
+import React, { useState, useEffect } from 'react';
+import { FileText, Upload, Calendar, DollarSign, User, Building, Phone, Mail, MapPin, CreditCard, Star, Clock, Package } from 'lucide-react';
+import { SalesRecord, User as UserType, Product } from '../../types';
 import { formatDate } from '../../utils/dateUtils';
+import { getProducts } from '../../utils/storage';
 
 interface SalesReportFormProps {
   currentUser: UserType;
@@ -9,11 +10,13 @@ interface SalesReportFormProps {
 }
 
 export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, onSalesAdd }) => {
+  const [products, setProducts] = useState<Product[]>([]);
   const [formData, setFormData] = useState({
     // Product Information
+    productId: '',
     productName: '',
     productCode: '',
-    category: 'product',
+    category: '',
     quantity: 1,
     unitPrice: 0,
     discount: 0,
@@ -37,11 +40,46 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
     followUpDate: '',
     priority: 'medium',
     dealStage: 'closed-won',
-    territory: 'North',
+    territory: currentUser.territory || 'North',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [productSearch, setProductSearch] = useState('');
+
+  useEffect(() => {
+    const loadedProducts = getProducts();
+    setProducts(loadedProducts);
+    setFilteredProducts(loadedProducts);
+  }, []);
+
+  useEffect(() => {
+    if (productSearch) {
+      const filtered = products.filter(product =>
+        product.name.toLowerCase().includes(productSearch.toLowerCase()) ||
+        product.category.toLowerCase().includes(productSearch.toLowerCase()) ||
+        product.model.toLowerCase().includes(productSearch.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    } else {
+      setFilteredProducts(products);
+    }
+  }, [productSearch, products]);
+
+  const handleProductSelect = (productId: string) => {
+    const selectedProduct = products.find(p => p.id === productId);
+    if (selectedProduct) {
+      setFormData({
+        ...formData,
+        productId: selectedProduct.id,
+        productName: selectedProduct.name,
+        productCode: selectedProduct.id,
+        category: selectedProduct.category,
+        unitPrice: selectedProduct.price,
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +93,7 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
         id: Date.now().toString(),
         userId: currentUser.id,
         date: formData.saleDate,
+        productId: formData.productId,
         productName: formData.productName,
         quantity: formData.quantity,
         unitPrice: formData.unitPrice,
@@ -85,9 +124,10 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
       
       // Reset form
       setFormData({
+        productId: '',
         productName: '',
         productCode: '',
-        category: 'product',
+        category: '',
         quantity: 1,
         unitPrice: 0,
         discount: 0,
@@ -105,10 +145,11 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
         followUpDate: '',
         priority: 'medium',
         dealStage: 'closed-won',
-        territory: 'North',
+        territory: currentUser.territory || 'North',
       });
 
       setCurrentStep(1);
+      setProductSearch('');
       
       // Show success animation
       const successDiv = document.createElement('div');
@@ -117,7 +158,9 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
       document.body.appendChild(successDiv);
       
       setTimeout(() => {
-        document.body.removeChild(successDiv);
+        if (document.body.contains(successDiv)) {
+          document.body.removeChild(successDiv);
+        }
       }, 3000);
       
     } catch (error) {
@@ -131,7 +174,7 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
   const commission = totalAmount * 0.05;
 
   const steps = [
-    { id: 1, title: 'Product Details', icon: DollarSign },
+    { id: 1, title: 'Product Selection', icon: Package },
     { id: 2, title: 'Customer Info', icon: User },
     { id: 3, title: 'Sale Details', icon: Calendar },
     { id: 4, title: 'Review & Submit', icon: FileText },
@@ -188,113 +231,117 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Step 1: Product Information */}
+        {/* Step 1: Product Selection */}
         {currentStep === 1 && (
           <div className="card animate-fadeIn">
             <div className="flex items-center mb-6">
-              <DollarSign className="w-6 h-6 text-blue-600 mr-3" />
-              <h2 className="text-2xl font-bold text-gray-900">Product Information</h2>
+              <Package className="w-6 h-6 text-blue-600 mr-3" />
+              <h2 className="text-2xl font-bold text-gray-900">Product Selection</h2>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Product Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.productName}
-                  onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
-                  className="input-field"
-                  placeholder="Enter product name"
-                  required
-                />
-              </div>
+            {/* Product Search */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Search Products
+              </label>
+              <input
+                type="text"
+                value={productSearch}
+                onChange={(e) => setProductSearch(e.target.value)}
+                className="input-field"
+                placeholder="Search by product name, category, or model..."
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Product Code
-                </label>
-                <input
-                  type="text"
-                  value={formData.productCode}
-                  onChange={(e) => setFormData({ ...formData, productCode: e.target.value })}
-                  className="input-field"
-                  placeholder="SKU/Product code"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Category *
-                </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="input-field"
-                  required
-                >
-                  <option value="product">Physical Product</option>
-                  <option value="service">Service</option>
-                  <option value="subscription">Subscription</option>
-                  <option value="consulting">Consulting</option>
-                  <option value="software">Software</option>
-                  <option value="training">Training</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Quantity *
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={formData.quantity}
-                  onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) })}
-                  className="input-field"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Unit Price (₹) *
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.unitPrice}
-                  onChange={(e) => setFormData({ ...formData, unitPrice: parseFloat(e.target.value) })}
-                  className="input-field"
-                  placeholder="0.00"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Discount (₹)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.discount}
-                  onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) })}
-                  className="input-field"
-                  placeholder="0.00"
-                />
+            {/* Product Selection */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Select Product *
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                {filteredProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    onClick={() => handleProductSelect(product.id)}
+                    className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg ${
+                      formData.productId === product.id
+                        ? 'border-blue-500 bg-blue-50 shadow-lg'
+                        : 'border-gray-200 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-gray-900">{product.name}</h3>
+                      <span className="text-lg font-bold text-green-600">₹{product.price.toLocaleString()}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-1">Category: {product.category}</p>
+                    <p className="text-sm text-gray-600">Model: {product.model}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="mt-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold text-gray-900">Subtotal:</span>
-                <span className="text-2xl font-bold text-blue-600">₹{(formData.quantity * formData.unitPrice).toFixed(2)}</span>
+            {formData.productId && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Quantity *
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.quantity}
+                    onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) })}
+                    className="input-field"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Unit Price (₹) *
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.unitPrice}
+                    onChange={(e) => setFormData({ ...formData, unitPrice: parseFloat(e.target.value) })}
+                    className="input-field"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Discount (₹)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.discount}
+                    onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) })}
+                    className="input-field"
+                    placeholder="0.00"
+                  />
+                </div>
               </div>
-            </div>
+            )}
+
+            {formData.productId && (
+              <div className="mt-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-semibold text-gray-900">Subtotal:</span>
+                  <span className="text-2xl font-bold text-blue-600">₹{(formData.quantity * formData.unitPrice).toFixed(2)}</span>
+                </div>
+                {formData.discount > 0 && (
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-lg font-semibold text-gray-900">After Discount:</span>
+                    <span className="text-2xl font-bold text-green-600">₹{totalAmount.toFixed(2)}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -496,17 +543,13 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Territory
                 </label>
-                <select
+                <input
+                  type="text"
                   value={formData.territory}
                   onChange={(e) => setFormData({ ...formData, territory: e.target.value })}
                   className="input-field"
-                >
-                  <option value="North">North</option>
-                  <option value="South">South</option>
-                  <option value="East">East</option>
-                  <option value="West">West</option>
-                  <option value="Central">Central</option>
-                </select>
+                  placeholder="Sales territory"
+                />
               </div>
             </div>
 
@@ -622,7 +665,13 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
             {currentStep < 4 ? (
               <button
                 type="button"
-                onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
+                onClick={() => {
+                  if (currentStep === 1 && !formData.productId) {
+                    alert('Please select a product first');
+                    return;
+                  }
+                  setCurrentStep(Math.min(4, currentStep + 1));
+                }}
                 className="btn-primary"
               >
                 Next Step

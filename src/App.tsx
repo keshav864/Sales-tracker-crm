@@ -9,6 +9,7 @@ import { AttendanceTracker } from './components/attendance/AttendanceTracker';
 import { SalesTracker } from './components/sales/SalesTracker';
 import { DataExport } from './components/export/DataExport';
 import { EmployeeList } from './components/attendance/EmployeeList';
+import { EmployeeManagement } from './components/admin/EmployeeManagement';
 import {
   getUsers,
   getAttendanceRecords,
@@ -68,10 +69,9 @@ function App() {
         );
       case 'employees':
         return (
-          <EmployeeList
+          <EmployeeManagement
             users={users}
-            attendance={attendance}
-            onAttendanceUpdate={handleAttendanceUpdate}
+            onUsersUpdate={setUsers}
           />
         );
       case 'export':

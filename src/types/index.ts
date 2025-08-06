@@ -11,6 +11,16 @@ export interface User {
   phone?: string;
   designation?: string;
   target?: number;
+  manager?: string | null;
+  territory?: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  model: string;
 }
 
 export interface AttendanceRecord {
@@ -30,6 +40,7 @@ export interface SalesRecord {
   id: string;
   userId: string;
   date: string;
+  productId: string;
   productName: string;
   quantity: number;
   unitPrice: number;
