@@ -104,7 +104,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                   onChange={(e) => setSelectedRole(e.target.value as 'admin' | 'manager' | 'employee')}
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 >
-                  <option value="employee" className="bg-gray-800 text-white">Employee</option>
+                  <option value="employee" className="bg-orange-800 text-white">Employee</option>
                   <option value="manager" className="bg-gray-800 text-white">Manager</option>
                   <option value="admin" className="bg-gray-800 text-white">Admin</option>
                 </select>
