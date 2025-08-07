@@ -89,7 +89,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen gradient-bg">
+    <div className="min-h-screen bg-gray-50">
       <Header 
         user={user} 
         onLogout={logout} 

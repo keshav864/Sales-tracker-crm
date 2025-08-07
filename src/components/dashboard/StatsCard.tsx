@@ -28,7 +28,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   };
 
   return (
-    <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
       <div className="flex items-center">
         <div className={`${colorClasses[color]} rounded-xl p-3 mr-4 shadow-lg`}>
           <Icon className="w-6 h-6 text-white" />

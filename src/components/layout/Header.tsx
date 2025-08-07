@@ -34,7 +34,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onMenuToggle }) 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <header className="bg-white/95 backdrop-blur-lg shadow-lg border-b border-gray-200/50 sticky top-0 z-50">
+    <header className="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left Section */}

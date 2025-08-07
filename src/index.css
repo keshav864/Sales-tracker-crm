@@ -12,8 +12,7 @@
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
-   
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: #ffffff;
     min-height: 100vh;
   }
 
@@ -64,11 +63,11 @@
   }
 
   .gradient-bg {
-    @apply bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50;
+    @apply bg-white;
   }
 
   .glass-effect {
-    @apply bg-white/20 backdrop-blur-lg border border-white/30 shadow-xl;
+    @apply bg-white backdrop-blur-lg border border-gray-200 shadow-xl;
   }
 }
 

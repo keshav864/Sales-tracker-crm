@@ -158,7 +158,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
       </div>
 
       {/* Employee List */}
-      <div className="card">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">

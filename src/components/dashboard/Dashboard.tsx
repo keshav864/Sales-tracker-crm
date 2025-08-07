@@ -70,8 +70,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="space-y-8 p-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 rounded-2xl p-8 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
+        <div className="absolute inset-0 bg-black/5"></div>
         <div className="relative z-10">
           <div className="flex items-center justify-between">
             <div>

@@ -44,12 +44,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className={`bg-white/95 backdrop-blur-lg shadow-xl border-r border-gray-200/50 transition-all duration-300 ${
+    <aside className={`bg-white shadow-xl border-r border-gray-200 transition-all duration-300 ${
       isCollapsed ? 'w-16' : 'w-64'
     } min-h-screen sticky top-16`}>
       {/* User Profile Section */}
       {!isCollapsed && (
-        <div className="p-6 border-b border-gray-200/50">
+        <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="relative">
               <img
