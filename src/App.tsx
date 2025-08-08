@@ -41,6 +41,14 @@ function App() {
     saveSalesRecords(records);
   };
 
+  const handleUserUpdate = (updatedUser: any) => {
+    const updatedUsers = users.map(u => u.id === updatedUser.id ? updatedUser : u);
+    setUsers(updatedUsers);
+    // Update current user in auth context if it's the same user
+    if (user && user.id === updatedUser.id) {
+      // The user state will be updated through the auth hook
+    }
+  };
   if (!isAuthenticated || !user) {
     return <LoginForm onLogin={login} />;
   }
@@ -94,6 +102,7 @@ function App() {
         user={user} 
         onLogout={logout} 
         onMenuToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onUserUpdate={handleUserUpdate}
       />
       <div className="flex">
         <Sidebar

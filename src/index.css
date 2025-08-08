@@ -63,11 +63,11 @@
   }
 
   .gradient-bg {
-    @apply bg-white;
+    @apply bg-gradient-to-br from-white to-gray-50;
   }
 
   .glass-effect {
-    @apply bg-white backdrop-blur-lg border border-gray-200 shadow-xl;
+    @apply bg-white/95 backdrop-blur-lg border border-gray-200/50 shadow-xl;
   }
 }
 

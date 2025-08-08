@@ -20,7 +20,10 @@ export const useAuth = () => {
 
   const login = (employeeId: string, password: string): boolean => {
     const users = getUsers();
-    const user = users.find(u => u.employeeId === employeeId && u.password === password);
+    const user = users.find(u => 
+      u.employeeId.toLowerCase() === employeeId.toLowerCase() && 
+      u.password === password
+    );
     
     if (user) {
       setCurrentUser(user);

@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { LogOut, User, Settings, Bell, Search, Menu } from 'lucide-react';
 import { User as UserType, NotificationItem } from '../../types';
+import { ProfileSettings } from '../profile/ProfileSettings';
 
 interface HeaderProps {
   user: UserType;
   onLogout: () => void;
   onMenuToggle?: () => void;
+  onUserUpdate?: (user: UserType) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ user, onLogout, onMenuToggle }) => {
+export const Header: React.FC<HeaderProps> = ({ user, onLogout, onMenuToggle, onUserUpdate }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showProfileSettings, setShowProfileSettings] = useState(false);
 
   const notifications: NotificationItem[] = [
     {
@@ -158,11 +161,23 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onMenuToggle }) 
                   </div>
                   
                   <div className="py-2">
-                    <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2">
+                    <button 
+                      onClick={() => {
+                        setShowProfile(false);
+                        setShowProfileSettings(true);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2"
+                    >
                       <User className="w-4 h-4" />
                       <span>View Profile</span>
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2">
+                    <button 
+                      onClick={() => {
+                        setShowProfile(false);
+                        setShowProfileSettings(true);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2"
+                    >
                       <Settings className="w-4 h-4" />
                       <span>Settings</span>
                     </button>
@@ -183,6 +198,15 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onMenuToggle }) 
           </div>
         </div>
       </div>
+
+      {/* Profile Settings Modal */}
+      {showProfileSettings && onUserUpdate && (
+        <ProfileSettings
+          user={user}
+          onUserUpdate={onUserUpdate}
+          onClose={() => setShowProfileSettings(false)}
+        />
+      )}
     </header>
   );
 };
