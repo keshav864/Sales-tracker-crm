@@ -182,6 +182,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <AttendanceChart attendance={attendance} />
         </div>
 
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-gray-900 flex items-center">
+              <Calendar className="w-6 h-6 mr-2 text-blue-500" />
+              Monthly Attendance Trends
+            </h3>
+            <div className="flex space-x-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            </div>
+          </div>
+          <AttendanceChart attendance={attendance} />
+        </div>
+
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-gray-900 flex items-center">
