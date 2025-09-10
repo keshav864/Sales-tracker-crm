@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { User, Save, Camera, Phone, Mail, MapPin, Building, Calendar, Target } from 'lucide-react';
+import { User, Save, Camera, Phone, Mail, MapPin, Building, Calendar, Target, Lock } from 'lucide-react';
 import { User as UserType } from '../../types';
 import { updateUserProfile } from '../../utils/storage';
+import { PasswordChangeModal } from '../auth/PasswordChangeModal';
 
 interface ProfileSettingsProps {
   user: UserType;
@@ -27,6 +28,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<'personal' | 'professional'>('personal');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -305,6 +307,25 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
             </div>
           )}
 
+          {/* Security Section */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+            <h4 className="font-semibold text-yellow-900 mb-3">Security Settings</h4>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-yellow-800">Password</p>
+                <p className="text-xs text-yellow-600">Last changed: Recently</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPasswordModal(true)}
+                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors duration-200 flex items-center space-x-2"
+              >
+                <Lock className="w-4 h-4" />
+                <span>Change Password</span>
+              </button>
+            </div>
+          </div>
+
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 mt-8">
             <button
@@ -331,6 +352,17 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           </div>
         </form>
       </div>
+
+      {/* Password Change Modal */}
+      {showPasswordModal && (
+        <PasswordChangeModal
+          userId={user.id}
+          onClose={() => setShowPasswordModal(false)}
+          onSuccess={() => {
+            alert('Password changed successfully!');
+          }}
+        />
+      )}
     </div>
   );
 };

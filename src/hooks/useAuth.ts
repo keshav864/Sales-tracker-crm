@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User, AuthState } from '../types';
-import { getCurrentUser, setCurrentUser, getUsers } from '../utils/storage';
+import { getCurrentUser, setCurrentUser } from '../utils/storage';
+import { authenticateUser, isSessionValid, refreshUserSession } from '../utils/auth';
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
@@ -9,8 +10,8 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
-    const user = getCurrentUser();
-    if (user) {
+    if (isSessionValid()) {
+      const user = getCurrentUser();
       setAuthState({
         user,
         isAuthenticated: true,
@@ -19,11 +20,7 @@ export const useAuth = () => {
   }, []);
 
   const login = (employeeId: string, password: string): boolean => {
-    const users = getUsers();
-    const user = users.find(u => 
-      u.employeeId.toLowerCase() === employeeId.toLowerCase() && 
-      u.password === password
-    );
+    const user = authenticateUser(employeeId, password);
     
     if (user) {
       setCurrentUser(user);
@@ -34,6 +31,14 @@ export const useAuth = () => {
       return true;
     }
     return false;
+  };
+
+  const updateUser = (updatedUser: User) => {
+    setAuthState(prev => ({
+      ...prev,
+      user: updatedUser,
+    }));
+    refreshUserSession(updatedUser.id);
   };
 
   const logout = () => {
@@ -48,5 +53,6 @@ export const useAuth = () => {
     ...authState,
     login,
     logout,
+    updateUser,
   };
 };
