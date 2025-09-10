@@ -49,7 +49,6 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
         .filter(record => record.date === dayStr)
         .reduce((sum, record) => sum + record.totalAmount, 0);
     });
-
     return {
       labels,
       datasets: [
