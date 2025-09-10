@@ -4,16 +4,24 @@ import { User as UserType } from '../../types';
 import { addNewEmployee, getUsers, saveUsers } from '../../utils/storage';
 import { SearchAndFilter } from '../common/SearchAndFilter';
 import { hashPassword } from '../../utils/auth';
+import { DataIntegrityChecker } from './DataIntegrityChecker';
 
 interface EmployeeManagementProps {
   users: UserType[];
+  sales: any[];
+  attendance: any[];
   onUsersUpdate: (users: UserType[]) => void;
+  onDataUpdate: (users: UserType[], sales: any[], attendance: any[]) => void;
 }
 
 export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
   users,
+  sales,
+  attendance,
   onUsersUpdate,
+  onDataUpdate,
 }) => {
+  const [activeTab, setActiveTab] = useState<'employees' | 'integrity'>('employees');
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'manager' | 'employee'>('all');
@@ -140,130 +148,185 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold text-gray-900">Employee Management</h2>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="btn-primary flex items-center space-x-2"
-        >
-          <UserPlus className="w-5 h-5" />
-          <span>Add Employee</span>
-        </button>
+        {activeTab === 'employees' && (
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="btn-primary flex items-center space-x-2"
+          >
+            <UserPlus className="w-5 h-5" />
+            <span>Add Employee</span>
+          </button>
+        )}
       </div>
 
-      {/* Filters */}
-      <SearchAndFilter
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        placeholder="Search employees..."
-        filters={[
-          {
-            label: 'Role',
-            value: filterRole,
-            options: [
-              { value: 'all', label: 'All Roles' },
-              { value: 'admin', label: 'Admin' },
-              { value: 'manager', label: 'Manager' },
-              { value: 'employee', label: 'Employee' },
-            ],
-            onChange: (value) => setFilterRole(value as any),
-          },
-          {
-            label: 'Department',
-            value: filterDepartment,
-            options: [
-              { value: 'all', label: 'All Departments' },
-              ...departments.map(dept => ({ value: dept, label: dept })),
-            ],
-            onChange: setFilterDepartment,
-          },
-        ]}
-      />
+      {/* Tab Navigation */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="border-b border-gray-200">
+          <nav className="flex space-x-8 px-6">
+            <button
+              onClick={() => setActiveTab('employees')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'employees'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Employee List
+            </button>
+            <button
+              onClick={() => setActiveTab('integrity')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'integrity'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Data Integrity
+            </button>
+          </nav>
+        </div>
 
-      {/* Employee List */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Employee
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Department
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Territory
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Target
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredUsers.map(user => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <img
-                        src={user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`}
-                        alt={user.name}
-                        className="w-10 h-10 rounded-full mr-3"
-                      />
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.employeeId}</div>
-                        <div className="text-sm text-gray-500">@{user.username}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center space-x-2">
-                      {getRoleIcon(user.role)}
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
-                        {user.role}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.department}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.territory || 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.target ? `₹${user.target.toLocaleString()}` : 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    <button
-                      onClick={() => handleEditEmployee(user)}
-                      className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    {user.role !== 'admin' && (
-                      <button
-                        onClick={() => handleDeleteEmployee(user.id)}
-                        className="text-red-600 hover:text-red-900 transition-colors duration-200"
-                        title="Delete Employee"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                    {user.role === 'admin' && (
-                      <div className="text-gray-400" title="Admin users cannot be deleted">
-                        <Shield className="w-4 h-4" />
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="p-6">
+          {activeTab === 'employees' && (
+            <div className="space-y-6">
+              {/* Filters */}
+              <SearchAndFilter
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                placeholder="Search employees..."
+                filters={[
+                  {
+                    label: 'Role',
+                    value: filterRole,
+                    options: [
+                      { value: 'all', label: 'All Roles' },
+                      { value: 'admin', label: 'Admin' },
+                      { value: 'manager', label: 'Manager' },
+                      { value: 'employee', label: 'Employee' },
+                    ],
+                    onChange: (value) => setFilterRole(value as any),
+                  },
+                  {
+                    label: 'Department',
+                    value: filterDepartment,
+                    options: [
+                      { value: 'all', label: 'All Departments' },
+                      ...departments.map(dept => ({ value: dept, label: dept })),
+                    ],
+                    onChange: setFilterDepartment,
+                  },
+                ]}
+              />
+
+              {/* Employee List */}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Employee
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Role
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Department
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Territory
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Target
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredUsers.map(user => (
+                      <tr key={user.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <img
+                              src={user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`}
+                              alt={user.name}
+                              className="w-10 h-10 rounded-full mr-3"
+                            />
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                              <div className="text-sm text-gray-500">{user.employeeId}</div>
+                              <div className="text-sm text-gray-500">@{user.username}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center space-x-2">
+                            {getRoleIcon(user.role)}
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
+                              {user.role}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {user.department}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {user.territory || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {user.target ? `₹${user.target.toLocaleString()}` : 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            user.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {user.isActive !== false ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                          <button
+                            onClick={() => handleEditEmployee(user)}
+                            className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          {user.role !== 'admin' && (
+                            <button
+                              onClick={() => handleDeleteEmployee(user.id)}
+                              className="text-red-600 hover:text-red-900 transition-colors duration-200"
+                              title="Delete Employee"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                          {user.role === 'admin' && (
+                            <div className="text-gray-400" title="Admin users cannot be deleted">
+                              <Shield className="w-4 h-4" />
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'integrity' && (
+            <DataIntegrityChecker
+              users={users}
+              sales={sales}
+              attendance={attendance}
+              onDataFixed={(fixedUsers, fixedSales, fixedAttendance) => {
+                onDataUpdate(fixedUsers, fixedSales, fixedAttendance);
+              }}
+            />
+          )}
         </div>
       </div>
 

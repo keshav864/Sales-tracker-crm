@@ -86,7 +86,17 @@ function App() {
         return (
           <EmployeeManagement
             users={users}
+            sales={sales}
+            attendance={attendance}
             onUsersUpdate={setUsers}
+            onDataUpdate={(updatedUsers, updatedSales, updatedAttendance) => {
+              setUsers(updatedUsers);
+              setSales(updatedSales);
+              setAttendance(updatedAttendance);
+              // Save to storage
+              saveAttendanceRecords(updatedAttendance);
+              saveSalesRecords(updatedSales);
+            }}
           />
         );
       case 'export':
