@@ -3,6 +3,7 @@ import { FileText, Upload, Calendar, DollarSign, User, Building, Phone, Mail, Ma
 import { SalesRecord, User as UserType, Product } from '../../types';
 import { formatDate } from '../../utils/dateUtils';
 import { getProducts } from '../../utils/storage';
+import { captureRealTimeData } from '../../utils/realTimeData';
 import { validateSalesRecord, sanitizeInput } from '../../utils/validation';
 
 interface SalesReportFormProps {
@@ -152,6 +153,9 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
       };
 
       onSalesAdd(newSale);
+      
+      // Capture real-time sales entry
+      captureRealTimeData.salesEntry(newSale);
       
       // Reset form
       setFormData({

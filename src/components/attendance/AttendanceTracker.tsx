@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Clock, Calendar, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { User, AttendanceRecord } from '../../types';
 import { formatDate, formatTime, formatDateTime } from '../../utils/dateUtils';
+import { captureRealTimeData } from '../../utils/realTimeData';
 import { AttendanceCalendar } from './AttendanceCalendar';
 import { EmployeeList } from './EmployeeList';
 
@@ -41,6 +42,9 @@ export const AttendanceTracker: React.FC<AttendanceTrackerProps> = ({
 
     const updatedRecords = [...attendance, newRecord];
     onAttendanceUpdate(updatedRecords);
+    
+    // Capture real-time attendance
+    captureRealTimeData.attendance(newRecord);
   };
 
   const handleCheckOut = () => {

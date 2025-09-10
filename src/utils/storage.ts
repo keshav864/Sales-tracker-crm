@@ -166,9 +166,10 @@ const getDefaultUsers = (): User[] => [
     manager: null,
     territory: 'All India',
     isActive: true,
+    lastLogin: new Date().toISOString(),
   },
   
-  // Managers
+  // Managers (3 total)
   {
     id: 'BM001',
     employeeId: 'BM001',
@@ -185,6 +186,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'ADMIN001',
     territory: 'Bihar/Delhi',
     isActive: true,
+    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
   },
   {
     id: 'BM002',
@@ -202,6 +204,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'ADMIN001',
     territory: 'Gujarat',
     isActive: true,
+    lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
   },
   {
     id: 'BM003',
@@ -219,26 +222,10 @@ const getDefaultUsers = (): User[] => [
     manager: 'ADMIN001',
     territory: 'MP & Rajasthan',
     isActive: true,
-  },
-  {
-    id: 'BM004',
-    employeeId: 'BM004',
-    name: 'Rajesh Sharma',
-    username: 'rajesh.sharma',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-02-15',
-    password: 'manager@123',
-    profilePicture: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9876543215',
-    designation: 'Regional Manager',
-    target: 270000,
-    manager: 'ADMIN001',
-    territory: 'Maharashtra',
-    isActive: true,
+    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
   },
 
-  // All 30 Employees from your list
+  // All 32 Employees (35 total including admin and 3 managers)
   {
     id: 'BM178',
     employeeId: 'BM178',
@@ -255,6 +242,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM001',
     territory: 'Bihar',
     isActive: true,
+    lastLogin: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
   },
   {
     id: 'BM200',
@@ -272,6 +260,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM001',
     territory: 'Katihar',
     isActive: true,
+    lastLogin: new Date(Date.now() - 45 * 60 * 1000).toISOString(), // 45 minutes ago
   },
   {
     id: 'BM214',
@@ -289,6 +278,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM001',
     territory: 'Indraprastha',
     isActive: true,
+    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
   },
   {
     id: 'BM212',
@@ -306,6 +296,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM002',
     territory: 'Gujarat',
     isActive: true,
+    lastLogin: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
   },
   {
     id: 'BM220',
@@ -323,6 +314,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM001',
     territory: 'West Bengal',
     isActive: true,
+    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
   },
   {
     id: 'BM227',
@@ -340,6 +332,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM003',
     territory: 'Rajasthan',
     isActive: true,
+    lastLogin: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
   },
   {
     id: 'BM222',
@@ -357,6 +350,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM001',
     territory: 'Bihar',
     isActive: true,
+    lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
   },
   {
     id: 'BM223',
@@ -374,6 +368,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM002',
     territory: 'Ahmedabad',
     isActive: true,
+    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
   },
   {
     id: 'BM234',
@@ -388,9 +383,10 @@ const getDefaultUsers = (): User[] => [
     phone: '+91 9827958772',
     designation: 'Area Sales Manager',
     target: 120000,
-    manager: 'BM004',
+    manager: 'BM003',
     territory: 'Chhattisgarh Nagpur',
     isActive: true,
+    lastLogin: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
   },
   {
     id: 'BM235',
@@ -408,6 +404,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM003',
     territory: 'Rajasthan Kota',
     isActive: true,
+    lastLogin: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
   },
   {
     id: 'BM236',
@@ -425,6 +422,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM003',
     territory: 'Indore',
     isActive: true,
+    lastLogin: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(), // 7 hours ago
   },
   {
     id: 'BM240',
@@ -439,9 +437,10 @@ const getDefaultUsers = (): User[] => [
     phone: '+91 9244671164',
     designation: 'Area Sales Manager',
     target: 125000,
-    manager: 'BM004',
+    manager: 'BM003',
     territory: 'Bhopal',
     isActive: true,
+    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
   },
   {
     id: 'BM241',
@@ -459,6 +458,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM001',
     territory: 'West Bengal',
     isActive: true,
+    lastLogin: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(), // 8 hours ago
   },
   {
     id: 'BM250',
@@ -476,6 +476,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM001',
     territory: 'Odisha',
     isActive: true,
+    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
   },
   {
     id: 'BM251',
@@ -493,6 +494,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM001',
     territory: 'West Bengal',
     isActive: true,
+    lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
   },
   {
     id: 'BM252',
@@ -510,6 +512,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM003',
     territory: 'Madhya Pradesh',
     isActive: true,
+    lastLogin: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
   },
   {
     id: 'BM254',
@@ -527,6 +530,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM003',
     territory: 'Madhya Pradesh',
     isActive: true,
+    lastLogin: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
   },
   {
     id: 'BM255',
@@ -544,6 +548,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM001',
     territory: 'Delhi NCR',
     isActive: true,
+    lastLogin: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
   },
   {
     id: 'BM258',
@@ -561,6 +566,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM001',
     territory: 'West Bengal',
     isActive: true,
+    lastLogin: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(), // 7 hours ago
   },
   {
     id: 'BM259',
@@ -575,9 +581,10 @@ const getDefaultUsers = (): User[] => [
     phone: '+91 9876543223',
     designation: 'Territory Sales Executive',
     target: 98000,
-    manager: 'BM004',
+    manager: 'BM002',
     territory: 'Kerala',
     isActive: true,
+    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
   },
   {
     id: 'BM264',
@@ -592,9 +599,10 @@ const getDefaultUsers = (): User[] => [
     phone: '+91 9876543224',
     designation: 'Sales Executive',
     target: 112000,
-    manager: 'BM004',
+    manager: 'BM002',
     territory: 'Maharashtra',
     isActive: true,
+    lastLogin: new Date(Date.now() - 9 * 60 * 60 * 1000).toISOString(), // 9 hours ago
   },
   {
     id: 'BM265',
@@ -609,9 +617,10 @@ const getDefaultUsers = (): User[] => [
     phone: '+91 9876543225',
     designation: 'Area Sales Executive',
     target: 106000,
-    manager: 'BM004',
+    manager: 'BM002',
     territory: 'Maharashtra',
     isActive: true,
+    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
   },
   {
     id: 'BM268',
@@ -629,6 +638,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM003',
     territory: 'Rajasthan',
     isActive: true,
+    lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
   },
   {
     id: 'BM272',
@@ -643,9 +653,10 @@ const getDefaultUsers = (): User[] => [
     phone: '+91 9876543227',
     designation: 'Territory Sales Executive',
     target: 99000,
-    manager: 'BM004',
+    manager: 'BM002',
     territory: 'Maharashtra',
     isActive: true,
+    lastLogin: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
   },
   {
     id: 'BM275',
@@ -663,6 +674,62 @@ const getDefaultUsers = (): User[] => [
     manager: 'BM002',
     territory: 'Gujarat',
     isActive: true,
+    lastLogin: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
+  },
+  // Additional 3 employees to reach 35 total
+  {
+    id: 'BM280',
+    employeeId: 'BM280',
+    name: 'Rajesh Kumar',
+    username: 'rajesh.kumar',
+    role: 'employee',
+    department: 'Sales',
+    joinDate: '2024-10-01',
+    password: 'bm280@123',
+    profilePicture: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9876543229',
+    designation: 'Sales Executive',
+    target: 105000,
+    manager: 'BM001',
+    territory: 'Punjab',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+  },
+  {
+    id: 'BM285',
+    employeeId: 'BM285',
+    name: 'Priya Sharma',
+    username: 'priya.sharma',
+    role: 'employee',
+    department: 'Sales',
+    joinDate: '2024-10-05',
+    password: 'bm285@123',
+    profilePicture: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9876543230',
+    designation: 'Territory Sales Executive',
+    target: 103000,
+    manager: 'BM003',
+    territory: 'Haryana',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
+  },
+  {
+    id: 'BM290',
+    employeeId: 'BM290',
+    name: 'Vikash Singh',
+    username: 'vikash.singh',
+    role: 'employee',
+    department: 'Sales',
+    joinDate: '2024-10-10',
+    password: 'bm290@123',
+    profilePicture: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9876543231',
+    designation: 'Sales Executive',
+    target: 101000,
+    manager: 'BM002',
+    territory: 'Karnataka',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
   },
 ];
 

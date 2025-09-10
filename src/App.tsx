@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useAuth } from './hooks/useAuth';
+import { realTimeDataManager, captureRealTimeData } from './utils/realTimeData';
 import { LoginForm } from './components/auth/LoginForm';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
@@ -27,24 +28,55 @@ function App() {
   const [attendance, setAttendance] = useState(getAttendanceRecords());
   const [sales, setSales] = useState(getSalesRecords());
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState<string>('');
 
   useEffect(() => {
     initializeDefaultData();
+    
+    // Set up real-time data listeners
+    realTimeDataManager.addListener('users', (updatedUsers: any[]) => {
+      setUsers(updatedUsers);
+      setLastSyncTime(new Date().toLocaleTimeString());
+    });
+    
+    realTimeDataManager.addListener('sales', (updatedSales: any[]) => {
+      setSales(updatedSales);
+      setLastSyncTime(new Date().toLocaleTimeString());
+    });
+    
+    realTimeDataManager.addListener('attendance', (updatedAttendance: any[]) => {
+      setAttendance(updatedAttendance);
+      setLastSyncTime(new Date().toLocaleTimeString());
+    });
+
+    // Capture user login
+    if (user) {
+      captureRealTimeData.userLogin(user);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      realTimeDataManager.destroy();
+    };
   }, []);
 
+  // Update last sync time when user logs in
+  useEffect(() => {
+    if (user) {
+      captureRealTimeData.userLogin(user);
+      setLastSyncTime(new Date().toLocaleTimeString());
+    }
+  }, [user]);
   const handleAttendanceUpdate = (records: any[]) => {
-    setAttendance(records);
-    saveAttendanceRecords(records);
+    realTimeDataManager.updateAttendance(records);
   };
 
   const handleSalesUpdate = (records: any[]) => {
-    setSales(records);
-    saveSalesRecords(records);
+    realTimeDataManager.updateSales(records);
   };
 
   const handleUserUpdate = (updatedUser: any) => {
-    const updatedUsers = users.map(u => u.id === updatedUser.id ? updatedUser : u);
-    setUsers(updatedUsers);
+    captureRealTimeData.profileUpdate(updatedUser.id, updatedUser);
     // Update current user in auth context if it's the same user
     if (user && user.id === updatedUser.id) {
       // Update the auth state with the new user data
@@ -55,7 +87,16 @@ function App() {
   const handleSettingsUpdate = (newSettings: any) => {
     // Handle settings update
     console.log('Settings updated:', newSettings);
+    // Log settings change
+    const settingsLog = JSON.parse(localStorage.getItem('crm_settings_log') || '[]');
+    settingsLog.push({
+      timestamp: new Date().toISOString(),
+      userId: user?.id,
+      settings: newSettings
+    });
+    localStorage.setItem('crm_settings_log', JSON.stringify(settingsLog));
   };
+
   if (!isAuthenticated || !user) {
     return <LoginForm onLogin={login} />;
   }
@@ -63,7 +104,16 @@ function App() {
   const renderContent = () => {
     switch (activeSection) {
       case 'dashboard':
-        return <Dashboard users={users} attendance={attendance} sales={sales} currentUser={user} />;
+        return (
+          <div>
+            <Dashboard users={users} attendance={attendance} sales={sales} currentUser={user} />
+            {lastSyncTime && (
+              <div className="fixed bottom-4 right-4 bg-green-500 text-white px-3 py-1 rounded-lg text-xs shadow-lg">
+                Last sync: {lastSyncTime}
+              </div>
+            )}
+          </div>
+        );
       case 'attendance':
         return (
           <AttendanceTracker
@@ -88,14 +138,11 @@ function App() {
             users={users}
             sales={sales}
             attendance={attendance}
-            onUsersUpdate={setUsers}
+            onUsersUpdate={(updatedUsers) => realTimeDataManager.updateUsers(updatedUsers)}
             onDataUpdate={(updatedUsers, updatedSales, updatedAttendance) => {
-              setUsers(updatedUsers);
-              setSales(updatedSales);
-              setAttendance(updatedAttendance);
-              // Save to storage
-              saveAttendanceRecords(updatedAttendance);
-              saveSalesRecords(updatedSales);
+              realTimeDataManager.updateUsers(updatedUsers);
+              realTimeDataManager.updateSales(updatedSales);
+              realTimeDataManager.updateAttendance(updatedAttendance);
             }}
           />
         );
@@ -116,7 +163,16 @@ function App() {
           />
         );
       default:
-        return <Dashboard users={users} attendance={attendance} sales={sales} currentUser={user} />;
+        return (
+          <div>
+            <Dashboard users={users} attendance={attendance} sales={sales} currentUser={user} />
+            {lastSyncTime && (
+              <div className="fixed bottom-4 right-4 bg-green-500 text-white px-3 py-1 rounded-lg text-xs shadow-lg">
+                Last sync: {lastSyncTime}
+              </div>
+            )}
+          </div>
+        );
     }
   };
 

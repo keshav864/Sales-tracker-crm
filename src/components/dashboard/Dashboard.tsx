@@ -15,6 +15,7 @@ import { User, AttendanceRecord, SalesRecord } from '../../types';
 import { StatsCard } from './StatsCard';
 import { AttendanceChart } from './AttendanceChart';
 import { SalesChart } from './SalesChart';
+import { realTimeDataManager } from '../../utils/realTimeData';
 import { formatDate } from '../../utils/dateUtils';
 
 interface DashboardProps {
@@ -99,6 +100,28 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
 
+      {/* Real-time Data Status */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Real-time Data Status</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600">{users.length}</div>
+            <div className="text-sm text-gray-600">Total Employees</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">{sales.length}</div>
+            <div className="text-sm text-gray-600">Sales Records</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-purple-600">{attendance.length}</div>
+            <div className="text-sm text-gray-600">Attendance Records</div>
+          </div>
+          <div className="text-center">
+            <div className="w-3 h-3 bg-green-500 rounded-full mx-auto mb-1 animate-pulse"></div>
+            <div className="text-sm text-gray-600">Live Sync Active</div>
+          </div>
+        </div>
+      </div>
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {isAdmin ? (

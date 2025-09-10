@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Download, FileText, Calendar, Users, TrendingUp, Filter } from 'lucide-react';
 import { User, AttendanceRecord, SalesRecord } from '../../types';
 import { exportToCSV } from '../../utils/storage';
+import { captureRealTimeData } from '../../utils/realTimeData';
 import { formatDate } from '../../utils/dateUtils';
 
 interface DataExportProps {
@@ -72,6 +73,10 @@ export const DataExport: React.FC<DataExportProps> = ({
       }
 
       exportToCSV(dataToExport, filename);
+      
+      // Capture export activity
+      captureRealTimeData.dataExport(exportType, dataToExport.length);
+      
       alert(`${dataToExport.length} records exported successfully!`);
     } catch (error) {
       alert('Error exporting data. Please try again.');
