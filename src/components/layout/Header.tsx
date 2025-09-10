@@ -130,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onMenuToggle, on
               >
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-semibold text-gray-900">{user.name}</p>
-                  <p className="text-xs text-gray-500 capitalize">{user.role} • {user.employeeId}</p>
+                  <p className="text-xs text-gray-500 capitalize">{user.role} • @{user.username}</p>
                 </div>
                 
                 <div className="relative">
@@ -154,7 +154,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onMenuToggle, on
                       />
                       <div>
                         <p className="font-semibold text-gray-900">{user.name}</p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
+                        <p className="text-sm text-gray-500">@{user.username}</p>
                         <p className="text-xs text-gray-400">{user.employeeId}</p>
                       </div>
                     </div>

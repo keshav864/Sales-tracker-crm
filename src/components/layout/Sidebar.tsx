@@ -40,7 +40,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       : []),
     { id: 'export', label: 'Export Data', icon: Download, color: 'text-cyan-500' },
     { id: 'calendar', label: 'Calendar', icon: Calendar, color: 'text-yellow-500' },
-    { id: 'settings', label: 'Settings', icon: Settings, color: 'text-gray-500' },
+    ...(user.role === 'admin'
+      ? [{ id: 'settings', label: 'System Settings', icon: Settings, color: 'text-gray-500' }]
+      : []),
   ];
 
   return (

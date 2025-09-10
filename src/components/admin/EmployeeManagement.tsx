@@ -23,7 +23,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
   const [newEmployee, setNewEmployee] = useState({
     employeeId: '',
     name: '',
-    email: '',
+    username: '',
     role: 'employee' as 'admin' | 'manager' | 'employee',
     department: 'Sales',
     password: '',
@@ -37,7 +37,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+                         user.username.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = filterRole === 'all' || user.role === filterRole;
     const matchesDepartment = filterDepartment === 'all' || user.department === filterDepartment;
     return matchesSearch && matchesRole && matchesDepartment;
@@ -69,7 +69,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
     setNewEmployee({
       employeeId: '',
       name: '',
-      email: '',
+      username: '',
       role: 'employee',
       department: 'Sales',
       password: '',
@@ -217,7 +217,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
                       <div>
                         <div className="text-sm font-medium text-gray-900">{user.name}</div>
                         <div className="text-sm text-gray-500">{user.employeeId}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
+                        <div className="text-sm text-gray-500">@{user.username}</div>
                       </div>
                     </div>
                   </td>
@@ -305,16 +305,17 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email *
+                    Username *
                   </label>
                   <input
-                    type="email"
-                    value={newEmployee.email}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
+                    type="text"
+                    value={newEmployee.username}
+                    onChange={(e) => setNewEmployee({ ...newEmployee, username: e.target.value.toLowerCase().replace(/\s+/g, '.') })}
                     className="input-field"
-                    placeholder="john@company.com"
+                    placeholder="john.doe"
                     required
                   />
+                  <p className="text-xs text-gray-500 mt-1">Username will be converted to lowercase with dots</p>
                 </div>
 
                 <div>
@@ -507,15 +508,17 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email *
+                    Username *
                   </label>
                   <input
-                    type="email"
-                    value={editingUser.email}
-                    onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
+                    type="text"
+                    value={editingUser.username}
+                    onChange={(e) => setEditingUser({ ...editingUser, username: e.target.value.toLowerCase().replace(/\s+/g, '.') })}
                     className="input-field"
+                    placeholder="john.doe"
                     required
                   />
+                  <p className="text-xs text-gray-500 mt-1">Username will be converted to lowercase with dots</p>
                 </div>
 
                 <div>

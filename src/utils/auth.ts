@@ -14,7 +14,10 @@ export const verifyPassword = (password: string, hashedPassword: string): boolea
 // Secure login with proper validation
 export const authenticateUser = (employeeId: string, password: string): User | null => {
   const users = getUsers();
-  const user = users.find(u => u.employeeId.toLowerCase() === employeeId.toLowerCase());
+  const user = users.find(u => 
+    u.employeeId.toLowerCase() === employeeId.toLowerCase() && 
+    u.isActive !== false
+  );
   
   if (!user) {
     return null;
@@ -32,6 +35,12 @@ export const authenticateUser = (employeeId: string, password: string): User | n
       const updatedUsers = users.map(u => u.id === user.id ? user : u);
       saveUsers(updatedUsers);
     }
+    
+    // Update last login
+    user.lastLogin = new Date().toISOString();
+    const updatedUsers = users.map(u => u.id === user.id ? user : u);
+    saveUsers(updatedUsers);
+    
     return user;
   }
 

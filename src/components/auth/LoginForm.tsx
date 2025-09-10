@@ -59,13 +59,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const getRoleCredentials = () => {
     switch (selectedRole) {
       case 'admin':
-        return { id: 'ADMIN001', password: 'admin@123', name: 'Manoj Kumar (Admin)' };
+        return { id: 'ADMIN001', password: 'admin@123', name: 'Manoj Kumar (Admin)', username: 'manoj.kumar' };
       case 'manager':
-        return { id: 'BM001', password: 'manager@123', name: 'Salim Javed (Manager)' };
+        return { id: 'BM001', password: 'manager@123', name: 'Salim Javed (Manager)', username: 'salim.javed' };
       case 'employee':
-        return { id: 'BM178', password: 'bm178@123', name: 'Manoj Kumar Singh (Employee)' };
+        return { id: 'BM178', password: 'bm178@123', name: 'Manoj Kumar Singh (Employee)', username: 'manoj.singh' };
       default:
-        return { id: '', password: '', name: '' };
+        return { id: '', password: '', name: '', username: '' };
     }
   };
 
@@ -304,6 +304,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                   </div>
                   <div className="text-xs text-gray-400 mt-1">
                     {credentials.name}
+                  </div>
+                  <div className="text-xs text-gray-300 mt-1">
+                    Username: {credentials.username}
                   </div>
                   <div className="text-xs font-mono text-gray-300">
                     {credentials.id} / {credentials.password}

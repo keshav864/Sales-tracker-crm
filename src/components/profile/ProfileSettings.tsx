@@ -17,7 +17,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 }) => {
   const [formData, setFormData] = useState({
     name: user.name,
-    email: user.email,
+    username: user.username,
     phone: user.phone || '',
     designation: user.designation || '',
     department: user.department,
@@ -100,7 +100,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
               </div>
               <div>
                 <h2 className="text-2xl font-bold">{formData.name}</h2>
-                <p className="text-blue-100">{user.employeeId} • {user.role}</p>
+                <p className="text-blue-100">@{formData.username} • {user.role}</p>
                 <p className="text-blue-200 text-sm">{formData.designation}</p>
               </div>
             </div>
@@ -160,16 +160,18 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    <Mail className="w-4 h-4 inline mr-2" />
-                    Email Address *
+                    <User className="w-4 h-4 inline mr-2" />
+                    Username *
                   </label>
                   <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/\s+/g, '.') })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    placeholder="john.doe"
                     required
                   />
+                  <p className="text-xs text-gray-500 mt-1">Username will be converted to lowercase with dots</p>
                 </div>
 
                 <div>

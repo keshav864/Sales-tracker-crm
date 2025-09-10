@@ -2,7 +2,7 @@ export interface User {
   id: string;
   employeeId: string;
   name: string;
-  email: string;
+  username: string;
   role: 'admin' | 'manager' | 'employee';
   department: string;
   profilePicture?: string;
@@ -13,6 +13,8 @@ export interface User {
   target?: number;
   manager?: string | null;
   territory?: string;
+  isActive?: boolean;
+  lastLogin?: string;
 }
 
 export interface Product {

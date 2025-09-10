@@ -10,6 +10,7 @@ import { SalesTracker } from './components/sales/SalesTracker';
 import { DataExport } from './components/export/DataExport';
 import { EmployeeList } from './components/attendance/EmployeeList';
 import { EmployeeManagement } from './components/admin/EmployeeManagement';
+import { SystemSettings } from './components/settings/SystemSettings';
 import {
   getUsers,
   getAttendanceRecords,
@@ -51,6 +52,10 @@ function App() {
     }
   };
 
+  const handleSettingsUpdate = (newSettings: any) => {
+    // Handle settings update
+    console.log('Settings updated:', newSettings);
+  };
   if (!isAuthenticated || !user) {
     return <LoginForm onLogin={login} />;
   }
@@ -91,6 +96,13 @@ function App() {
             attendance={attendance}
             sales={sales}
             currentUser={user}
+          />
+        );
+      case 'settings':
+        return (
+          <SystemSettings
+            currentUser={user}
+            onSettingsUpdate={handleSettingsUpdate}
           />
         );
       default:

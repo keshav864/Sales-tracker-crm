@@ -51,10 +51,12 @@ export const DataExport: React.FC<DataExportProps> = ({
           dataToExport = users.map(user => ({
             ID: user.id,
             Name: user.name,
-            Email: user.email,
+            Username: user.username,
             Role: user.role,
             Department: user.department,
             'Join Date': user.joinDate,
+            'Last Login': user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never',
+            Status: user.isActive !== false ? 'Active' : 'Inactive',
           }));
           filename = `users_report_${formatDate(new Date())}`;
           break;
@@ -98,7 +100,7 @@ export const DataExport: React.FC<DataExportProps> = ({
       return {
         Date: record.date,
         'Employee Name': user?.name || 'Unknown',
-        'Employee Email': user?.email || 'Unknown',
+        'Employee Username': user?.username || 'Unknown',
         Department: user?.department || 'Unknown',
         Status: record.status,
         'Check In': record.checkIn ? new Date(record.checkIn).toLocaleTimeString() : '',
@@ -129,7 +131,7 @@ export const DataExport: React.FC<DataExportProps> = ({
       return {
         Date: record.date,
         'Sales Person': user?.name || 'Unknown',
-        'Sales Person Email': user?.email || 'Unknown',
+        'Sales Person Username': user?.username || 'Unknown',
         'Product Name': record.productName,
         'Product Code': record.productCode || '',
         Category: record.category,
