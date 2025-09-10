@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { UserPlus, Edit, Trash2, Search, Users, Shield, User } from 'lucide-react';
+import { UserPlus, Edit, Trash2, Search, Users, Shield, User, AlertTriangle } from 'lucide-react';
 import { User as UserType } from '../../types';
 import { addNewEmployee, getUsers, saveUsers } from '../../utils/storage';
+import { SearchAndFilter } from '../common/SearchAndFilter';
+import { hashPassword } from '../../utils/auth';
 
 interface EmployeeManagementProps {
   users: UserType[];
@@ -16,6 +18,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'manager' | 'employee'>('all');
   const [editingUser, setEditingUser] = useState<UserType | null>(null);
+  const [filterDepartment, setFilterDepartment] = useState('all');
 
   const [newEmployee, setNewEmployee] = useState({
     employeeId: '',
@@ -36,8 +39,11 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
                          user.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = filterRole === 'all' || user.role === filterRole;
-    return matchesSearch && matchesRole;
+    const matchesDepartment = filterDepartment === 'all' || user.department === filterDepartment;
+    return matchesSearch && matchesRole && matchesDepartment;
   });
+
+  const departments = [...new Set(users.map(u => u.department))];
 
   const handleAddEmployee = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +58,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
       ...newEmployee,
       joinDate: new Date().toISOString().split('T')[0],
       profilePicture: `https://ui-avatars.com/api/?name=${encodeURIComponent(newEmployee.name)}&background=6366f1&color=fff`,
+      password: hashPassword(newEmployee.password), // Hash password before saving
     };
 
     const addedUser = addNewEmployee(userData);
@@ -96,7 +103,16 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
   };
 
   const handleDeleteEmployee = (userId: string) => {
-    if (window.confirm('Are you sure you want to delete this employee?')) {
+    const userToDelete = users.find(u => u.id === userId);
+    if (!userToDelete) return;
+
+    // Prevent deletion of admin users
+    if (userToDelete.role === 'admin') {
+      alert('Cannot delete admin users for security reasons.');
+      return;
+    }
+
+    if (window.confirm(`Are you sure you want to delete ${userToDelete.name}? This action cannot be undone.`)) {
       const updatedUsers = users.filter(u => u.id !== userId);
       saveUsers(updatedUsers);
       onUsersUpdate(updatedUsers);
@@ -134,28 +150,33 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 items-center">
-        <div className="relative">
-          <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search employees..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 input-field max-w-xs"
-          />
-        </div>
-        <select
-          value={filterRole}
-          onChange={(e) => setFilterRole(e.target.value as any)}
-          className="input-field max-w-xs"
-        >
-          <option value="all">All Roles</option>
-          <option value="admin">Admin</option>
-          <option value="manager">Manager</option>
-          <option value="employee">Employee</option>
-        </select>
-      </div>
+      <SearchAndFilter
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        placeholder="Search employees..."
+        filters={[
+          {
+            label: 'Role',
+            value: filterRole,
+            options: [
+              { value: 'all', label: 'All Roles' },
+              { value: 'admin', label: 'Admin' },
+              { value: 'manager', label: 'Manager' },
+              { value: 'employee', label: 'Employee' },
+            ],
+            onChange: (value) => setFilterRole(value as any),
+          },
+          {
+            label: 'Department',
+            value: filterDepartment,
+            options: [
+              { value: 'all', label: 'All Departments' },
+              ...departments.map(dept => ({ value: dept, label: dept })),
+            ],
+            onChange: setFilterDepartment,
+          },
+        ]}
+      />
 
       {/* Employee List */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
@@ -228,9 +249,15 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
                       <button
                         onClick={() => handleDeleteEmployee(user.id)}
                         className="text-red-600 hover:text-red-900 transition-colors duration-200"
+                        title="Delete Employee"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
+                    )}
+                    {user.role === 'admin' && (
+                      <div className="text-gray-400" title="Admin users cannot be deleted">
+                        <Shield className="w-4 h-4" />
+                      </div>
                     )}
                   </td>
                 </tr>
@@ -406,6 +433,21 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
                     required
                     minLength={6}
                   />
+                  <p className="text-xs text-gray-500 mt-1">Password will be securely encrypted</p>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <div className="flex items-start">
+                  <AlertTriangle className="w-5 h-5 text-blue-600 mr-2 mt-0.5" />
+                  <div className="text-sm text-blue-800">
+                    <p className="font-medium mb-1">Important Notes:</p>
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>Employee ID cannot be changed after creation</li>
+                      <li>Password will be securely encrypted</li>
+                      <li>Employee will be able to change their password after first login</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 
@@ -447,6 +489,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
                     className="input-field bg-gray-100"
                     disabled
                   />
+                  <p className="text-xs text-gray-500 mt-1">Employee ID cannot be changed</p>
                 </div>
 
                 <div>
@@ -572,6 +615,16 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
                       </option>
                     ))}
                   </select>
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                <div className="flex items-start">
+                  <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" />
+                  <div className="text-sm text-yellow-800">
+                    <p className="font-medium mb-1">Security Note:</p>
+                    <p>To change password, the employee should use the "Change Password" option in their profile settings.</p>
+                  </div>
                 </div>
               </div>
 

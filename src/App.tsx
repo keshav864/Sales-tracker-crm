@@ -46,9 +46,11 @@ function App() {
     setUsers(updatedUsers);
     // Update current user in auth context if it's the same user
     if (user && user.id === updatedUser.id) {
-      // The user state will be updated through the auth hook
+      // Update the auth state with the new user data
+      login(updatedUser.employeeId, 'dummy'); // This will refresh the session
     }
   };
+
   if (!isAuthenticated || !user) {
     return <LoginForm onLogin={login} />;
   }

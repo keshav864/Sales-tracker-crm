@@ -3,6 +3,7 @@ import { FileText, Upload, Calendar, DollarSign, User, Building, Phone, Mail, Ma
 import { SalesRecord, User as UserType, Product } from '../../types';
 import { formatDate } from '../../utils/dateUtils';
 import { getProducts } from '../../utils/storage';
+import { validateSalesRecord, sanitizeInput } from '../../utils/validation';
 
 interface SalesReportFormProps {
   currentUser: UserType;
@@ -47,6 +48,7 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
   const [currentStep, setCurrentStep] = useState(1);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [productSearch, setProductSearch] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const loadedProducts = getProducts();
@@ -83,39 +85,68 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setIsSubmitting(true);
 
     try {
+      // Sanitize inputs
+      const sanitizedData = {
+        ...formData,
+        productName: sanitizeInput(formData.productName),
+        customerName: sanitizeInput(formData.customerName),
+        customerEmail: sanitizeInput(formData.customerEmail),
+        customerPhone: sanitizeInput(formData.customerPhone),
+        customerCompany: sanitizeInput(formData.customerCompany),
+        customerAddress: sanitizeInput(formData.customerAddress),
+        notes: sanitizeInput(formData.notes),
+      };
+
+      // Validate the sales record
+      const validation = validateSalesRecord({
+        productName: sanitizedData.productName,
+        customer: sanitizedData.customerName,
+        quantity: sanitizedData.quantity,
+        unitPrice: sanitizedData.unitPrice,
+        customerEmail: sanitizedData.customerEmail,
+        customerPhone: sanitizedData.customerPhone,
+      });
+
+      if (!validation.isValid) {
+        setError(validation.errors.join(', '));
+        setIsSubmitting(false);
+        return;
+      }
+
       const totalAmount = (formData.quantity * formData.unitPrice) - formData.discount;
       const commission = totalAmount * 0.05; // 5% commission
       
       const newSale: SalesRecord = {
         id: Date.now().toString(),
         userId: currentUser.id,
-        date: formData.saleDate,
-        productId: formData.productId,
-        productName: formData.productName,
-        quantity: formData.quantity,
-        unitPrice: formData.unitPrice,
+        date: sanitizedData.saleDate,
+        productId: sanitizedData.productId,
+        productName: sanitizedData.productName,
+        quantity: sanitizedData.quantity,
+        unitPrice: sanitizedData.unitPrice,
         totalAmount,
-        customer: formData.customerName,
-        category: formData.category,
+        customer: sanitizedData.customerName,
+        category: sanitizedData.category,
         // Extended properties for CRM
-        customerEmail: formData.customerEmail,
-        customerPhone: formData.customerPhone,
-        customerCompany: formData.customerCompany,
-        customerAddress: formData.customerAddress,
-        productCode: formData.productCode,
-        discount: formData.discount,
-        paymentMethod: formData.paymentMethod,
-        paymentStatus: formData.paymentStatus as any,
-        notes: formData.notes,
-        leadSource: formData.leadSource,
-        followUpRequired: formData.followUpRequired,
-        followUpDate: formData.followUpDate,
-        priority: formData.priority as any,
-        dealStage: formData.dealStage as any,
-        territory: formData.territory,
+        customerEmail: sanitizedData.customerEmail,
+        customerPhone: sanitizedData.customerPhone,
+        customerCompany: sanitizedData.customerCompany,
+        customerAddress: sanitizedData.customerAddress,
+        productCode: sanitizedData.productCode,
+        discount: sanitizedData.discount,
+        paymentMethod: sanitizedData.paymentMethod,
+        paymentStatus: sanitizedData.paymentStatus as any,
+        notes: sanitizedData.notes,
+        leadSource: sanitizedData.leadSource,
+        followUpRequired: sanitizedData.followUpRequired,
+        followUpDate: sanitizedData.followUpDate,
+        priority: sanitizedData.priority as any,
+        dealStage: sanitizedData.dealStage as any,
+        territory: sanitizedData.territory,
         commission,
         submittedAt: new Date().toISOString(),
       };
@@ -367,6 +398,7 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
                     className="input-field pl-10"
                     placeholder="Full name"
                     required
+                    maxLength={100}
                   />
                 </div>
               </div>
@@ -383,6 +415,7 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
                     onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
                     className="input-field pl-10"
                     placeholder="customer@email.com"
+                    maxLength={100}
                   />
                 </div>
               </div>
@@ -399,6 +432,7 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
                     onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
                     className="input-field pl-10"
                     placeholder="+91 9876543210"
+                   maxLength={20}
                   />
                 </div>
               </div>
@@ -415,6 +449,7 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
                     onChange={(e) => setFormData({ ...formData, customerCompany: e.target.value })}
                     className="input-field pl-10"
                     placeholder="Company name"
+                   maxLength={100}
                   />
                 </div>
               </div>
@@ -431,6 +466,7 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
                     className="input-field pl-10"
                     rows={3}
                     placeholder="Customer address"
+                   maxLength={500}
                   />
                 </div>
               </div>
@@ -549,6 +585,7 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
                   onChange={(e) => setFormData({ ...formData, territory: e.target.value })}
                   className="input-field"
                   placeholder="Sales territory"
+                 maxLength={1000}
                 />
               </div>
             </div>
@@ -582,6 +619,12 @@ export const SalesReportForm: React.FC<SalesReportFormProps> = ({ currentUser, o
               )}
             </div>
 
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
             <div className="mt-6">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Notes & Comments
