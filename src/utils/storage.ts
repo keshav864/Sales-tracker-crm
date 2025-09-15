@@ -177,7 +177,7 @@ const getDefaultUsers = (): User[] => [
     joinDate: '2024-01-01',
     password: 'admin@123',
     profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9876543210',
+    phone: '+91 9876543210', 
     designation: 'Sales Director',
     target: 500000,
     manager: null,

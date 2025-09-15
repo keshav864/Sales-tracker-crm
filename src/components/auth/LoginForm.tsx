@@ -23,6 +23,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setIsLoading(true);
 
     try {
+      console.log('Login attempt:', { employeeId, password });
+      
       const success = onLogin(employeeId, password);
       if (!success) {
         setError('Invalid Employee ID or Password');

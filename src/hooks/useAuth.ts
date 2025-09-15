@@ -20,7 +20,10 @@ export const useAuth = () => {
   }, []);
 
   const login = (employeeId: string, password: string): boolean => {
+    console.log('useAuth login called with:', { employeeId, password });
+    
     const user = authenticateUser(employeeId, password);
+    console.log('Authentication result:', user ? 'Success' : 'Failed');
     
     if (user) {
       setCurrentUser(user);
