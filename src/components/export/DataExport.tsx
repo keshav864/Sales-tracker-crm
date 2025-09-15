@@ -49,16 +49,7 @@ export const DataExport: React.FC<DataExportProps> = ({
             alert('You do not have permission to export user data.');
             return;
           }
-          dataToExport = users.map(user => ({
-            ID: user.id,
-            Name: user.name,
-            Username: user.username,
-            Role: user.role,
-            Department: user.department,
-            'Join Date': user.joinDate,
-            'Last Login': user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never',
-            Status: user.isActive !== false ? 'Active' : 'Inactive',
-          }));
+          dataToExport = getFilteredUsers();
           filename = `users_report_${formatDate(new Date())}`;
           break;
         case 'comprehensive':
@@ -83,6 +74,31 @@ export const DataExport: React.FC<DataExportProps> = ({
     } finally {
       setIsExporting(false);
     }
+  };
+
+  const getFilteredUsers = () => {
+    let filtered = users;
+    
+    if (selectedUser !== 'all') {
+      filtered = filtered.filter(user => user.id === selectedUser);
+    }
+    
+    return filtered.map(user => ({
+      ID: user.id,
+      'Employee ID': user.employeeId,
+      Name: user.name,
+      Username: user.username,
+      Role: user.role,
+      Department: user.department,
+      Designation: user.designation || '',
+      Phone: user.phone || '',
+      Territory: user.territory || '',
+      Target: user.target || 0,
+      Manager: user.manager || '',
+      'Join Date': user.joinDate,
+      'Last Login': user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never',
+      Status: user.isActive !== false ? 'Active' : 'Inactive',
+    }));
   };
 
   const getFilteredAttendance = () => {

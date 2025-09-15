@@ -36,16 +36,17 @@ function App() {
     // Set up real-time data listeners
     realTimeDataManager.addListener('users', (updatedUsers: any[]) => {
       setUsers(updatedUsers);
-      setLastSyncTime(new Date().toLocaleTimeString());
     });
     
     realTimeDataManager.addListener('sales', (updatedSales: any[]) => {
       setSales(updatedSales);
-      setLastSyncTime(new Date().toLocaleTimeString());
     });
     
     realTimeDataManager.addListener('attendance', (updatedAttendance: any[]) => {
       setAttendance(updatedAttendance);
+    });
+    
+    realTimeDataManager.addListener('syncTime', (syncTime: string) => {
       setLastSyncTime(new Date().toLocaleTimeString());
     });
 

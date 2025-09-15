@@ -61,9 +61,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       case 'admin':
         return { id: 'ADMIN001', password: 'admin@123', name: 'Manoj Kumar (Admin)', username: 'manoj.kumar' };
       case 'manager':
-        return { id: 'BM001', password: 'manager@123', name: 'Salim Javed (Manager)', username: 'salim.javed' };
+        return { id: 'BM001', password: 'salim@2024', name: 'Salim Javed (Manager)', username: 'salim.javed' };
       case 'employee':
-        return { id: 'BM178', password: 'bm178@123', name: 'Manoj Kumar Singh (Employee)', username: 'manoj.singh' };
+        return { id: 'BM178', password: 'manoj@178', name: 'Manoj Kumar Singh (Employee)', username: 'manoj.singh' };
       default:
         return { id: '', password: '', name: '', username: '' };
     }
