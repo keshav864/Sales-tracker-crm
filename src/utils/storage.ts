@@ -121,12 +121,12 @@ export const saveSalesTargets = (targets: SalesTarget[]): void => {
 // Default Products from the image
 const getDefaultProducts = (): Product[] => [
   // Projector Products (from screenshot)
-  { id: 'PROJ_GALAXY', name: 'Galaxy Projector', price: 11513, category: 'Projectors', model: 'Galaxy' },
-  { id: 'PROJ_PLAY', name: 'Play Projector', price: 10073, category: 'Projectors', model: 'Play' },
-  { id: 'PROJ_EPIC', name: 'Epic Projector', price: 6473, category: 'Projectors', model: 'Epic' },
-  { id: 'PROJ_JOY', name: 'Joy Projector', price: 5039, category: 'Projectors', model: 'Joy' },
-  { id: 'PROJ_PIXA', name: 'Pixa Projector', price: 7199, category: 'Projectors', model: 'Pixa' },
-  { id: 'PROJ_SCREEN_M65', name: 'Screen M65 Projector', price: 11513, category: 'Projectors', model: 'M65' },
+  { id: 'PROJ_GALAXY', name: 'Galaxy Projector', price: 11513, category: 'Projector', model: 'Galaxy' },
+  { id: 'PROJ_PLAY', name: 'Play Projector', price: 10073, category: 'Projector', model: 'Play' },
+  { id: 'PROJ_EPIC', name: 'Epic Projector', price: 6473, category: 'Projector', model: 'Epic' },
+  { id: 'PROJ_JOY', name: 'Joy Projector', price: 5039, category: 'Projector', model: 'Joy' },
+  { id: 'PROJ_PIXA', name: 'Pixa Projector', price: 7199, category: 'Projector', model: 'Pixa' },
+  { id: 'PROJ_SCREEN_M65', name: 'Screen M65 Projector', price: 11513, category: 'Projector', model: 'M65' },
   
   // Mobile Products (existing)
   { id: 'GALAXY', name: 'Galaxy', price: 11513, category: 'Mobile', model: 'Galaxy' },
