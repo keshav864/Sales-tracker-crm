@@ -120,21 +120,36 @@ export const saveSalesTargets = (targets: SalesTarget[]): void => {
 
 // Default Products from the image
 const getDefaultProducts = (): Product[] => [
+  // Projector Products (from screenshot)
+  { id: 'PROJ_GALAXY', name: 'Galaxy Projector', price: 11513, category: 'Projector', model: 'Galaxy' },
+  { id: 'PROJ_PLAY', name: 'Play Projector', price: 10073, category: 'Projector', model: 'Play' },
+  { id: 'PROJ_EPIC', name: 'Epic Projector', price: 6473, category: 'Projector', model: 'Epic' },
+  { id: 'PROJ_JOY', name: 'Joy Projector', price: 5039, category: 'Projector', model: 'Joy' },
+  { id: 'PROJ_PIXA', name: 'Pixa Projector', price: 7199, category: 'Projector', model: 'Pixa' },
+  { id: 'PROJ_SCREEN_M65', name: 'Screen M65 Projector', price: 11513, category: 'Projector', model: 'M65' },
+  
+  // Mobile Products (existing)
   { id: 'GALAXY', name: 'Galaxy', price: 11513, category: 'Mobile', model: 'Galaxy' },
   { id: 'PLAY', name: 'Play', price: 10073, category: 'Mobile', model: 'Play' },
   { id: 'EPIC', name: 'Epic', price: 6473, category: 'Mobile', model: 'Epic' },
   { id: 'JOY', name: 'Joy', price: 5039, category: 'Mobile', model: 'Joy' },
   { id: 'PIXA', name: 'Pixa', price: 7199, category: 'Mobile', model: 'Pixa' },
+  
+  // Screen Products
   { id: 'SCREEN_M65', name: 'Screen M65', price: 11513, category: 'Screen', model: 'M65' },
   { id: 'SCREEN_M80', name: 'Screen M80', price: 12951, category: 'Screen', model: 'M80' },
   { id: 'SCREEN_M100', name: 'Screen M100', price: 14393, category: 'Screen', model: 'M100' },
   { id: 'SCREEN_FR140', name: 'Screen FR140', price: 40111, category: 'Screen', model: 'FR140' },
   { id: 'SCREEN_FR160', name: 'Screen FR160', price: 50291, category: 'Screen', model: 'FR160' },
+  
+  // Extension Board Products
   { id: 'EXT_BOARD_331', name: 'Extension Board 331', price: 791, category: 'Extension', model: '331' },
   { id: 'EXT_BOARD_411', name: 'Extension Board 411', price: 719, category: 'Extension', model: '411' },
   { id: 'EXT_BOARD_422', name: 'Extension Board 422', price: 863, category: 'Extension', model: '422' },
   { id: 'EXT_BOARD_524', name: 'Extension Board 524', price: 1079, category: 'Extension', model: '524' },
   { id: 'EXT_BOARD_522', name: 'Extension Board 522', price: 935, category: 'Extension', model: '522' },
+  
+  // SMPS Products
   { id: 'SMPS_450', name: 'SMPS 450', price: 633, category: 'SMPS', model: '450' },
   { id: 'SMPS_500', name: 'SMPS 500', price: 950, category: 'SMPS', model: '500' },
   { id: 'SMPS_550', name: 'SMPS 550', price: 1108, category: 'SMPS', model: '550' },
@@ -144,6 +159,8 @@ const getDefaultProducts = (): Product[] => [
   { id: 'SMPS_800', name: 'SMPS 800', price: 1900, category: 'SMPS', model: '800' },
   { id: 'SMPS_850', name: 'SMPS 850', price: 1900, category: 'SMPS', model: '850' },
   { id: 'SMPS_1000', name: 'SMPS 1000', price: 2374, category: 'SMPS', model: '1000' },
+  
+  // AI Products
   { id: 'AI_MODEL', name: 'AI Model', price: 2771, category: 'AI', model: 'Standard' },
 ];
 
@@ -178,7 +195,7 @@ const getDefaultUsers = (): User[] => [
     role: 'manager',
     department: 'Sales',
     joinDate: '2024-01-15',
-    password: 'manager@123',
+    password: 'salim@2024',
     profilePicture: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150',
     phone: '+91 7870660333',
     designation: 'District General Manager',
@@ -196,7 +213,7 @@ const getDefaultUsers = (): User[] => [
     role: 'manager',
     department: 'Sales',
     joinDate: '2024-01-20',
-    password: 'manager@123',
+    password: 'sandeep@2024',
     profilePicture: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
     phone: '+91 9876543214',
     designation: 'Regional Manager',
@@ -214,7 +231,7 @@ const getDefaultUsers = (): User[] => [
     role: 'manager',
     department: 'Sales',
     joinDate: '2024-02-01',
-    password: 'manager@123',
+    password: 'pawan@2024',
     profilePicture: 'https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150',
     phone: '+91 9174995813',
     designation: 'Sales Manager',
@@ -234,7 +251,7 @@ const getDefaultUsers = (): User[] => [
     role: 'employee',
     department: 'Sales',
     joinDate: '2024-01-15',
-    password: 'bm178@123',
+    password: 'manoj@178',
     profilePicture: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150',
     phone: '+91 9507732111',
     designation: 'Area Sales Manager',

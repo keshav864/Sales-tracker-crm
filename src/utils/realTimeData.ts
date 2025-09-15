@@ -14,6 +14,7 @@ export class RealTimeDataManager {
   private static instance: RealTimeDataManager;
   private listeners: Map<string, Function[]> = new Map();
   private syncInterval: NodeJS.Timeout | null = null;
+  private lastSyncTime: string = '';
 
   private constructor() {
     this.startRealTimeSync();
@@ -28,10 +29,10 @@ export class RealTimeDataManager {
 
   // Start real-time synchronization
   private startRealTimeSync() {
-    // Sync data every 30 seconds
+    // Sync data every 10 seconds for real-time updates
     this.syncInterval = setInterval(() => {
       this.syncData();
-    }, 30000);
+    }, 10000);
 
     // Also sync on visibility change (when user returns to tab)
     document.addEventListener('visibilitychange', () => {
@@ -46,6 +47,9 @@ export class RealTimeDataManager {
         this.syncData();
       }
     });
+
+    // Initial sync
+    this.syncData();
   }
 
   // Add listener for data changes
@@ -71,7 +75,13 @@ export class RealTimeDataManager {
   private notifyListeners(dataType: string, data: any) {
     const callbacks = this.listeners.get(dataType);
     if (callbacks) {
-      callbacks.forEach(callback => callback(data));
+      callbacks.forEach(callback => {
+        try {
+          callback(data);
+        } catch (error) {
+          console.error('Error in real-time listener:', error);
+        }
+      });
     }
   }
 
@@ -82,16 +92,22 @@ export class RealTimeDataManager {
       const sales = getSalesRecords();
       const attendance = getAttendanceRecords();
 
+      this.lastSyncTime = new Date().toLocaleTimeString();
+      
       this.notifyListeners('users', users);
       this.notifyListeners('sales', sales);
       this.notifyListeners('attendance', attendance);
+      this.notifyListeners('syncTime', this.lastSyncTime);
+
+      // Log sync activity
+      this.logDataChange('sync', users.length + sales.length + attendance.length);
     } catch (error) {
       console.error('Error syncing data:', error);
     }
   }
 
   // Force sync data immediately
-  public forcSync() {
+  public forceSync() {
     this.syncData();
   }
 
@@ -100,6 +116,7 @@ export class RealTimeDataManager {
     saveUsers(users);
     this.notifyListeners('users', users);
     this.logDataChange('users', users.length);
+    this.forceSync();
   }
 
   // Update sales data with real-time sync
@@ -107,6 +124,7 @@ export class RealTimeDataManager {
     saveSalesRecords(sales);
     this.notifyListeners('sales', sales);
     this.logDataChange('sales', sales.length);
+    this.forceSync();
   }
 
   // Update attendance data with real-time sync
@@ -114,9 +132,10 @@ export class RealTimeDataManager {
     saveAttendanceRecords(attendance);
     this.notifyListeners('attendance', attendance);
     this.logDataChange('attendance', attendance.length);
+    this.forceSync();
   }
 
-  // Log data changes for debugging
+  // Log data changes for debugging and audit
   private logDataChange(dataType: string, count: number) {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] Real-time sync: ${dataType} updated (${count} records)`);
@@ -127,7 +146,8 @@ export class RealTimeDataManager {
       timestamp,
       dataType,
       count,
-      action: 'update'
+      action: 'update',
+      userId: JSON.parse(localStorage.getItem('crm_current_user') || '{}').id || 'system'
     });
     
     // Keep only last 100 log entries
@@ -150,13 +170,18 @@ export class RealTimeDataManager {
     return {
       totalSyncs: syncLog.length,
       last24Hours: last24Hours.length,
-      lastSync: syncLog.length > 0 ? syncLog[syncLog.length - 1].timestamp : null,
+      lastSync: this.lastSyncTime || (syncLog.length > 0 ? syncLog[syncLog.length - 1].timestamp : null),
       dataTypes: {
         users: syncLog.filter((log: any) => log.dataType === 'users').length,
         sales: syncLog.filter((log: any) => log.dataType === 'sales').length,
         attendance: syncLog.filter((log: any) => log.dataType === 'attendance').length,
       }
     };
+  }
+
+  // Get last sync time
+  public getLastSyncTime(): string {
+    return this.lastSyncTime;
   }
 
   // Clean up
@@ -182,6 +207,16 @@ export const captureRealTimeData = {
         : u
     );
     realTimeDataManager.updateUsers(updatedUsers);
+    
+    // Log login activity
+    const loginLog = JSON.parse(localStorage.getItem('crm_login_log') || '[]');
+    loginLog.push({
+      timestamp: new Date().toISOString(),
+      userId: user.id,
+      username: user.username,
+      action: 'login'
+    });
+    localStorage.setItem('crm_login_log', JSON.stringify(loginLog));
   },
 
   // Capture sales entry
@@ -189,6 +224,17 @@ export const captureRealTimeData = {
     const sales = getSalesRecords();
     const updatedSales = [...sales, { ...sale, submittedAt: new Date().toISOString() }];
     realTimeDataManager.updateSales(updatedSales);
+    
+    // Log sales activity
+    const salesLog = JSON.parse(localStorage.getItem('crm_sales_log') || '[]');
+    salesLog.push({
+      timestamp: new Date().toISOString(),
+      userId: sale.userId,
+      saleId: sale.id,
+      amount: sale.totalAmount,
+      action: 'create'
+    });
+    localStorage.setItem('crm_sales_log', JSON.stringify(salesLog));
   },
 
   // Capture attendance
@@ -196,6 +242,17 @@ export const captureRealTimeData = {
     const attendanceRecords = getAttendanceRecords();
     const updatedAttendance = [...attendanceRecords, attendance];
     realTimeDataManager.updateAttendance(updatedAttendance);
+    
+    // Log attendance activity
+    const attendanceLog = JSON.parse(localStorage.getItem('crm_attendance_log') || '[]');
+    attendanceLog.push({
+      timestamp: new Date().toISOString(),
+      userId: attendance.userId,
+      date: attendance.date,
+      status: attendance.status,
+      action: 'checkin'
+    });
+    localStorage.setItem('crm_attendance_log', JSON.stringify(attendanceLog));
   },
 
   // Capture user profile update
@@ -207,6 +264,16 @@ export const captureRealTimeData = {
         : u
     );
     realTimeDataManager.updateUsers(updatedUsers);
+    
+    // Log profile update
+    const profileLog = JSON.parse(localStorage.getItem('crm_profile_log') || '[]');
+    profileLog.push({
+      timestamp: new Date().toISOString(),
+      userId,
+      updates: Object.keys(updates),
+      action: 'profile_update'
+    });
+    localStorage.setItem('crm_profile_log', JSON.stringify(profileLog));
   },
 
   // Capture data export

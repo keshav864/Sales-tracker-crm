@@ -121,6 +121,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <div className="text-sm text-gray-600">Live Sync Active</div>
           </div>
         </div>
+        {lastSyncTime && (
+          <div className="mt-4 text-center">
+            <div className="text-xs text-gray-500">
+              Last sync: {lastSyncTime}
+            </div>
+          </div>
+        )}
       </div>
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
