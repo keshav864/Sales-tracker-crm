@@ -4,11 +4,15 @@ import { getUsers, saveUsers, getCurrentUser, setCurrentUser } from './storage';
 // Password hashing utility (simple implementation for demo)
 export const hashPassword = (password: string): string => {
   // In production, use bcrypt or similar
-  return btoa(password + 'salt_key_2024');
+  return 'btoa_' + btoa(password + 'salt_key_2024');
 };
 
 export const verifyPassword = (password: string, hashedPassword: string): boolean => {
-  return hashPassword(password) === hashedPassword;
+  if (hashedPassword.startsWith('btoa_')) {
+    return hashPassword(password) === hashedPassword;
+  }
+  // Fallback for old format
+  return btoa(password + 'salt_key_2024') === hashedPassword.replace('btoa_', '');
 };
 
 // Secure login with proper validation
@@ -24,13 +28,13 @@ export const authenticateUser = (employeeId: string, password: string): User | n
   }
 
   // Check if password is already hashed (for existing users)
-  const isValidPassword = user.password.startsWith('btoa') 
+  const isValidPassword = user.password.startsWith('btoa_') 
     ? verifyPassword(password, user.password)
     : user.password === password; // Backward compatibility
 
   if (isValidPassword) {
     // Hash password if not already hashed
-    if (!user.password.startsWith('btoa')) {
+    if (!user.password.startsWith('btoa_') && user.password === password) {
       user.password = hashPassword(password);
       const updatedUsers = users.map(u => u.id === user.id ? user : u);
       saveUsers(updatedUsers);
@@ -57,7 +61,7 @@ export const changePassword = (userId: string, currentPassword: string, newPassw
   const user = users[userIndex];
   
   // Verify current password
-  const isCurrentPasswordValid = user.password.startsWith('btoa')
+  const isCurrentPasswordValid = user.password.startsWith('btoa_')
     ? verifyPassword(currentPassword, user.password)
     : user.password === currentPassword;
     

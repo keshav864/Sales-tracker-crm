@@ -66,7 +66,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
       ...newEmployee,
       joinDate: new Date().toISOString().split('T')[0],
       profilePicture: `https://ui-avatars.com/api/?name=${encodeURIComponent(newEmployee.name)}&background=6366f1&color=fff`,
-      password: hashPassword(newEmployee.password), // Hash password before saving
+      password: newEmployee.password, // Keep plain text for initial login, will be hashed on first login
     };
 
     const addedUser = addNewEmployee(userData);
