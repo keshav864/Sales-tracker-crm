@@ -23,6 +23,7 @@ interface DashboardProps {
   attendance: AttendanceRecord[];
   sales: SalesRecord[];
   currentUser: User;
+  lastSyncTime: string;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -30,6 +31,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   attendance,
   sales,
   currentUser,
+  lastSyncTime,
 }) => {
   const stats = useMemo(() => {
     const today = formatDate(new Date());
