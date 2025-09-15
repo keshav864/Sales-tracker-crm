@@ -129,11 +129,11 @@ const getDefaultProducts = (): Product[] => [
   { id: 'PROJ_SCREEN_M65', name: 'Screen M65 Projector', price: 11513, category: 'Projectors', model: 'M65' },
   
   // Mobile Products (existing)
-  { id: 'GALAXY', name: 'Galaxy', price: 11513, category: 'Mobile', model: 'Galaxy' },
-  { id: 'PLAY', name: 'Play', price: 10073, category: 'Mobile', model: 'Play' },
-  { id: 'EPIC', name: 'Epic', price: 6473, category: 'Mobile', model: 'Epic' },
-  { id: 'JOY', name: 'Joy', price: 5039, category: 'Mobile', model: 'Joy' },
-  { id: 'PIXA', name: 'Pixa', price: 7199, category: 'Mobile', model: 'Pixa' },
+  { id: 'GALAXY', name: 'Galaxy', price: 11513, category: 'Projectors', model: 'Galaxy' },
+  { id: 'PLAY', name: 'Play', price: 10073, category: 'Projectors', model: 'Play' },
+  { id: 'EPIC', name: 'Epic', price: 6473, category: 'Projectors', model: 'Epic' },
+  { id: 'JOY', name: 'Joy', price: 5039, category: 'Projectors', model: 'Joy' },
+  { id: 'PIXA', name: 'Pixa', price: 7199, category: 'Projectors', model: 'Pixa' },
   
   // Screen Products
   { id: 'SCREEN_M65', name: 'Screen M65', price: 11513, category: 'Screen', model: 'M65' },
@@ -161,7 +161,7 @@ const getDefaultProducts = (): Product[] => [
   { id: 'SMPS_1000', name: 'SMPS 1000', price: 2374, category: 'SMPS', model: '1000' },
   
   // AI Products
-  { id: 'AI_MODEL', name: 'AI Model', price: 2771, category: 'AI', model: 'Standard' },
+  { id: 'AI_MOUSE', name: 'AI Mouse', price: 2771, category: 'AI Mouse', model: 'Standard' },
 ];
 
 // Complete 30 employees list as provided
@@ -176,7 +176,7 @@ const getDefaultUsers = (): User[] => [
     department: 'Management',
     joinDate: '2024-01-01',
     password: 'admin@123',
-    profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
+    profilePicture: 'https://cdn.shopify.com/s/files/1/0752/8084/3005/files/Manoj_Sir_web_Image.webp?v=1748955358auto=compress&cs=tinysrgb&w=150',
     phone: '+91 9876543210',
     designation: 'Sales Director',
     target: 500000,
@@ -244,22 +244,22 @@ const getDefaultUsers = (): User[] => [
 
   // All 32 Employees (35 total including admin and 3 managers)
   {
-    id: 'BM178',
-    employeeId: 'BM178',
-    name: 'Manoj Kumar Singh',
-    username: 'manoj.singh',
+    id: 'BM214',
+    employeeId: 'BM214',
+    name: 'Pramod Nair',
+    username: 'pramod.nair',
     role: 'employee',
     department: 'Sales',
-    joinDate: '2024-01-15',
-    password: 'manoj@178',
-    profilePicture: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9507732111',
-    designation: 'Area Sales Manager',
-    target: 150000,
+    joinDate: '2024-02-15',
+    password: 'bm214@123',
+    profilePicture: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9153900969',
+    designation: 'Territory Sales Manager',
+    target: 120000,
     manager: 'BM001',
-    territory: 'Bihar',
+    territory: 'Indraprastha',
     isActive: true,
-    lastLogin: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
+    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
   },
   {
     id: 'BM200',
@@ -280,22 +280,22 @@ const getDefaultUsers = (): User[] => [
     lastLogin: new Date(Date.now() - 45 * 60 * 1000).toISOString(), // 45 minutes ago
   },
   {
-    id: 'BM214',
-    employeeId: 'BM214',
-    name: 'Pramod Nair',
-    username: 'pramod.nair',
+    id: 'BM178',
+    employeeId: 'BM178',
+    name: 'Manoj Kumar Singh',
+    username: 'manoj.singh',
     role: 'employee',
     department: 'Sales',
-    joinDate: '2024-02-15',
-    password: 'bm214@123',
-    profilePicture: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9153900969',
-    designation: 'Territory Sales Manager',
-    target: 120000,
+    joinDate: '2024-01-15',
+    password: 'manoj@178',
+    profilePicture: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9507732111',
+    designation: 'Area Sales Manager',
+    target: 150000,
     manager: 'BM001',
-    territory: 'Indraprastha',
+    territory: 'Bihar',
     isActive: true,
-    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+    lastLogin: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
   },
   {
     id: 'BM212',
