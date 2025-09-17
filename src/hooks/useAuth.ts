@@ -20,11 +20,11 @@ export const useAuth = () => {
   }, []);
 
   const login = (employeeId: string, password: string): boolean => {
-    console.log('useAuth login called with:', employeeId);
+    console.log('🎯 useAuth login called with:', employeeId, password);
     const user = authenticateUser(employeeId, password);
     
     if (user) {
-      console.log('Setting authenticated user:', user.name);
+      console.log('🎯 Setting authenticated user:', user.name);
       setCurrentUser(user);
       setAuthState({
         user,
@@ -32,7 +32,7 @@ export const useAuth = () => {
       });
       return true;
     }
-    console.log('Authentication failed in useAuth');
+    console.log('🎯 Authentication failed in useAuth');
     return false;
   };
 

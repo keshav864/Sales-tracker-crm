@@ -1,6 +1,47 @@
 import { User } from '../types';
 import { getUsers, saveUsers, getCurrentUser, setCurrentUser } from './storage';
 
+// Simple authentication without complex hashing for demo
+export const authenticateUser = (employeeId: string, password: string): User | null => {
+  const users = getUsers();
+  console.log('🔍 Authenticating user:', employeeId);
+  console.log('🔍 Available users:', users.map(u => ({ 
+    employeeId: u.employeeId, 
+    name: u.name, 
+    password: u.password,
+    role: u.role 
+  })));
+  
+  // Find user by employee ID (case insensitive)
+  const user = users.find(u => 
+    u.employeeId.toLowerCase() === employeeId.toLowerCase() && 
+    u.isActive !== false
+  );
+  
+  if (!user) {
+    console.log('❌ User not found for employeeId:', employeeId);
+    return null;
+  }
+
+  console.log('✅ Found user:', user.name);
+  console.log('🔑 Checking password:', password, 'against stored:', user.password);
+  
+  // Direct password comparison
+  if (user.password === password) {
+    console.log('✅ Password match - Authentication successful');
+    
+    // Update last login
+    user.lastLogin = new Date().toISOString();
+    const updatedUsers = users.map(u => u.id === user.id ? user : u);
+    saveUsers(updatedUsers);
+    
+    return user;
+  }
+
+  console.log('❌ Password mismatch - Authentication failed');
+  return null;
+};
+
 // Password hashing utility (simple implementation for demo)
 export const hashPassword = (password: string): string => {
   // In production, use bcrypt or similar
@@ -9,43 +50,6 @@ export const hashPassword = (password: string): string => {
 
 export const verifyPassword = (password: string, hashedPassword: string): boolean => {
   return hashPassword(password) === hashedPassword;
-};
-
-// Secure login with proper validation
-export const authenticateUser = (employeeId: string, password: string): User | null => {
-  const users = getUsers();
-  console.log('Authenticating user:', employeeId);
-  console.log('Available users:', users.map(u => ({ id: u.employeeId, hasPassword: !!u.password })));
-  
-  const user = users.find(u => 
-    u.employeeId.toLowerCase() === employeeId.toLowerCase() && 
-    u.isActive !== false
-  );
-  
-  if (!user) {
-    console.log('User not found for employeeId:', employeeId);
-    return null;
-  }
-
-  console.log('Found user:', user.name, 'Password check:', user.password);
-  
-  // Check if password is already hashed (for existing users)
-  const isValidPassword = user.password === password; // Direct comparison for demo
-
-  console.log('Password validation result:', isValidPassword);
-  
-  if (isValidPassword) {
-    // Update last login
-    user.lastLogin = new Date().toISOString();
-    const updatedUsers = users.map(u => u.id === user.id ? user : u);
-    saveUsers(updatedUsers);
-    
-    console.log('Authentication successful for:', user.name);
-    return user;
-  }
-
-  console.log('Authentication failed - password mismatch');
-  return null;
 };
 
 // Change password functionality
@@ -57,15 +61,11 @@ export const changePassword = (userId: string, currentPassword: string, newPassw
   
   const user = users[userIndex];
   
-  // Verify current password
-  const isCurrentPasswordValid = user.password.startsWith('btoa')
-    ? verifyPassword(currentPassword, user.password)
-    : user.password === currentPassword;
-    
-  if (!isCurrentPasswordValid) return false;
+  // Verify current password (direct comparison for demo)
+  if (user.password !== currentPassword) return false;
   
-  // Update with new hashed password
-  users[userIndex].password = hashPassword(newPassword);
+  // Update with new password
+  users[userIndex].password = newPassword;
   saveUsers(users);
   
   // Update current user session if it's the same user

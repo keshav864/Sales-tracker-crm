@@ -164,7 +164,7 @@ const getDefaultProducts = (): Product[] => [
   { id: 'AI_MODEL', name: 'AI Model', price: 2771, category: 'AI', model: 'Standard' },
 ];
 
-// Complete 30 employees list as provided
+// Complete employee list with exact credentials
 const getDefaultUsers = (): User[] => [
   // Admin
   {

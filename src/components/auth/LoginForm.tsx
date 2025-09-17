@@ -22,16 +22,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setError('');
     setIsLoading(true);
 
-    console.log('Login attempt:', { employeeId, password });
+    console.log('🚀 Login attempt:', { employeeId, password });
 
     try {
       const success = onLogin(employeeId, password);
-      console.log('Login result:', success);
+      console.log('🚀 Login result:', success);
       if (!success) {
         setError('Invalid Employee ID or Password');
       }
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('🚀 Login error:', err);
       setError('An error occurred during login');
     } finally {
       setIsLoading(false);
@@ -213,7 +213,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                     id="resetEmployeeId"
                     type="text"
                     value={resetEmployeeId}
-                    onChange={(e) => setResetEmployeeId(e.target.value.toUpperCase())}
+                    onChange={(e) => setEmployeeId(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                     placeholder="Enter your Employee ID"
                     required
