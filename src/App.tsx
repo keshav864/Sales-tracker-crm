@@ -107,7 +107,7 @@ function App() {
       case 'dashboard':
         return (
           <div>
-            <Dashboard users={users} attendance={attendance} sales={sales} currentUser={user} />
+            <Dashboard users={users} attendance={attendance} sales={sales} currentUser={user} lastSyncTime={lastSyncTime} />
             {lastSyncTime && (
               <div className="fixed bottom-4 right-4 bg-green-500 text-white px-3 py-1 rounded-lg text-xs shadow-lg">
                 Last sync: {lastSyncTime}
@@ -166,7 +166,7 @@ function App() {
       default:
         return (
           <div>
-            <Dashboard users={users} attendance={attendance} sales={sales} currentUser={user} />
+            <Dashboard users={users} attendance={attendance} sales={sales} currentUser={user} lastSyncTime={lastSyncTime} />
             {lastSyncTime && (
               <div className="fixed bottom-4 right-4 bg-green-500 text-white px-3 py-1 rounded-lg text-xs shadow-lg">
                 Last sync: {lastSyncTime}
