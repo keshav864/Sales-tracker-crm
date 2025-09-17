@@ -14,36 +14,37 @@ export const verifyPassword = (password: string, hashedPassword: string): boolea
 // Secure login with proper validation
 export const authenticateUser = (employeeId: string, password: string): User | null => {
   const users = getUsers();
+  console.log('Authenticating user:', employeeId);
+  console.log('Available users:', users.map(u => ({ id: u.employeeId, hasPassword: !!u.password })));
+  
   const user = users.find(u => 
     u.employeeId.toLowerCase() === employeeId.toLowerCase() && 
     u.isActive !== false
   );
   
   if (!user) {
+    console.log('User not found for employeeId:', employeeId);
     return null;
   }
 
+  console.log('Found user:', user.name, 'Password check:', user.password);
+  
   // Check if password is already hashed (for existing users)
-  const isValidPassword = user.password.startsWith('btoa') 
-    ? verifyPassword(password, user.password)
-    : user.password === password; // Backward compatibility
+  const isValidPassword = user.password === password; // Direct comparison for demo
 
+  console.log('Password validation result:', isValidPassword);
+  
   if (isValidPassword) {
-    // Hash password if not already hashed
-    if (!user.password.startsWith('btoa')) {
-      user.password = hashPassword(password);
-      const updatedUsers = users.map(u => u.id === user.id ? user : u);
-      saveUsers(updatedUsers);
-    }
-    
     // Update last login
     user.lastLogin = new Date().toISOString();
     const updatedUsers = users.map(u => u.id === user.id ? user : u);
     saveUsers(updatedUsers);
     
+    console.log('Authentication successful for:', user.name);
     return user;
   }
 
+  console.log('Authentication failed - password mismatch');
   return null;
 };
 
