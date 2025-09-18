@@ -86,59 +86,25 @@ export const getProducts = (): Product[] => {
 
 export const saveProducts = (products: Product[]): void => {
   localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-      {/* Manager Filter and Export (Admin Only) */}
-      {isAdmin && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h3 className="text-lg font-bold text-gray-900">Team Filter</h3>
-              <select
-                value={selectedManager}
-                onChange={(e) => setSelectedManager(e.target.value)}
-                className="input-field max-w-xs"
-              >
-                <option value="all">All Teams</option>
-                {managers.map(manager => (
-                  <option key={manager.id} value={manager.id}>
-                    {manager.name} ({manager.designation})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <button
-              onClick={handleExportTeamData}
-              className="btn-primary flex items-center space-x-2"
-            >
-              <Download className="w-5 h-5" />
-              <span>Export Team Data</span>
-            </button>
-          </div>
-        </div>
-      )}
 };
 
 // Attendance Management
 export const getAttendanceRecords = (): AttendanceRecord[] => {
   const records = localStorage.getItem(STORAGE_KEYS.ATTENDANCE);
-          {isAdmin && selectedManager !== 'all' && (
-            <span className="text-blue-600 ml-2">
-              - {users.find(u => u.id === selectedManager)?.name}'s Team
-            </span>
-          )}
   return records ? JSON.parse(records) : [];
 };
 
-            <div className="text-2xl font-bold text-green-600">{filteredData.users.length}</div>
+export const saveAttendanceRecords = (records: AttendanceRecord[]): void => {
   localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify(records));
 };
 
 // Sales Management
 export const getSalesRecords = (): SalesRecord[] => {
-            <div className="text-2xl font-bold text-blue-600">{filteredData.sales.length}</div>
+  const records = localStorage.getItem(STORAGE_KEYS.SALES);
   return records ? JSON.parse(records) : [];
 };
 
-            <div className="text-2xl font-bold text-purple-600">{filteredData.attendance.length}</div>
+export const saveSalesRecords = (records: SalesRecord[]): void => {
   localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(records));
 };
 
@@ -234,7 +200,7 @@ const getDefaultUsers = (): User[] => [
     phone: '+91 7870660333',
     designation: 'District General Manager (DGM)',
     target: 300000,
-          <AttendanceChart attendance={filteredData.attendance} />
+    manager: 'ADMIN001',
     territory: 'Bihar/Delhi & West Bengal/Odisha',
     isActive: true,
     lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
@@ -247,7 +213,7 @@ const getDefaultUsers = (): User[] => [
     role: 'manager',
     department: 'Sales',
     joinDate: '2024-01-20',
-          <WeeklySalesChart sales={filteredData.sales} />
+    password: 'sandeep@2024',
     profilePicture: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
     phone: '+91 9876543214',
     designation: 'Regional Manager (Gujarat)',
@@ -260,7 +226,7 @@ const getDefaultUsers = (): User[] => [
   {
     id: 'BM003',
     employeeId: 'BM003',
-          <MonthlySalesChart sales={filteredData.sales} />
+    name: 'Pawan Khanna',
     username: 'pawan.khanna',
     role: 'manager',
     department: 'Sales',
@@ -325,25 +291,5 @@ export const initializeDefaultData = (): void => {
   }
   if (!localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
     saveProducts(getDefaultProducts());
-  const handleExportTeamData = () => {
-    const exportData = filteredData.users.map(user => ({
-      'Employee ID': user.employeeId,
-      'Name': user.name,
-      'Role': user.role,
-      'Department': user.department,
-      'Designation': user.designation || '',
-      'Phone': user.phone || '',
-      'Territory': user.territory || '',
-      'Target': user.target || 0,
-      'Manager': users.find(u => u.id === user.manager)?.name || 'None',
-      'Status': user.isActive !== false ? 'Active' : 'Inactive',
-    }));
-
-    const filename = selectedManager === 'all' 
-      ? `all_employees_${new Date().toISOString().split('T')[0]}`
-      : `team_${users.find(u => u.id === selectedManager)?.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}`;
-
-    exportToCSV(exportData, filename);
-  };
   }
 };
