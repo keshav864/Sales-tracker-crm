@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { LoginForm } from './components/auth/LoginForm';
 import { Header } from './components/layout/Header';
@@ -10,17 +10,47 @@ import { SalesReports } from './components/sales/SalesReports';
 import { EmployeeManagement } from './components/admin/EmployeeManagement';
 import { ProfileSettings } from './components/profile/ProfileSettings';
 import { SystemSettings } from './components/settings/SystemSettings';
-import { initializeDefaultData } from './utils/storage';
+import { DataExport } from './components/export/DataExport';
+import { 
+  getUsers, 
+  getSalesRecords, 
+  getAttendanceRecords, 
+  saveUsers,
+  saveSalesRecords,
+  saveAttendanceRecords,
+  initializeDefaultData 
+} from './utils/storage';
 
 // Initialize default data on app start
 initializeDefaultData();
 
-type ViewType = 'dashboard' | 'attendance' | 'sales' | 'reports' | 'employees' | 'profile' | 'settings';
+type ViewType = 'dashboard' | 'attendance' | 'sales' | 'reports' | 'employees' | 'profile' | 'settings' | 'export' | 'analytics' | 'calendar' | 'targets';
 
 function App() {
-  const { user, login, logout } = useAuth();
+  const { user, login, logout, updateUser } = useAuth();
   const [currentView, setCurrentView] = useState<ViewType>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Data states
+  const [users, setUsers] = useState(getUsers());
+  const [sales, setSales] = useState(getSalesRecords());
+  const [attendance, setAttendance] = useState(getAttendanceRecords());
+
+  // Update data handlers
+  const handleUsersUpdate = (updatedUsers: typeof users) => {
+    setUsers(updatedUsers);
+    saveUsers(updatedUsers);
+  };
+
+  const handleSalesUpdate = (updatedSales: typeof sales) => {
+    setSales(updatedSales);
+    saveSalesRecords(updatedSales);
+  };
+
+  const handleAttendanceUpdate = (updatedAttendance: typeof attendance) => {
+    setAttendance(updatedAttendance);
+    saveAttendanceRecords(updatedAttendance);
+  };
 
   if (!user) {
     return <LoginForm onLogin={login} />;
@@ -31,17 +61,63 @@ function App() {
       case 'dashboard':
         return <Dashboard />;
       case 'attendance':
-        return <AttendanceTracker />;
+        return (
+          <AttendanceTracker 
+            users={users}
+            attendance={attendance}
+            currentUser={user}
+            onAttendanceUpdate={handleAttendanceUpdate}
+          />
+        );
       case 'sales':
-        return <SalesTracker />;
+        return (
+          <SalesTracker 
+            users={users}
+            sales={sales}
+            currentUser={user}
+            onSalesUpdate={handleSalesUpdate}
+          />
+        );
       case 'reports':
-        return <SalesReports />;
+        return (
+          <SalesReports 
+            sales={sales}
+            users={users}
+            currentUser={user}
+          />
+        );
       case 'employees':
-        return user.role === 'admin' ? <EmployeeManagement /> : <Dashboard />;
+        return user.role === 'admin' ? (
+          <EmployeeManagement 
+            users={users}
+            currentUser={user}
+            onUsersUpdate={handleUsersUpdate}
+          />
+        ) : <Dashboard />;
+      case 'export':
+        return (
+          <DataExport 
+            users={users}
+            attendance={attendance}
+            sales={sales}
+            currentUser={user}
+          />
+        );
       case 'profile':
-        return <ProfileSettings />;
+        return (
+          <ProfileSettings 
+            user={user}
+            onUserUpdate={updateUser}
+            onClose={() => setCurrentView('dashboard')}
+          />
+        );
       case 'settings':
-        return user.role === 'admin' ? <SystemSettings /> : <Dashboard />;
+        return user.role === 'admin' ? (
+          <SystemSettings 
+            currentUser={user}
+            onSettingsUpdate={() => {}}
+          />
+        ) : <Dashboard />;
       default:
         return <Dashboard />;
     }
@@ -53,6 +129,7 @@ function App() {
         user={user} 
         onLogout={logout} 
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        onUserUpdate={updateUser}
       />
       
       <div className="flex">
