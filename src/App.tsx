@@ -6,7 +6,7 @@ import Dashboard from './components/dashboard/Dashboard';
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
 
-function App() {
+export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -71,5 +71,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
