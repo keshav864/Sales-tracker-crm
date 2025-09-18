@@ -1,340 +1,349 @@
-import React, { useMemo } from 'react';
-import {
-  Users,
-  UserCheck,
-  UserX,
-  Clock,
-  DollarSign,
-  TrendingUp,
-  Target,
-  Award,
-  Calendar,
-  BarChart3,
-} from 'lucide-react';
-import { User, AttendanceRecord, SalesRecord } from '../../types';
-import { StatsCard } from './StatsCard';
-import { AttendanceChart } from './AttendanceChart';
-import { SalesChart } from './SalesChart';
-import { WeeklySalesChart } from './WeeklySalesChart';
-import { MonthlySalesChart } from './MonthlySalesChart';
-import { formatDate } from '../../utils/dateUtils';
-import { getVisibleUsers, getVisibleSalesRecords, getVisibleAttendanceRecords } from '../../utils/dataPrivacy';
+import { User, AttendanceRecord, SalesRecord, SalesTarget, Product } from '../types';
 
-interface DashboardProps {
-  users: User[];
-  attendance: AttendanceRecord[];
-  sales: SalesRecord[];
-  currentUser: User;
-  lastSyncTime: string;
-}
+const STORAGE_KEYS = {
+  USERS: 'crm_users',
+  ATTENDANCE: 'crm_attendance',
+  SALES: 'crm_sales',
+  TARGETS: 'crm_targets',
+  CURRENT_USER: 'crm_current_user',
+  PRODUCTS: 'crm_products',
+};
 
-export const Dashboard: React.FC<DashboardProps> = ({
-  users,
-  attendance,
-  sales,
-  currentUser,
-  lastSyncTime,
-}) => {
-  // Apply data privacy filters
-  const visibleUsers = useMemo(() => getVisibleUsers(currentUser, users), [currentUser, users]);
-  const visibleSales = useMemo(() => getVisibleSalesRecords(currentUser, sales, users), [currentUser, sales, users]);
-  const visibleAttendance = useMemo(() => getVisibleAttendanceRecords(currentUser, attendance, users), [currentUser, attendance, users]);
+// User Management
+export const getUsers = (): User[] => {
+  const users = localStorage.getItem(STORAGE_KEYS.USERS);
+  return users ? JSON.parse(users) : getDefaultUsers();
+};
 
-  const stats = useMemo(() => {
-    const today = formatDate(new Date());
-    const todayAttendance = visibleAttendance.filter(record => record.date === today);
-    const todaySales = visibleSales.filter(record => record.date === today);
+export const saveUsers = (users: User[]): void => {
+  localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+};
+
+export const getCurrentUser = (): User | null => {
+  const user = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+  return user ? JSON.parse(user) : null;
+};
+
+export const setCurrentUser = (user: User | null): void => {
+  if (user) {
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+  } else {
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+  }
+};
+
+// Password Reset
+export const resetUserPassword = (employeeId: string, newPassword: string): boolean => {
+  const users = getUsers();
+  const userIndex = users.findIndex(u => u.employeeId === employeeId);
+  
+  if (userIndex !== -1) {
+    users[userIndex].password = newPassword;
+    saveUsers(users);
+    return true;
+  }
+  return false;
+};
+
+// Update User Profile
+export const updateUserProfile = (userId: string, updates: Partial<User>): boolean => {
+  const users = getUsers();
+  const userIndex = users.findIndex(u => u.id === userId);
+  
+  if (userIndex !== -1) {
+    users[userIndex] = { ...users[userIndex], ...updates };
+    saveUsers(users);
     
-    const currentMonth = new Date().toISOString().slice(0, 7);
-    const monthSales = visibleSales.filter(record => record.date.startsWith(currentMonth));
-    const userMonthSales = monthSales.filter(record => record.userId === currentUser.id);
-
-    // Calculate user-specific stats
-    const userTotalSales = visibleSales.filter(record => record.userId === currentUser.id)
-      .reduce((sum, sale) => sum + sale.totalAmount, 0);
+    // Update current user if it's the same user
+    const currentUser = getCurrentUser();
+    if (currentUser && currentUser.id === userId) {
+      setCurrentUser(users[userIndex]);
+    }
     
-    const userTodaySales = todaySales.filter(record => record.userId === currentUser.id)
-      .reduce((sum, sale) => sum + sale.totalAmount, 0);
+    return true;
+  }
+  return false;
+};
 
-    const userMonthTotal = userMonthSales.reduce((sum, sale) => sum + sale.totalAmount, 0);
-    const targetAchievement = currentUser.target ? (userMonthTotal / currentUser.target) * 100 : 0;
+// Add New Employee (Admin only)
+export const addNewEmployee = (userData: Omit<User, 'id'>): User => {
+  const users = getUsers();
+  const newUser: User = {
+    ...userData,
+    id: userData.employeeId,
+  };
+  
+  users.push(newUser);
+  saveUsers(users);
+  return newUser;
+};
 
-    return {
-      totalEmployees: visibleUsers.length,
-      presentToday: todayAttendance.filter(r => r.status === 'present').length,
-      absentToday: todayAttendance.filter(r => r.status === 'absent').length,
-      lateToday: todayAttendance.filter(r => r.status === 'late').length,
-      totalSalesToday: todaySales.reduce((sum, sale) => sum + sale.totalAmount, 0),
-      totalSalesThisMonth: monthSales.reduce((sum, sale) => sum + sale.totalAmount, 0),
-      userTotalSales,
-      userTodaySales,
-      userMonthTotal,
-      targetAchievement,
-      totalDeals: visibleSales.length,
-      conversionRate: 85.5,
-    };
-  }, [visibleUsers, visibleAttendance, visibleSales, currentUser]);
+// Products Management
+export const getProducts = (): Product[] => {
+  const products = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
+  return products ? JSON.parse(products) : getDefaultProducts();
+};
 
-  const isAdmin = currentUser.role === 'admin';
-  const isManager = currentUser.role === 'manager';
-
-  return (
-    <div className="space-y-8 p-6">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
-        <div className="absolute inset-0 bg-black/5"></div>
-        <div className="relative z-10">
+export const saveProducts = (products: Product[]): void => {
+  localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+      {/* Manager Filter and Export (Admin Only) */}
+      {isAdmin && (
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">
-                Welcome back, {currentUser.name}! 👋
-              </h1>
-              <p className="text-blue-100 text-lg">
-                {isAdmin ? 'Admin Dashboard - Complete System Overview' : 
-                 isManager ? `Manager Dashboard - ${currentUser.territory} Team Overview` : 
-                 'Your Performance Dashboard'}
-              </p>
-              <p className="text-blue-200 text-sm mt-1">
-                {new Date().toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </p>
+            <div className="flex items-center space-x-4">
+              <h3 className="text-lg font-bold text-gray-900">Team Filter</h3>
+              <select
+                value={selectedManager}
+                onChange={(e) => setSelectedManager(e.target.value)}
+                className="input-field max-w-xs"
+              >
+                <option value="all">All Teams</option>
+                {managers.map(manager => (
+                  <option key={manager.id} value={manager.id}>
+                    {manager.name} ({manager.designation})
+                  </option>
+                ))}
+              </select>
             </div>
-            <div className="hidden md:block">
-              <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
-                <BarChart3 className="w-12 h-12 text-white" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Real-time Data Status */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">
-          {isAdmin ? 'System Overview' : isManager ? 'Team Overview' : 'Personal Overview'}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{visibleUsers.length}</div>
-            <div className="text-sm text-gray-600">
-              {isAdmin ? 'Total Employees' : isManager ? 'Team Members' : 'You'}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{visibleSales.length}</div>
-            <div className="text-sm text-gray-600">Sales Records</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">{visibleAttendance.length}</div>
-            <div className="text-sm text-gray-600">Attendance Records</div>
-          </div>
-          <div className="text-center">
-            <div className="w-3 h-3 bg-green-500 rounded-full mx-auto mb-1 animate-pulse"></div>
-            <div className="text-sm text-gray-600">Live Sync Active</div>
-          </div>
-        </div>
-        {lastSyncTime && (
-          <div className="mt-4 text-center">
-            <div className="text-xs text-gray-500">
-              Last sync: {lastSyncTime}
-            </div>
-          </div>
-        )}
-      </div>
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {isAdmin || isManager ? (
-          <>
-            <StatsCard
-              title={isAdmin ? "Total Employees" : "Team Members"}
-              value={stats.totalEmployees}
-              icon={Users}
-              color="blue"
-              trend={{ value: 25, isPositive: true }}
-            />
-            <StatsCard
-              title="Present Today"
-              value={stats.presentToday}
-              icon={UserCheck}
-              color="green"
-              trend={{ value: 25, isPositive: true }}
-            />
-            <StatsCard
-              title={isAdmin ? "Total Sales Today" : "Team Sales Today"}
-              value={`₹${stats.totalSalesToday.toLocaleString()}`}
-              icon={DollarSign}
-              color="purple"
-              trend={{ value: 15, isPositive: true }}
-            />
-            <StatsCard
-              title={isAdmin ? "Monthly Revenue" : "Team Monthly Revenue"}
-              value={`₹${stats.totalSalesThisMonth.toLocaleString()}`}
-              icon={TrendingUp}
-              color="green"
-              trend={{ value: 22, isPositive: true }}
-            />
-          </>
-        ) : (
-          <>
-            <StatsCard
-              title="My Sales Today"
-              value={`₹${stats.userTodaySales.toLocaleString()}`}
-              icon={DollarSign}
-              color="green"
-              trend={{ value: 12, isPositive: true }}
-            />
-            <StatsCard
-              title="Monthly Sales"
-              value={`₹${stats.userMonthTotal.toLocaleString()}`}
-              icon={TrendingUp}
-              color="blue"
-              trend={{ value: 18, isPositive: true }}
-            />
-            <StatsCard
-              title="Target Achievement"
-              value={`${stats.targetAchievement.toFixed(1)}%`}
-              icon={Target}
-              color="purple"
-              trend={{ value: 5, isPositive: true }}
-            />
-            <StatsCard
-              title="Total Career Sales"
-              value={`₹${stats.userTotalSales.toLocaleString()}`}
-              icon={Award}
-              color="yellow"
-              trend={{ value: 25, isPositive: true }}
-            />
-          </>
-        )}
-      </div>
-
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center">
-              <Calendar className="w-6 h-6 mr-2 text-blue-500" />
-              Weekly Attendance Trends
-            </h3>
-            <div className="flex space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-            </div>
-          </div>
-          <AttendanceChart attendance={visibleAttendance} />
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center">
-              <TrendingUp className="w-6 h-6 mr-2 text-purple-500" />
-              Weekly Sales Performance
-            </h3>
-            <div className="flex space-x-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-            </div>
-          </div>
-          <WeeklySalesChart sales={visibleSales} />
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900 flex items-center">
-              <BarChart3 className="w-6 h-6 mr-2 text-green-500" />
-              Monthly Sales Trend
-            </h3>
-            <div className="flex space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            </div>
-          </div>
-          <MonthlySalesChart sales={visibleSales} />
-        </div>
-      </div>
-
-      {/* Additional Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Quick Actions */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
-          <div className="space-y-3">
-            <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105">
-              Record New Sale
-            </button>
-            <button className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-4 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105">
-              Mark Attendance
-            </button>
-            <button className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-3 px-4 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
-              View Reports
+            <button
+              onClick={handleExportTeamData}
+              className="btn-primary flex items-center space-x-2"
+            >
+              <Download className="w-5 h-5" />
+              <span>Export Team Data</span>
             </button>
           </div>
         </div>
+      )}
+};
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activity</h3>
-          <div className="space-y-3">
-            <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-xl">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">Sale Recorded</p>
-                <p className="text-xs text-gray-500">₹25,000 - 2 hours ago</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-xl">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">Checked In</p>
-                <p className="text-xs text-gray-500">9:15 AM - Today</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-xl">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">Report Generated</p>
-                <p className="text-xs text-gray-500">Monthly Report - Yesterday</p>
-              </div>
-            </div>
-          </div>
-        </div>
+// Attendance Management
+export const getAttendanceRecords = (): AttendanceRecord[] => {
+  const records = localStorage.getItem(STORAGE_KEYS.ATTENDANCE);
+          {isAdmin && selectedManager !== 'all' && (
+            <span className="text-blue-600 ml-2">
+              - {users.find(u => u.id === selectedManager)?.name}'s Team
+            </span>
+          )}
+  return records ? JSON.parse(records) : [];
+};
 
-        {/* Performance Metrics */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Performance Metrics</h3>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-600">Conversion Rate</span>
-                <span className="text-sm font-bold text-green-600">85.5%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full" style={{ width: '85.5%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-600">Monthly Target</span>
-                <span className="text-sm font-bold text-blue-600">{stats.targetAchievement.toFixed(1)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full" style={{ width: `${Math.min(stats.targetAchievement, 100)}%` }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-600">Attendance Rate</span>
-                <span className="text-sm font-bold text-purple-600">92%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-gradient-to-r from-purple-400 to-purple-600 h-2 rounded-full" style={{ width: '92%' }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+            <div className="text-2xl font-bold text-green-600">{filteredData.users.length}</div>
+  localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify(records));
+};
+
+// Sales Management
+export const getSalesRecords = (): SalesRecord[] => {
+            <div className="text-2xl font-bold text-blue-600">{filteredData.sales.length}</div>
+  return records ? JSON.parse(records) : [];
+};
+
+            <div className="text-2xl font-bold text-purple-600">{filteredData.attendance.length}</div>
+  localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(records));
+};
+
+// Sales Targets
+export const getSalesTargets = (): SalesTarget[] => {
+  const targets = localStorage.getItem(STORAGE_KEYS.TARGETS);
+  return targets ? JSON.parse(targets) : [];
+};
+
+export const saveSalesTargets = (targets: SalesTarget[]): void => {
+  localStorage.setItem(STORAGE_KEYS.TARGETS, JSON.stringify(targets));
+};
+
+// Default Products from the image
+const getDefaultProducts = (): Product[] => [
+  // Projector Products (from screenshot)
+  { id: 'PROJ_GALAXY', name: 'Galaxy Projector', price: 11513, category: 'Projector', model: 'Galaxy' },
+  { id: 'PROJ_PLAY', name: 'Play Projector', price: 10073, category: 'Projector', model: 'Play' },
+  { id: 'PROJ_EPIC', name: 'Epic Projector', price: 6473, category: 'Projector', model: 'Epic' },
+  { id: 'PROJ_JOY', name: 'Joy Projector', price: 5039, category: 'Projector', model: 'Joy' },
+  { id: 'PROJ_PIXA', name: 'Pixa Projector', price: 7199, category: 'Projector', model: 'Pixa' },
+  { id: 'PROJ_SCREEN_M65', name: 'Screen M65 Projector', price: 11513, category: 'Projector', model: 'M65' },
+  
+  // Mobile Products (existing)
+  { id: 'GALAXY', name: 'Galaxy', price: 11513, category: 'Mobile', model: 'Galaxy' },
+  { id: 'PLAY', name: 'Play', price: 10073, category: 'Mobile', model: 'Play' },
+  { id: 'EPIC', name: 'Epic', price: 6473, category: 'Mobile', model: 'Epic' },
+  { id: 'JOY', name: 'Joy', price: 5039, category: 'Mobile', model: 'Joy' },
+  { id: 'PIXA', name: 'Pixa', price: 7199, category: 'Mobile', model: 'Pixa' },
+  
+  // Screen Products
+  { id: 'SCREEN_M65', name: 'Screen M65', price: 11513, category: 'Screen', model: 'M65' },
+  { id: 'SCREEN_M80', name: 'Screen M80', price: 12951, category: 'Screen', model: 'M80' },
+  { id: 'SCREEN_M100', name: 'Screen M100', price: 14393, category: 'Screen', model: 'M100' },
+  { id: 'SCREEN_FR140', name: 'Screen FR140', price: 40111, category: 'Screen', model: 'FR140' },
+  { id: 'SCREEN_FR160', name: 'Screen FR160', price: 50291, category: 'Screen', model: 'FR160' },
+  
+  // Extension Board Products
+  { id: 'EXT_BOARD_331', name: 'Extension Board 331', price: 791, category: 'Extension', model: '331' },
+  { id: 'EXT_BOARD_411', name: 'Extension Board 411', price: 719, category: 'Extension', model: '411' },
+  { id: 'EXT_BOARD_422', name: 'Extension Board 422', price: 863, category: 'Extension', model: '422' },
+  { id: 'EXT_BOARD_524', name: 'Extension Board 524', price: 1079, category: 'Extension', model: '524' },
+  { id: 'EXT_BOARD_522', name: 'Extension Board 522', price: 935, category: 'Extension', model: '522' },
+  
+  // SMPS Products
+  { id: 'SMPS_450', name: 'SMPS 450', price: 633, category: 'SMPS', model: '450' },
+  { id: 'SMPS_500', name: 'SMPS 500', price: 950, category: 'SMPS', model: '500' },
+  { id: 'SMPS_550', name: 'SMPS 550', price: 1108, category: 'SMPS', model: '550' },
+  { id: 'SMPS_650', name: 'SMPS 650', price: 1266, category: 'SMPS', model: '650' },
+  { id: 'SMPS_700', name: 'SMPS 700', price: 1425, category: 'SMPS', model: '700' },
+  { id: 'SMPS_750', name: 'SMPS 750', price: 1583, category: 'SMPS', model: '750' },
+  { id: 'SMPS_800', name: 'SMPS 800', price: 1900, category: 'SMPS', model: '800' },
+  { id: 'SMPS_850', name: 'SMPS 850', price: 1900, category: 'SMPS', model: '850' },
+  { id: 'SMPS_1000', name: 'SMPS 1000', price: 2374, category: 'SMPS', model: '1000' },
+  
+  // AI Products
+  { id: 'AI_MODEL', name: 'AI Model', price: 2771, category: 'AI', model: 'Standard' },
+];
+
+// Complete employee list with exact credentials
+const getDefaultUsers = (): User[] => [
+  // Admin
+  {
+    id: 'ADMIN001',
+    employeeId: 'ADMIN001',
+    name: 'Manoj Kumar',
+    username: 'manoj.kumar',
+    role: 'admin',
+    department: 'Management',
+    joinDate: '2024-01-01',
+    password: 'admin@123',
+    profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9876543210',
+    designation: 'Sales Director',
+    target: 500000,
+    manager: null,
+    territory: 'All India',
+    isActive: true,
+    lastLogin: new Date().toISOString(),
+  },
+  
+  // Reporting Managers
+  {
+    id: 'BM001',
+    employeeId: 'BM001',
+    name: 'Salim Javed',
+    username: 'salim.javed',
+    role: 'manager',
+    department: 'Sales',
+    joinDate: '2024-01-15',
+    password: 'salim@2024',
+    profilePicture: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 7870660333',
+    designation: 'District General Manager (DGM)',
+    target: 300000,
+          <AttendanceChart attendance={filteredData.attendance} />
+    territory: 'Bihar/Delhi & West Bengal/Odisha',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+  },
+  {
+    id: 'BM002',
+    employeeId: 'BM002',
+    name: 'Sandeep Bediawala',
+    username: 'sandeep.bediawala',
+    role: 'manager',
+    department: 'Sales',
+    joinDate: '2024-01-20',
+          <WeeklySalesChart sales={filteredData.sales} />
+    profilePicture: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9876543214',
+    designation: 'Regional Manager (Gujarat)',
+    target: 280000,
+    manager: 'ADMIN001',
+    territory: 'Gujarat & Chhattisgarh',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
+  },
+  {
+    id: 'BM003',
+    employeeId: 'BM003',
+          <MonthlySalesChart sales={filteredData.sales} />
+    username: 'pawan.khanna',
+    role: 'manager',
+    department: 'Sales',
+    joinDate: '2024-02-01',
+    password: 'pawan@2024',
+    profilePicture: 'https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9174995813',
+    designation: 'Sales Manager',
+    target: 250000,
+    manager: 'ADMIN001',
+    territory: 'MP & Rajasthan',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
+  },
+  {
+    id: 'BM004',
+    employeeId: 'BM004',
+    name: 'Dhiraj Prakash',
+    username: 'dhiraj.prakash',
+    role: 'manager',
+    department: 'Sales',
+    joinDate: '2024-02-05',
+    password: 'dhiraj@2024',
+    profilePicture: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9174995813',
+    designation: 'Sales Manager',
+    target: 250000,
+    manager: 'ADMIN001',
+    territory: 'MP & Rajasthan',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
+  },
+];
+
+// Export Functions
+export const exportToCSV = (data: any[], filename: string): void => {
+  if (data.length === 0) return;
+  
+  const headers = Object.keys(data[0]);
+  const csvContent = [
+    headers.join(','),
+    ...data.map(row => headers.map(header => `"${row[header] || ''}"`).join(','))
+  ].join('\n');
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${filename}.csv`);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+// Initialize default data if not exists
+export const initializeDefaultData = (): void => {
+  if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
+    saveUsers(getDefaultUsers());
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
+    saveProducts(getDefaultProducts());
+  const handleExportTeamData = () => {
+    const exportData = filteredData.users.map(user => ({
+      'Employee ID': user.employeeId,
+      'Name': user.name,
+      'Role': user.role,
+      'Department': user.department,
+      'Designation': user.designation || '',
+      'Phone': user.phone || '',
+      'Territory': user.territory || '',
+      'Target': user.target || 0,
+      'Manager': users.find(u => u.id === user.manager)?.name || 'None',
+      'Status': user.isActive !== false ? 'Active' : 'Inactive',
+    }));
+
+    const filename = selectedManager === 'all' 
+      ? `all_employees_${new Date().toISOString().split('T')[0]}`
+      : `team_${users.find(u => u.id === selectedManager)?.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}`;
+
+    exportToCSV(exportData, filename);
+  };
+  }
 };
