@@ -1,296 +1,212 @@
-import { User, AttendanceRecord, SalesRecord, SalesTarget, Product } from '../types';
+import React, { useState } from 'react';
+import { LogOut, User, Settings, Bell, Search, Menu } from 'lucide-react';
+import { User as UserType, NotificationItem } from '../../types';
+import { ProfileSettings } from '../profile/ProfileSettings';
 
-const STORAGE_KEYS = {
-  USERS: 'crm_users',
-  ATTENDANCE: 'crm_attendance',
-  SALES: 'crm_sales',
-  TARGETS: 'crm_targets',
-  CURRENT_USER: 'crm_current_user',
-  PRODUCTS: 'crm_products',
-};
-
-// User Management
-export const getUsers = (): User[] => {
-  const users = localStorage.getItem(STORAGE_KEYS.USERS);
-  return users ? JSON.parse(users) : getDefaultUsers();
-};
-
-export const saveUsers = (users: User[]): void => {
-  localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-};
-
-export const getCurrentUser = (): User | null => {
-  const user = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-  return user ? JSON.parse(user) : null;
-};
-
-export const setCurrentUser = (user: User | null): void => {
-  if (user) {
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
-  } else {
-    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-  }
-};
-
-// Password Reset
-export const resetUserPassword = (employeeId: string, newPassword: string): boolean => {
-  const users = getUsers();
-  const userIndex = users.findIndex(u => u.employeeId === employeeId);
-  
-  if (userIndex !== -1) {
-    users[userIndex].password = newPassword;
-    saveUsers(users);
-    return true;
-  }
-  return false;
-};
-
-// Update User Profile
-export const updateUserProfile = (userId: string, updates: Partial<User>): boolean => {
-  const users = getUsers();
-  const userIndex = users.findIndex(u => u.id === userId);
-  
-  if (userIndex !== -1) {
-    users[userIndex] = { ...users[userIndex], ...updates };
-    saveUsers(users);
-    
-    // Update current user if it's the same user
-    const currentUser = getCurrentUser();
-    if (currentUser && currentUser.id === userId) {
-      setCurrentUser(users[userIndex]);
-    }
-    
-    return true;
-  }
-  return false;
-};
-
-// Add New Employee (Admin only)
-export const addNewEmployee = (userData: Omit<User, 'id'>): User => {
-  const users = getUsers();
-  const newUser: User = {
-    ...userData,
-    id: userData.employeeId,
-  };
-  
-  users.push(newUser);
-  saveUsers(users);
-  return newUser;
-};
-
-// Products Management
-export const getProducts = (): Product[] => {
-  const products = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-  return products ? JSON.parse(products) : getDefaultProducts();
-};
-
-export const saveProducts = (products: Product[]): void => {
-  localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-};
-
-// Attendance Management
-export const getAttendanceRecords = (): AttendanceRecord[] => {
-  const records = localStorage.getItem(STORAGE_KEYS.ATTENDANCE);
-  return records ? JSON.parse(records) : [];
-};
-
-export const saveAttendanceRecords = (records: AttendanceRecord[]): void => {
-  localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify(records));
-};
-
-// Sales Management
-export const getSalesRecords = (): SalesRecord[] => {
-  const records = localStorage.getItem(STORAGE_KEYS.SALES);
-  return records ? JSON.parse(records) : [];
-};
-
-export const saveSalesRecords = (records: SalesRecord[]): void => {
-  localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(records));
-};
-
-// Sales Targets
-export const getSalesTargets = (): SalesTarget[] => {
-  const targets = localStorage.getItem(STORAGE_KEYS.TARGETS);
-  return targets ? JSON.parse(targets) : [];
-};
-
-export const saveSalesTargets = (targets: SalesTarget[]): void => {
-  localStorage.setItem(STORAGE_KEYS.TARGETS, JSON.stringify(targets));
-};
-
-// Default Products from the image
-const getDefaultProducts = (): Product[] => [
-  // Projector Products (from screenshot)
-  { id: 'PROJ_GALAXY', name: 'Galaxy Projector', price: 11513, category: 'Projector', model: 'Galaxy' },
-  { id: 'PROJ_PLAY', name: 'Play Projector', price: 10073, category: 'Projector', model: 'Play' },
-  { id: 'PROJ_EPIC', name: 'Epic Projector', price: 6473, category: 'Projector', model: 'Epic' },
-  { id: 'PROJ_JOY', name: 'Joy Projector', price: 5039, category: 'Projector', model: 'Joy' },
-  { id: 'PROJ_PIXA', name: 'Pixa Projector', price: 7199, category: 'Projector', model: 'Pixa' },
-  { id: 'PROJ_SCREEN_M65', name: 'Screen M65 Projector', price: 11513, category: 'Projector', model: 'M65' },
-  
-  // Mobile Products (existing)
-  { id: 'GALAXY', name: 'Galaxy', price: 11513, category: 'Mobile', model: 'Galaxy' },
-  { id: 'PLAY', name: 'Play', price: 10073, category: 'Mobile', model: 'Play' },
-  { id: 'EPIC', name: 'Epic', price: 6473, category: 'Mobile', model: 'Epic' },
-  { id: 'JOY', name: 'Joy', price: 5039, category: 'Mobile', model: 'Joy' },
-  { id: 'PIXA', name: 'Pixa', price: 7199, category: 'Mobile', model: 'Pixa' },
-  
-  // Screen Products
-  { id: 'SCREEN_M65', name: 'Screen M65', price: 11513, category: 'Screen', model: 'M65' },
-  { id: 'SCREEN_M80', name: 'Screen M80', price: 12951, category: 'Screen', model: 'M80' },
-  { id: 'SCREEN_M100', name: 'Screen M100', price: 14393, category: 'Screen', model: 'M100' },
-  { id: 'SCREEN_FR140', name: 'Screen FR140', price: 40111, category: 'Screen', model: 'FR140' },
-  { id: 'SCREEN_FR160', name: 'Screen FR160', price: 50291, category: 'Screen', model: 'FR160' },
-  
-  // Extension Board Products
-  { id: 'EXT_BOARD_331', name: 'Extension Board 331', price: 791, category: 'Extension', model: '331' },
-  { id: 'EXT_BOARD_411', name: 'Extension Board 411', price: 719, category: 'Extension', model: '411' },
-  { id: 'EXT_BOARD_422', name: 'Extension Board 422', price: 863, category: 'Extension', model: '422' },
-  { id: 'EXT_BOARD_524', name: 'Extension Board 524', price: 1079, category: 'Extension', model: '524' },
-  { id: 'EXT_BOARD_522', name: 'Extension Board 522', price: 935, category: 'Extension', model: '522' },
-  
-  // SMPS Products
-  { id: 'SMPS_450', name: 'SMPS 450', price: 633, category: 'SMPS', model: '450' },
-  { id: 'SMPS_500', name: 'SMPS 500', price: 950, category: 'SMPS', model: '500' },
-  { id: 'SMPS_550', name: 'SMPS 550', price: 1108, category: 'SMPS', model: '550' },
-  { id: 'SMPS_650', name: 'SMPS 650', price: 1266, category: 'SMPS', model: '650' },
-  { id: 'SMPS_700', name: 'SMPS 700', price: 1425, category: 'SMPS', model: '700' },
-  { id: 'SMPS_750', name: 'SMPS 750', price: 1583, category: 'SMPS', model: '750' },
-  { id: 'SMPS_800', name: 'SMPS 800', price: 1900, category: 'SMPS', model: '800' },
-  { id: 'SMPS_850', name: 'SMPS 850', price: 1900, category: 'SMPS', model: '850' },
-  { id: 'SMPS_1000', name: 'SMPS 1000', price: 2374, category: 'SMPS', model: '1000' },
-  
-  // AI Products
-  { id: 'AI_MODEL', name: 'AI Model', price: 2771, category: 'AI', model: 'Standard' },
-];
-
-// Complete employee list with exact credentials
-const getDefaultUsers = (): User[] => [
-  // Admin
-  {
-    id: 'ADMIN001',
-    employeeId: 'ADMIN001',
-    name: 'Manoj Kumar',
-    username: 'manoj.kumar',
-    role: 'admin',
-    department: 'Management',
-    joinDate: '2024-01-01',
-    password: 'admin@123',
-    profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9876543210',
-    designation: 'Sales Director',
-    target: 500000,
-    manager: null,
-    territory: 'All India',
-    isActive: true,
-    lastLogin: new Date().toISOString(),
-  },
-  
-  // Reporting Managers
-  {
-    id: 'BM001',
-    employeeId: 'BM001',
-    name: 'Salim Javed',
-    username: 'salim.javed',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-01-15',
-    password: 'salim@2024',
-    profilePicture: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 7870660333',
-    designation: 'District General Manager (DGM)',
-    target: 300000,
-    manager: 'ADMIN001',
-    territory: 'Bihar/Delhi & West Bengal/Odisha',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-  },
-  {
-    id: 'BM002',
-    employeeId: 'BM002',
-    name: 'Sandeep Bediawala',
-    username: 'sandeep.bediawala',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-01-20',
-    password: 'sandeep@2024',
-    profilePicture: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9876543214',
-    designation: 'Regional Manager (Gujarat)',
-    target: 280000,
-    manager: 'ADMIN001',
-    territory: 'Gujarat & Chhattisgarh',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
-  },
-  {
-    id: 'BM003',
-    employeeId: 'BM003',
-    name: 'Pawan Khanna',
-    username: 'pawan.khanna',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-02-01',
-    password: 'pawan@2024',
-    profilePicture: 'https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9174995813',
-    designation: 'Sales Manager',
-    target: 250000,
-    manager: 'ADMIN001',
-    territory: 'MP & Rajasthan',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
-  },
-  {
-    id: 'BM004',
-    employeeId: 'BM004',
-    name: 'Dhiraj Prakash',
-    username: 'dhiraj.prakash',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-02-05',
-    password: 'dhiraj@2024',
-    profilePicture: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9174995813',
-    designation: 'Sales Manager',
-    target: 250000,
-    manager: 'ADMIN001',
-    territory: 'MP & Rajasthan',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
-  },
-];
-
-// Export Functions
-export const exportToCSV = (data: any[], filename: string): void => {
-  if (data.length === 0) return;
-  
-  const headers = Object.keys(data[0]);
-  const csvContent = [
-    headers.join(','),
-    ...data.map(row => headers.map(header => `"${row[header] || ''}"`).join(','))
-  ].join('\n');
-  
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', `${filename}.csv`);
-  link.style.visibility = 'hidden';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-
-// Initialize default data if not exists
-export const initializeDefaultData = (): void => {
-  if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
-    saveUsers(getDefaultUsers());
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
-    saveProducts(getDefaultProducts());
-                      <LogOut className="w-5 h-5" />
-  };
+interface HeaderProps {
+  user: UserType;
+  onLogout: () => void;
+  onMenuToggle?: () => void;
+  onUserUpdate?: (user: UserType) => void;
 }
+
+export const Header: React.FC<HeaderProps> = ({ user, onLogout, onMenuToggle, onUserUpdate }) => {
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showProfileSettings, setShowProfileSettings] = useState(false);
+
+  const notifications: NotificationItem[] = [
+    {
+      id: '1',
+      title: 'New Sale Recorded',
+      message: 'Sale of ₹25,000 recorded successfully',
+      type: 'success',
+      timestamp: '2 minutes ago',
+      read: false,
+    },
+    {
+      id: '2',
+      title: 'Attendance Reminder',
+      message: 'Don\'t forget to check out',
+      type: 'warning',
+      timestamp: '1 hour ago',
+      read: false,
+    },
+  ];
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  return (
+    <header className="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Left Section */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={onMenuToggle}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+            >
+              <Menu className="w-6 h-6 text-gray-600" />
+            </button>
+            
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-lg">ST</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  SalesTracker CRM
+                </h1>
+                <p className="text-xs text-gray-500">Sales & Attendance Management</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Center Section - Search */}
+          <div className="hidden md:flex flex-1 max-w-lg mx-8">
+            <div className="relative w-full">
+              <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search employees, sales, reports..."
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+              />
+            </div>
+          </div>
+
+          {/* Right Section */}
+          <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 relative"
+              >
+                <Bell className="w-6 h-6" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50 animate-slideDown">
+                  <div className="px-4 py-2 border-b border-gray-100">
+                    <h3 className="font-semibold text-gray-900">Notifications</h3>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    {notifications.map((notification) => (
+                      <div key={notification.id} className="px-4 py-3 hover:bg-gray-50 transition-colors duration-200">
+                        <div className="flex items-start space-x-3">
+                          <div className={`w-2 h-2 rounded-full mt-2 ${
+                            notification.type === 'success' ? 'bg-green-500' :
+                            notification.type === 'warning' ? 'bg-yellow-500' :
+                            notification.type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+                          }`} />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">{notification.title}</p>
+                            <p className="text-xs text-gray-600">{notification.message}</p>
+                            <p className="text-xs text-gray-400 mt-1">{notification.timestamp}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Settings */}
+            <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200">
+              <Settings className="w-6 h-6" />
+            </button>
+
+            {/* Profile Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowProfile(!showProfile)}
+                className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-50 transition-all duration-200"
+              >
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm font-semibold text-gray-900">{user.name}</p>
+                  <p className="text-xs text-gray-500 capitalize">{user.role} • @{user.username}</p>
+                </div>
+                
+                <div className="relative">
+                  <img
+                    src={user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`}
+                    alt={user.name}
+                    className="w-10 h-10 rounded-xl object-cover border-2 border-gray-200 shadow-sm"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                </div>
+              </button>
+
+              {showProfile && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50 animate-slideDown">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <div className="flex items-center space-x-3">
+                      <img
+                        src={user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`}
+                        alt={user.name}
+                        className="w-12 h-12 rounded-xl object-cover"
+                      />
+                      <div>
+                        <p className="font-semibold text-gray-900">{user.name}</p>
+                        <p className="text-sm text-gray-500">@{user.username}</p>
+                        <p className="text-xs text-gray-400">{user.employeeId}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="py-2">
+                    <button 
+                      onClick={() => {
+                        setShowProfile(false);
+                        setShowProfileSettings(true);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>View Profile</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowProfile(false);
+                        setShowProfileSettings(true);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <Settings className="w-4 h-4" />
+                      <span>Settings</span>
+                    </button>
+                  </div>
+                  
+                  <div className="border-t border-gray-100 py-2">
+                    <button
+                      onClick={onLogout}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Profile Settings Modal */}
+      {showProfileSettings && onUserUpdate && (
+        <ProfileSettings
+          user={user}
+          onUserUpdate={onUserUpdate}
+          onClose={() => setShowProfileSettings(false)}
+        />
+      )}
+    </header>
+  );
+};

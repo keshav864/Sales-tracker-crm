@@ -1,295 +1,370 @@
-import { User, AttendanceRecord, SalesRecord, SalesTarget, Product } from '../types';
+import React, { useState } from 'react';
+import { User, Save, Camera, Phone, Mail, MapPin, Building, Calendar, Target, Lock } from 'lucide-react';
+import { User as UserType } from '../../types';
+import { updateUserProfile } from '../../utils/storage';
+import { PasswordChangeModal } from '../auth/PasswordChangeModal';
 
-const STORAGE_KEYS = {
-  USERS: 'crm_users',
-  ATTENDANCE: 'crm_attendance',
-  SALES: 'crm_sales',
-  TARGETS: 'crm_targets',
-  CURRENT_USER: 'crm_current_user',
-  PRODUCTS: 'crm_products',
-};
+interface ProfileSettingsProps {
+  user: UserType;
+  onUserUpdate: (user: UserType) => void;
+  onClose: () => void;
+}
 
-// User Management
-export const getUsers = (): User[] => {
-  const users = localStorage.getItem(STORAGE_KEYS.USERS);
-  return users ? JSON.parse(users) : getDefaultUsers();
-};
+export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
+  user,
+  onUserUpdate,
+  onClose,
+}) => {
+  const [formData, setFormData] = useState({
+    name: user.name,
+    username: user.username,
+    phone: user.phone || '',
+    designation: user.designation || '',
+    department: user.department,
+    territory: user.territory || '',
+    target: user.target || 0,
+    profilePicture: user.profilePicture || '',
+  });
 
-export const saveUsers = (users: User[]): void => {
-  localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-};
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<'personal' | 'professional'>('personal');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
-export const getCurrentUser = (): User | null => {
-  const user = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-  return user ? JSON.parse(user) : null;
-};
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-export const setCurrentUser = (user: User | null): void => {
-  if (user) {
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
-  } else {
-    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-  }
-};
-
-// Password Reset
-export const resetUserPassword = (employeeId: string, newPassword: string): boolean => {
-  const users = getUsers();
-  const userIndex = users.findIndex(u => u.employeeId === employeeId);
-  
-  if (userIndex !== -1) {
-    users[userIndex].password = newPassword;
-    saveUsers(users);
-    return true;
-  }
-  return false;
-};
-
-// Update User Profile
-export const updateUserProfile = (userId: string, updates: Partial<User>): boolean => {
-  const users = getUsers();
-  const userIndex = users.findIndex(u => u.id === userId);
-  
-  if (userIndex !== -1) {
-    users[userIndex] = { ...users[userIndex], ...updates };
-    saveUsers(users);
-    
-    // Update current user if it's the same user
-    const currentUser = getCurrentUser();
-    if (currentUser && currentUser.id === userId) {
-      setCurrentUser(users[userIndex]);
+    try {
+      const success = updateUserProfile(user.id, formData);
+      
+      if (success) {
+        const updatedUser = { ...user, ...formData };
+        onUserUpdate(updatedUser);
+        
+        // Show success message
+        const successDiv = document.createElement('div');
+        successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-slideDown';
+        successDiv.innerHTML = '✅ Profile updated successfully!';
+        document.body.appendChild(successDiv);
+        
+        setTimeout(() => {
+          if (document.body.contains(successDiv)) {
+            document.body.removeChild(successDiv);
+          }
+        }, 3000);
+        
+        onClose();
+      } else {
+        alert('Failed to update profile. Please try again.');
+      }
+    } catch (error) {
+      alert('Error updating profile. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    return true;
-  }
-  return false;
-};
-
-// Add New Employee (Admin only)
-export const addNewEmployee = (userData: Omit<User, 'id'>): User => {
-  const users = getUsers();
-  const newUser: User = {
-    ...userData,
-    id: userData.employeeId,
   };
-  
-  users.push(newUser);
-  saveUsers(users);
-  return newUser;
-};
 
-// Products Management
-export const getProducts = (): Product[] => {
-  const products = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-  return products ? JSON.parse(products) : getDefaultProducts();
-};
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFormData({ ...formData, profilePicture: event.target?.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-export const saveProducts = (products: Product[]): void => {
-  localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-};
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <img
+                  src={formData.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=6366f1&color=fff`}
+                  alt={formData.name}
+                  className="w-20 h-20 rounded-full border-4 border-white shadow-lg object-cover"
+                />
+                <label className="absolute bottom-0 right-0 bg-white text-blue-600 p-2 rounded-full cursor-pointer hover:bg-gray-100 transition-colors duration-200 shadow-lg">
+                  <Camera className="w-4 h-4" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold">{formData.name}</h2>
+                <p className="text-blue-100">@{formData.username} • {user.role}</p>
+                <p className="text-blue-200 text-sm">{formData.designation}</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-white hover:text-gray-200 text-2xl font-bold"
+            >
+              ×
+            </button>
+          </div>
+        </div>
 
-// Attendance Management
-export const getAttendanceRecords = (): AttendanceRecord[] => {
-  const records = localStorage.getItem(STORAGE_KEYS.ATTENDANCE);
-  return records ? JSON.parse(records) : [];
-};
+        {/* Tab Navigation */}
+        <div className="border-b border-gray-200">
+          <nav className="flex space-x-8 px-6">
+            <button
+              onClick={() => setActiveTab('personal')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                activeTab === 'personal'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Personal Information
+            </button>
+            <button
+              onClick={() => setActiveTab('professional')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                activeTab === 'professional'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Professional Details
+            </button>
+          </nav>
+        </div>
 
-export const saveAttendanceRecords = (records: AttendanceRecord[]): void => {
-  localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify(records));
-};
+        <form onSubmit={handleSubmit} className="p-6">
+          {/* Personal Information Tab */}
+          {activeTab === 'personal' && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <User className="w-4 h-4 inline mr-2" />
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    required
+                  />
+                </div>
 
-// Sales Management
-export const getSalesRecords = (): SalesRecord[] => {
-  const records = localStorage.getItem(STORAGE_KEYS.SALES);
-  return records ? JSON.parse(records) : [];
-};
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <User className="w-4 h-4 inline mr-2" />
+                    Username *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/\s+/g, '.') })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    placeholder="john.doe"
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Username will be converted to lowercase with dots</p>
+                </div>
 
-export const saveSalesRecords = (records: SalesRecord[]): void => {
-  localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(records));
-};
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Phone className="w-4 h-4 inline mr-2" />
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    placeholder="+91 9876543210"
+                  />
+                </div>
 
-// Sales Targets
-export const getSalesTargets = (): SalesTarget[] => {
-  const targets = localStorage.getItem(STORAGE_KEYS.TARGETS);
-  return targets ? JSON.parse(targets) : [];
-};
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Calendar className="w-4 h-4 inline mr-2" />
+                    Employee ID
+                  </label>
+                  <input
+                    type="text"
+                    value={user.employeeId}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-100 text-gray-600"
+                    disabled
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Employee ID cannot be changed</p>
+                </div>
+              </div>
 
-export const saveSalesTargets = (targets: SalesTarget[]): void => {
-  localStorage.setItem(STORAGE_KEYS.TARGETS, JSON.stringify(targets));
-};
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <h4 className="font-semibold text-blue-900 mb-2">Account Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-blue-700 font-medium">Role:</span>
+                    <span className="ml-2 capitalize">{user.role}</span>
+                  </div>
+                  <div>
+                    <span className="text-blue-700 font-medium">Join Date:</span>
+                    <span className="ml-2">{new Date(user.joinDate).toLocaleDateString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-blue-700 font-medium">Status:</span>
+                    <span className="ml-2 text-green-600 font-medium">Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
-// Default Products from the image
-const getDefaultProducts = (): Product[] => [
-  // Projector Products (from screenshot)
-  { id: 'PROJ_GALAXY', name: 'Galaxy Projector', price: 11513, category: 'Projector', model: 'Galaxy' },
-  { id: 'PROJ_PLAY', name: 'Play Projector', price: 10073, category: 'Projector', model: 'Play' },
-  { id: 'PROJ_EPIC', name: 'Epic Projector', price: 6473, category: 'Projector', model: 'Epic' },
-  { id: 'PROJ_JOY', name: 'Joy Projector', price: 5039, category: 'Projector', model: 'Joy' },
-  { id: 'PROJ_PIXA', name: 'Pixa Projector', price: 7199, category: 'Projector', model: 'Pixa' },
-  { id: 'PROJ_SCREEN_M65', name: 'Screen M65 Projector', price: 11513, category: 'Projector', model: 'M65' },
-  
-  // Mobile Products (existing)
-  { id: 'GALAXY', name: 'Galaxy', price: 11513, category: 'Mobile', model: 'Galaxy' },
-  { id: 'PLAY', name: 'Play', price: 10073, category: 'Mobile', model: 'Play' },
-  { id: 'EPIC', name: 'Epic', price: 6473, category: 'Mobile', model: 'Epic' },
-  { id: 'JOY', name: 'Joy', price: 5039, category: 'Mobile', model: 'Joy' },
-  { id: 'PIXA', name: 'Pixa', price: 7199, category: 'Mobile', model: 'Pixa' },
-  
-  // Screen Products
-  { id: 'SCREEN_M65', name: 'Screen M65', price: 11513, category: 'Screen', model: 'M65' },
-  { id: 'SCREEN_M80', name: 'Screen M80', price: 12951, category: 'Screen', model: 'M80' },
-  { id: 'SCREEN_M100', name: 'Screen M100', price: 14393, category: 'Screen', model: 'M100' },
-  { id: 'SCREEN_FR140', name: 'Screen FR140', price: 40111, category: 'Screen', model: 'FR140' },
-  { id: 'SCREEN_FR160', name: 'Screen FR160', price: 50291, category: 'Screen', model: 'FR160' },
-  
-  // Extension Board Products
-  { id: 'EXT_BOARD_331', name: 'Extension Board 331', price: 791, category: 'Extension', model: '331' },
-  { id: 'EXT_BOARD_411', name: 'Extension Board 411', price: 719, category: 'Extension', model: '411' },
-  { id: 'EXT_BOARD_422', name: 'Extension Board 422', price: 863, category: 'Extension', model: '422' },
-  { id: 'EXT_BOARD_524', name: 'Extension Board 524', price: 1079, category: 'Extension', model: '524' },
-  { id: 'EXT_BOARD_522', name: 'Extension Board 522', price: 935, category: 'Extension', model: '522' },
-  
-  // SMPS Products
-  { id: 'SMPS_450', name: 'SMPS 450', price: 633, category: 'SMPS', model: '450' },
-  { id: 'SMPS_500', name: 'SMPS 500', price: 950, category: 'SMPS', model: '500' },
-  { id: 'SMPS_550', name: 'SMPS 550', price: 1108, category: 'SMPS', model: '550' },
-  { id: 'SMPS_650', name: 'SMPS 650', price: 1266, category: 'SMPS', model: '650' },
-  { id: 'SMPS_700', name: 'SMPS 700', price: 1425, category: 'SMPS', model: '700' },
-  { id: 'SMPS_750', name: 'SMPS 750', price: 1583, category: 'SMPS', model: '750' },
-  { id: 'SMPS_800', name: 'SMPS 800', price: 1900, category: 'SMPS', model: '800' },
-  { id: 'SMPS_850', name: 'SMPS 850', price: 1900, category: 'SMPS', model: '850' },
-  { id: 'SMPS_1000', name: 'SMPS 1000', price: 2374, category: 'SMPS', model: '1000' },
-  
-  // AI Products
-  { id: 'AI_MODEL', name: 'AI Model', price: 2771, category: 'AI', model: 'Standard' },
-];
+          {/* Professional Details Tab */}
+          {activeTab === 'professional' && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Building className="w-4 h-4 inline mr-2" />
+                    Designation
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.designation}
+                    onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    placeholder="Sales Executive"
+                  />
+                </div>
 
-// Complete employee list with exact credentials
-const getDefaultUsers = (): User[] => [
-  // Admin
-  {
-    id: 'ADMIN001',
-    employeeId: 'ADMIN001',
-    name: 'Manoj Kumar',
-    username: 'manoj.kumar',
-    role: 'admin',
-    department: 'Management',
-    joinDate: '2024-01-01',
-    password: 'admin@123',
-    profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9876543210',
-    designation: 'Sales Director',
-    target: 500000,
-    manager: null,
-    territory: 'All India',
-    isActive: true,
-    lastLogin: new Date().toISOString(),
-  },
-  
-  // Reporting Managers
-  {
-    id: 'BM001',
-    employeeId: 'BM001',
-    name: 'Salim Javed',
-    username: 'salim.javed',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-01-15',
-    password: 'salim@2024',
-    profilePicture: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 7870660333',
-    designation: 'District General Manager (DGM)',
-    target: 300000,
-    manager: 'ADMIN001',
-    territory: 'Bihar/Delhi & West Bengal/Odisha',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-  },
-  {
-    id: 'BM002',
-    employeeId: 'BM002',
-    name: 'Sandeep Bediawala',
-    username: 'sandeep.bediawala',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-01-20',
-    password: 'sandeep@2024',
-    profilePicture: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9876543214',
-    designation: 'Regional Manager (Gujarat)',
-    target: 280000,
-    manager: 'ADMIN001',
-    territory: 'Gujarat & Chhattisgarh',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
-  },
-  {
-    id: 'BM003',
-    employeeId: 'BM003',
-    name: 'Pawan Khanna',
-    username: 'pawan.khanna',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-02-01',
-    password: 'pawan@2024',
-    profilePicture: 'https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9174995813',
-    designation: 'Sales Manager',
-    target: 250000,
-    manager: 'ADMIN001',
-    territory: 'MP & Rajasthan',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
-  },
-  {
-    id: 'BM004',
-    employeeId: 'BM004',
-    name: 'Dhiraj Prakash',
-    username: 'dhiraj.prakash',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-02-05',
-    password: 'dhiraj@2024',
-    profilePicture: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9174995813',
-    designation: 'Sales Manager',
-    target: 250000,
-    manager: 'ADMIN001',
-    territory: 'MP & Rajasthan',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
-  },
-];
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Building className="w-4 h-4 inline mr-2" />
+                    Department
+                  </label>
+                  <select
+                    value={formData.department}
+                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                  >
+                    <option value="Sales">Sales</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Management">Management</option>
+                    <option value="Operations">Operations</option>
+                    <option value="HR">Human Resources</option>
+                    <option value="Finance">Finance</option>
+                  </select>
+                </div>
 
-// Export Functions
-export const exportToCSV = (data: any[], filename: string): void => {
-  if (data.length === 0) return;
-  
-  const headers = Object.keys(data[0]);
-  const csvContent = [
-    headers.join(','),
-    ...data.map(row => headers.map(header => `"${row[header] || ''}"`).join(','))
-  ].join('\n');
-  
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', `${filename}.csv`);
-  link.style.visibility = 'hidden';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <MapPin className="w-4 h-4 inline mr-2" />
+                    Territory
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.territory}
+                    onChange={(e) => setFormData({ ...formData, territory: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    placeholder="North India"
+                  />
+                </div>
 
-// Initialize default data if not exists
-export const initializeDefaultData = (): void => {
-  if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
-    saveUsers(getDefaultUsers());
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
-    saveProducts(getDefaultProducts());
-  }
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Target className="w-4 h-4 inline mr-2" />
+                    Monthly Target (₹)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.target}
+                    onChange={(e) => setFormData({ ...formData, target: parseInt(e.target.value) || 0 })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    placeholder="150000"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <h4 className="font-semibold text-green-900 mb-3">Performance Overview</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">₹{formData.target?.toLocaleString()}</div>
+                    <div className="text-sm text-green-700">Monthly Target</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">68%</div>
+                    <div className="text-sm text-blue-700">Achievement Rate</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">A+</div>
+                    <div className="text-sm text-purple-700">Performance Grade</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Security Section */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+            <h4 className="font-semibold text-yellow-900 mb-3">Security Settings</h4>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-yellow-800">Password</p>
+                <p className="text-xs text-yellow-600">Last changed: Recently</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPasswordModal(true)}
+                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors duration-200 flex items-center space-x-2"
+              >
+                <Lock className="w-4 h-4" />
+                <span>Change Password</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 mt-8">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors duration-200 font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-medium flex items-center space-x-2 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Save className="w-5 h-5" />
+                  <span>Save Changes</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Password Change Modal */}
+      {showPasswordModal && (
+        <PasswordChangeModal
+          userId={user.id}
+          onClose={() => setShowPasswordModal(false)}
+          onSuccess={() => {
+            alert('Password changed successfully!');
+          }}
+        />
+      )}
+    </div>
+  );
 };
