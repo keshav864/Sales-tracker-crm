@@ -212,7 +212,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Header 
         user={user} 
         onLogout={logout} 
@@ -228,7 +228,7 @@ function App() {
           isCollapsed={sidebarOpen}
         />
         
-        <main className="flex-1 p-3 md:p-6 md:ml-64">
+        <main className="flex-1 p-3 md:p-6 md:ml-64 bg-white">
           <div className="max-w-7xl mx-auto">
             {renderView()}
           </div>

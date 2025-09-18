@@ -192,14 +192,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <div className="card hover-lift">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 hover:shadow-xl transition-all duration-300">
           <div className="flex items-center">
             <div className="bg-blue-500 rounded-xl p-3 mr-4 shadow-lg">
               <Users className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-medium text-gray-500 mb-1">Total Employees</h3>
-              <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalEmployees}</p>
+              <p className="text-xl md:text-2xl font-bold text-black">{stats.totalEmployees}</p>
               <p className="text-xs md:text-sm text-blue-600 mt-1">
                 {currentUser.role === 'admin' ? 'All' : 'Team'}
               </p>
@@ -207,14 +207,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
 
-        <div className="card hover-lift">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 hover:shadow-xl transition-all duration-300">
           <div className="flex items-center">
             <div className="bg-green-500 rounded-xl p-3 mr-4 shadow-lg">
               <UserCheck className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-medium text-gray-500 mb-1">Present Today</h3>
-              <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.presentToday}</p>
+              <p className="text-xl md:text-2xl font-bold text-black">{stats.presentToday}</p>
               <p className="text-xs md:text-sm text-green-600 mt-1">
                 {stats.lateToday > 0 ? `+${stats.lateToday} late` : 'On time'}
               </p>
@@ -222,14 +222,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
 
-        <div className="card hover-lift">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 hover:shadow-xl transition-all duration-300">
           <div className="flex items-center">
             <div className="bg-purple-500 rounded-xl p-3 mr-4 shadow-lg">
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-medium text-gray-500 mb-1">Sales Today</h3>
-              <p className="text-lg md:text-2xl font-bold text-gray-900">₹{stats.totalSalesToday.toLocaleString()}</p>
+              <p className="text-lg md:text-2xl font-bold text-black">₹{stats.totalSalesToday.toLocaleString()}</p>
               <p className="text-xs md:text-sm text-purple-600 mt-1">
                 Month: ₹{(stats.totalSalesThisMonth / 1000).toFixed(0)}K
               </p>
@@ -237,14 +237,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
 
-        <div className="card hover-lift">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 hover:shadow-xl transition-all duration-300">
           <div className="flex items-center">
             <div className="bg-orange-500 rounded-xl p-3 mr-4 shadow-lg">
               <Target className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-medium text-gray-500 mb-1">Achievement</h3>
-              <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.achievementRate.toFixed(1)}%</p>
+              <p className="text-xl md:text-2xl font-bold text-black">{stats.achievementRate.toFixed(1)}%</p>
               <p className="text-xs md:text-sm text-orange-600 mt-1">
                 Target: ₹{(stats.totalTarget / 1000).toFixed(0)}K
               </p>
@@ -257,7 +257,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {(currentUser.role === 'admin' || currentUser.role === 'manager') && (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Team Structure</h3>
+            <h3 className="text-xl font-semibold text-black">Team Structure</h3>
             <div className="text-sm text-gray-600">
               {currentUser.role === 'admin' ? `${managers.length} managers, ${stats.totalEmployees} total employees` : 'Your team overview'}
             </div>
@@ -268,12 +268,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
             .map(manager => (
             <div key={manager.id} className="mb-6 bg-white border border-gray-200 rounded-xl overflow-hidden">
               {/* Manager Header */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 border-b border-gray-200">
+              <div className="bg-white p-4 border-b border-gray-200">
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 lg:space-y-0">
                   <div className="flex items-center space-x-4">
                     <button
                       onClick={() => toggleManagerExpansion(manager.id)}
-                      className="p-1 hover:bg-white rounded-lg transition-colors duration-200"
+                      className="p-1 hover:bg-gray-50 rounded-lg transition-colors duration-200"
                     >
                       {expandedManagers.has(manager.id) ? (
                         <ChevronDown className="w-5 h-5 text-gray-600" />
@@ -289,7 +289,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     />
                     
                     <div>
-                      <h4 className="font-semibold text-gray-900 text-lg">{manager.name}</h4>
+                      <h4 className="font-semibold text-black text-lg">{manager.name}</h4>
                       <p className="text-blue-600 font-medium">{manager.designation}</p>
                       <p className="text-sm text-gray-600">{manager.territory}</p>
                     </div>
@@ -306,12 +306,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     </div>
                     <div className="text-center">
                       <p className="text-sm text-gray-600">Phone</p>
-                      <p className="font-medium text-gray-900">{manager.phone}</p>
+                      <p className="font-medium text-black">{manager.phone}</p>
                     </div>
                     {currentUser.role === 'admin' && (
                       <button
                         onClick={() => handleExportTeamData(manager.id)}
-                        className="btn-secondary text-xs py-1 px-2 flex items-center space-x-1"
+                        className="bg-white hover:bg-gray-50 text-gray-800 font-semibold py-1 px-2 rounded-xl transition-all duration-300 border border-gray-200 shadow-sm text-xs flex items-center space-x-1"
                       >
                         <Download className="w-4 h-4" />
                         <span>Export</span>
@@ -323,7 +323,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
               {/* Team Members */}
               {expandedManagers.has(manager.id) && teamStructure[manager.id] && (
-                <div className="p-4 bg-gray-50">
+                <div className="p-4 bg-white">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
                     {teamStructure[manager.id].slice(0, 12).map(employee => (
                       <div key={employee.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow duration-200">
@@ -334,7 +334,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             className="w-10 h-10 rounded-lg object-cover"
                           />
                           <div className="flex-1">
-                            <h5 className="font-medium text-gray-900">{employee.name}</h5>
+                            <h5 className="font-medium text-black">{employee.name}</h5>
                             <p className="text-xs text-gray-600">{employee.designation}</p>
                           </div>
                         </div>
@@ -342,11 +342,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
                             <span className="text-gray-600">ID:</span>
-                            <span className="font-medium">{employee.employeeId}</span>
+                            <span className="font-medium text-black">{employee.employeeId}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">Territory:</span>
-                            <span className="font-medium text-xs truncate ml-1">{employee.territory}</span>
+                            <span className="font-medium text-xs truncate ml-1 text-black">{employee.territory}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">Target:</span>
@@ -354,7 +354,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">Phone:</span>
-                            <span className="font-medium text-xs">{employee.phone}</span>
+                            <span className="font-medium text-xs text-black">{employee.phone}</span>
                           </div>
                         </div>
 
@@ -383,47 +383,47 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Weekly Sales Trend</h3>
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
+          <h3 className="text-lg font-semibold text-black mb-4">Weekly Sales Trend</h3>
           <WeeklySalesChart sales={visibleSales} />
         </div>
 
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Sales Overview</h3>
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
+          <h3 className="text-lg font-semibold text-black mb-4">Monthly Sales Overview</h3>
           <MonthlySalesChart sales={visibleSales} />
         </div>
       </div>
 
-      <div className="card">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Attendance Trends</h3>
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
+        <h3 className="text-lg font-semibold text-black mb-4">Attendance Trends</h3>
         <AttendanceChart attendance={visibleAttendance} />
       </div>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-        <div className="card text-center hover-lift">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 text-center hover:shadow-xl transition-all duration-300">
           <Clock className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-          <h4 className="font-semibold text-gray-900 mb-2">Mark Attendance</h4>
+          <h4 className="font-semibold text-black mb-2">Mark Attendance</h4>
           <p className="text-gray-600 text-sm mb-4">Quick check-in/out for today</p>
-          <button className="btn-primary w-full">
+          <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 md:py-3 px-4 md:px-6 rounded-xl transition-all duration-300 w-full">
             Check In/Out
           </button>
         </div>
 
-        <div className="card text-center hover-lift">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 text-center hover:shadow-xl transition-all duration-300">
           <TrendingUp className="w-12 h-12 text-green-600 mx-auto mb-4" />
-          <h4 className="font-semibold text-gray-900 mb-2">Add Sale</h4>
+          <h4 className="font-semibold text-black mb-2">Add Sale</h4>
           <p className="text-gray-600 text-sm mb-4">Record a new sales transaction</p>
-          <button className="btn-success w-full">
+          <button className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-2 md:py-3 px-4 md:px-6 rounded-xl transition-all duration-300 w-full">
             Add Sale
           </button>
         </div>
 
-        <div className="card text-center hover-lift">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 text-center hover:shadow-xl transition-all duration-300">
           <BarChart3 className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-          <h4 className="font-semibold text-gray-900 mb-2">View Reports</h4>
+          <h4 className="font-semibold text-black mb-2">View Reports</h4>
           <p className="text-gray-600 text-sm mb-4">Detailed analytics and insights</p>
-          <button className="btn-secondary w-full">
+          <button className="bg-white hover:bg-gray-50 text-gray-800 font-semibold py-2 md:py-3 px-4 md:px-6 rounded-xl transition-all duration-300 border border-gray-200 shadow-sm w-full">
             View Reports
           </button>
         </div>

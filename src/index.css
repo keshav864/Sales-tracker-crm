@@ -14,6 +14,7 @@
     line-height: 1.6;
     background: #ffffff;
     min-height: 100vh;
+    color: #000000;
   }
 
   html {
@@ -38,10 +39,6 @@
     @apply bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-semibold py-2 md:py-3 px-4 md:px-6 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transform hover:scale-105 shadow-lg hover:shadow-xl text-sm md:text-base;
   }
   
-  .card {
-    @apply bg-white backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50 p-4 md:p-6 hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02];
-  }
-  
   .input-field {
     @apply w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white backdrop-blur-sm hover:bg-white focus:bg-white shadow-sm text-sm md:text-base;
   }
@@ -62,13 +59,7 @@
     @apply bg-yellow-100 text-yellow-800 border border-yellow-200;
   }
 
-  .gradient-bg {
-    @apply bg-gradient-to-br from-white to-gray-50;
-  }
 
-  .glass-effect {
-    @apply bg-white backdrop-blur-lg border border-gray-200/50 shadow-xl;
-  }
 }
 
 @layer utilities {
