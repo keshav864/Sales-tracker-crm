@@ -149,7 +149,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   return (
-    <div className="space-y-6 bg-white">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -268,12 +268,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
             .map(manager => (
             <div key={manager.id} className="mb-6 bg-white border border-gray-200 rounded-xl overflow-hidden">
               {/* Manager Header */}
-              <div className="bg-white p-4 border-b border-gray-200">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <button
                       onClick={() => toggleManagerExpansion(manager.id)}
-                      className="p-1 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                      className="p-1 hover:bg-white rounded-lg transition-colors duration-200"
                     >
                       {expandedManagers.has(manager.id) ? (
                         <ChevronDown className="w-5 h-5 text-gray-600" />
@@ -323,7 +323,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
               {/* Team Members */}
               {expandedManagers.has(manager.id) && teamStructure[manager.id] && (
-                <div className="p-4 bg-white">
+                <div className="p-4 bg-gray-50">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {teamStructure[manager.id].map(employee => (
                       <div key={employee.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow duration-200">

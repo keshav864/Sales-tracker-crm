@@ -53,7 +53,7 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
       labels,
       datasets: [
         {
-          label: 'Daily Sales ($)',
+          label: 'Daily Sales (₹)',
           data: salesData,
           backgroundColor: 'rgba(59, 130, 246, 0.8)',
           borderColor: 'rgb(59, 130, 246)',
@@ -80,6 +80,8 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
             'rgba(251, 191, 36, 0.8)',
             'rgba(239, 68, 68, 0.8)',
             'rgba(147, 51, 234, 0.8)',
+            'rgba(236, 72, 153, 0.8)',
+            'rgba(14, 165, 233, 0.8)',
           ],
           borderWidth: 2,
           borderColor: '#ffffff',
@@ -104,7 +106,7 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
       labels: userSales.map(user => user.name),
       datasets: [
         {
-          label: 'Total Sales ($)',
+          label: 'Total Sales (₹)',
           data: userSales.map(user => user.sales),
           backgroundColor: 'rgba(34, 197, 94, 0.8)',
           borderColor: 'rgb(34, 197, 94)',
@@ -126,7 +128,7 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
         beginAtZero: true,
         ticks: {
           callback: function(value: any) {
-            return '$' + value.toLocaleString();
+            return '₹' + value.toLocaleString();
           },
         },
       },
@@ -144,6 +146,13 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-bold text-gray-900">Sales Analytics</h2>
+        <div className="text-sm text-gray-600">
+          Comprehensive sales performance analysis
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -175,13 +184,13 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
         <div className="card text-center">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Total Revenue</h4>
           <p className="text-xl font-bold text-green-600">
-            ${relevantSales.reduce((sum, sale) => sum + sale.totalAmount, 0).toLocaleString()}
+            ₹{relevantSales.reduce((sum, sale) => sum + sale.totalAmount, 0).toLocaleString()}
           </p>
         </div>
         <div className="card text-center">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Average Sale</h4>
           <p className="text-xl font-bold text-blue-600">
-            ${relevantSales.length > 0 
+            ₹{relevantSales.length > 0 
               ? (relevantSales.reduce((sum, sale) => sum + sale.totalAmount, 0) / relevantSales.length).toFixed(2)
               : '0.00'
             }

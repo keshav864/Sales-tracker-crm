@@ -15,7 +15,7 @@ import { getUsers, getSalesRecords, getAttendanceRecords, updateUserProfile } fr
 import { realTimeDataManager } from './utils/realTimeData';
 import { User, SalesRecord, AttendanceRecord } from './types';
 
-type ViewType = 'dashboard' | 'attendance' | 'sales' | 'reports' | 'employees' | 'profile' | 'settings' | 'export';
+type ViewType = 'dashboard' | 'attendance' | 'sales' | 'analytics' | 'reports' | 'employees' | 'profile' | 'settings' | 'export';
 
 function App() {
   const { user, login, logout } = useAuth();
@@ -134,6 +134,14 @@ function App() {
             sales={allSales}
             currentUser={user}
             onSalesUpdate={handleSalesUpdate}
+          />
+        );
+      case 'analytics':
+        return (
+          <SalesAnalytics 
+            sales={allSales}
+            users={allUsers}
+            currentUser={user}
           />
         );
       case 'reports':
