@@ -1,295 +1,252 @@
-import { User, AttendanceRecord, SalesRecord, SalesTarget, Product } from '../types';
+import React from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { TrendingUp, Users, Target, Calendar, DollarSign, Award, Clock, CheckCircle } from 'lucide-react';
+import { User, AttendanceRecord, SalesRecord } from '../../types';
 
-const STORAGE_KEYS = {
-  USERS: 'crm_users',
-  ATTENDANCE: 'crm_attendance',
-  SALES: 'crm_sales',
-  TARGETS: 'crm_targets',
-  CURRENT_USER: 'crm_current_user',
-  PRODUCTS: 'crm_products',
-};
+interface DashboardProps {
+  users: User[];
+  attendance: AttendanceRecord[];
+  sales: SalesRecord[];
+  currentUser: User;
+  onUsersUpdate: (users: User[]) => void;
+  onAttendanceUpdate: (attendance: AttendanceRecord[]) => void;
+  onSalesUpdate: (sales: SalesRecord[]) => void;
+}
 
-// User Management
-export const getUsers = (): User[] => {
-  const users = localStorage.getItem(STORAGE_KEYS.USERS);
-  return users ? JSON.parse(users) : getDefaultUsers();
-};
+export const Dashboard: React.FC<DashboardProps> = ({
+  users,
+  attendance,
+  sales,
+  currentUser,
+}) => {
+  // Calculate dashboard metrics
+  const totalEmployees = users.length;
+  const activeEmployees = users.filter(u => u.isActive).length;
+  const totalSales = sales.reduce((sum, sale) => sum + sale.amount, 0);
+  const todayAttendance = attendance.filter(record => {
+    const today = new Date().toDateString();
+    return new Date(record.date).toDateString() === today;
+  }).length;
 
-export const saveUsers = (users: User[]): void => {
-  localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-};
+  // Sales data for charts
+  const salesByMonth = sales.reduce((acc, sale) => {
+    const month = new Date(sale.date).toLocaleDateString('en-US', { month: 'short' });
+    acc[month] = (acc[month] || 0) + sale.amount;
+    return acc;
+  }, {} as Record<string, number>);
 
-export const getCurrentUser = (): User | null => {
-  const user = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-  return user ? JSON.parse(user) : null;
-};
+  const chartData = Object.entries(salesByMonth).map(([month, amount]) => ({
+    month,
+    amount,
+  }));
 
-export const setCurrentUser = (user: User | null): void => {
-  if (user) {
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
-  } else {
-    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-  }
-};
+  // Team performance data
+  const teamPerformance = users
+    .filter(u => u.role !== 'admin')
+    .map(user => {
+      const userSales = sales.filter(s => s.employeeId === user.employeeId);
+      const totalAmount = userSales.reduce((sum, sale) => sum + sale.amount, 0);
+      const achievement = user.target ? (totalAmount / user.target) * 100 : 0;
+      
+      return {
+        name: user.name,
+        sales: totalAmount,
+        target: user.target || 0,
+        achievement: Math.round(achievement),
+      };
+    })
+    .sort((a, b) => b.sales - a.sales)
+    .slice(0, 5);
 
-// Password Reset
-export const resetUserPassword = (employeeId: string, newPassword: string): boolean => {
-  const users = getUsers();
-  const userIndex = users.findIndex(u => u.employeeId === employeeId);
-  
-  if (userIndex !== -1) {
-    users[userIndex].password = newPassword;
-    saveUsers(users);
-    return true;
-  }
-  return false;
-};
+  // Status distribution
+  const statusData = [
+    { name: 'Active', value: activeEmployees, color: '#10B981' },
+    { name: 'Inactive', value: totalEmployees - activeEmployees, color: '#EF4444' },
+  ];
 
-// Update User Profile
-export const updateUserProfile = (userId: string, updates: Partial<User>): boolean => {
-  const users = getUsers();
-  const userIndex = users.findIndex(u => u.id === userId);
-  
-  if (userIndex !== -1) {
-    users[userIndex] = { ...users[userIndex], ...updates };
-    saveUsers(users);
-    
-    // Update current user if it's the same user
-    const currentUser = getCurrentUser();
-    if (currentUser && currentUser.id === userId) {
-      setCurrentUser(users[userIndex]);
-    }
-    
-    return true;
-  }
-  return false;
-};
+  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
 
-// Add New Employee (Admin only)
-export const addNewEmployee = (userData: Omit<User, 'id'>): User => {
-  const users = getUsers();
-  const newUser: User = {
-    ...userData,
-    id: userData.employeeId,
-  };
-  
-  users.push(newUser);
-  saveUsers(users);
-  return newUser;
-};
+  return (
+    <div className="space-y-6">
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
+        <h1 className="text-2xl font-bold mb-2">
+          Welcome back, {currentUser.name}!
+        </h1>
+        <p className="text-blue-100">
+          Here's what's happening with your team today.
+        </p>
+      </div>
 
-// Products Management
-export const getProducts = (): Product[] => {
-  const products = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-  return products ? JSON.parse(products) : getDefaultProducts();
-};
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Sales</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ₹{totalSales.toLocaleString()}
+              </p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-full">
+              <DollarSign className="h-6 w-6 text-green-600" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center text-sm">
+            <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+            <span className="text-green-600">+12.5%</span>
+            <span className="text-gray-500 ml-1">from last month</span>
+          </div>
+        </div>
 
-export const saveProducts = (products: Product[]): void => {
-  localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-};
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Active Employees</p>
+              <p className="text-2xl font-bold text-gray-900">{activeEmployees}</p>
+            </div>
+            <div className="p-3 bg-blue-100 rounded-full">
+              <Users className="h-6 w-6 text-blue-600" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center text-sm">
+            <span className="text-gray-500">Total: {totalEmployees} employees</span>
+          </div>
+        </div>
 
-// Attendance Management
-export const getAttendanceRecords = (): AttendanceRecord[] => {
-  const records = localStorage.getItem(STORAGE_KEYS.ATTENDANCE);
-  return records ? JSON.parse(records) : [];
-};
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Today's Attendance</p>
+              <p className="text-2xl font-bold text-gray-900">{todayAttendance}</p>
+            </div>
+            <div className="p-3 bg-purple-100 rounded-full">
+              <Calendar className="h-6 w-6 text-purple-600" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center text-sm">
+            <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
+            <span className="text-green-600">
+              {Math.round((todayAttendance / activeEmployees) * 100)}% present
+            </span>
+          </div>
+        </div>
 
-export const saveAttendanceRecords = (records: AttendanceRecord[]): void => {
-  localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify(records));
-};
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Sales Entries</p>
+              <p className="text-2xl font-bold text-gray-900">{sales.length}</p>
+            </div>
+            <div className="p-3 bg-orange-100 rounded-full">
+              <Target className="h-6 w-6 text-orange-600" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center text-sm">
+            <Clock className="h-4 w-4 text-gray-500 mr-1" />
+            <span className="text-gray-500">This month</span>
+          </div>
+        </div>
+      </div>
 
-// Sales Management
-export const getSalesRecords = (): SalesRecord[] => {
-  const records = localStorage.getItem(STORAGE_KEYS.SALES);
-  return records ? JSON.parse(records) : [];
-};
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Sales Trend Chart */}
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Sales Trend</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Sales']} />
+              <Line 
+                type="monotone" 
+                dataKey="amount" 
+                stroke="#3B82F6" 
+                strokeWidth={2}
+                dot={{ fill: '#3B82F6' }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
 
-export const saveSalesRecords = (records: SalesRecord[]): void => {
-  localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(records));
-};
+        {/* Employee Status Distribution */}
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Employee Status</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={statusData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {statusData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
 
-// Sales Targets
-export const getSalesTargets = (): SalesTarget[] => {
-  const targets = localStorage.getItem(STORAGE_KEYS.TARGETS);
-  return targets ? JSON.parse(targets) : [];
-};
+      {/* Team Performance */}
+      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Performers</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={teamPerformance}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip 
+              formatter={(value, name) => [
+                name === 'sales' ? `₹${Number(value).toLocaleString()}` : `${value}%`,
+                name === 'sales' ? 'Sales' : 'Achievement'
+              ]}
+            />
+            <Bar dataKey="sales" fill="#3B82F6" name="sales" />
+            <Bar dataKey="achievement" fill="#10B981" name="achievement" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
 
-export const saveSalesTargets = (targets: SalesTarget[]): void => {
-  localStorage.setItem(STORAGE_KEYS.TARGETS, JSON.stringify(targets));
-};
-
-// Default Products from the image
-const getDefaultProducts = (): Product[] => [
-  // Projector Products (from screenshot)
-  { id: 'PROJ_GALAXY', name: 'Galaxy Projector', price: 11513, category: 'Projector', model: 'Galaxy' },
-  { id: 'PROJ_PLAY', name: 'Play Projector', price: 10073, category: 'Projector', model: 'Play' },
-  { id: 'PROJ_EPIC', name: 'Epic Projector', price: 6473, category: 'Projector', model: 'Epic' },
-  { id: 'PROJ_JOY', name: 'Joy Projector', price: 5039, category: 'Projector', model: 'Joy' },
-  { id: 'PROJ_PIXA', name: 'Pixa Projector', price: 7199, category: 'Projector', model: 'Pixa' },
-  { id: 'PROJ_SCREEN_M65', name: 'Screen M65 Projector', price: 11513, category: 'Projector', model: 'M65' },
-  
-  // Mobile Products (existing)
-  { id: 'GALAXY', name: 'Galaxy', price: 11513, category: 'Mobile', model: 'Galaxy' },
-  { id: 'PLAY', name: 'Play', price: 10073, category: 'Mobile', model: 'Play' },
-  { id: 'EPIC', name: 'Epic', price: 6473, category: 'Mobile', model: 'Epic' },
-  { id: 'JOY', name: 'Joy', price: 5039, category: 'Mobile', model: 'Joy' },
-  { id: 'PIXA', name: 'Pixa', price: 7199, category: 'Mobile', model: 'Pixa' },
-  
-  // Screen Products
-  { id: 'SCREEN_M65', name: 'Screen M65', price: 11513, category: 'Screen', model: 'M65' },
-  { id: 'SCREEN_M80', name: 'Screen M80', price: 12951, category: 'Screen', model: 'M80' },
-  { id: 'SCREEN_M100', name: 'Screen M100', price: 14393, category: 'Screen', model: 'M100' },
-  { id: 'SCREEN_FR140', name: 'Screen FR140', price: 40111, category: 'Screen', model: 'FR140' },
-  { id: 'SCREEN_FR160', name: 'Screen FR160', price: 50291, category: 'Screen', model: 'FR160' },
-  
-  // Extension Board Products
-  { id: 'EXT_BOARD_331', name: 'Extension Board 331', price: 791, category: 'Extension', model: '331' },
-  { id: 'EXT_BOARD_411', name: 'Extension Board 411', price: 719, category: 'Extension', model: '411' },
-  { id: 'EXT_BOARD_422', name: 'Extension Board 422', price: 863, category: 'Extension', model: '422' },
-  { id: 'EXT_BOARD_524', name: 'Extension Board 524', price: 1079, category: 'Extension', model: '524' },
-  { id: 'EXT_BOARD_522', name: 'Extension Board 522', price: 935, category: 'Extension', model: '522' },
-  
-  // SMPS Products
-  { id: 'SMPS_450', name: 'SMPS 450', price: 633, category: 'SMPS', model: '450' },
-  { id: 'SMPS_500', name: 'SMPS 500', price: 950, category: 'SMPS', model: '500' },
-  { id: 'SMPS_550', name: 'SMPS 550', price: 1108, category: 'SMPS', model: '550' },
-  { id: 'SMPS_650', name: 'SMPS 650', price: 1266, category: 'SMPS', model: '650' },
-  { id: 'SMPS_700', name: 'SMPS 700', price: 1425, category: 'SMPS', model: '700' },
-  { id: 'SMPS_750', name: 'SMPS 750', price: 1583, category: 'SMPS', model: '750' },
-  { id: 'SMPS_800', name: 'SMPS 800', price: 1900, category: 'SMPS', model: '800' },
-  { id: 'SMPS_850', name: 'SMPS 850', price: 1900, category: 'SMPS', model: '850' },
-  { id: 'SMPS_1000', name: 'SMPS 1000', price: 2374, category: 'SMPS', model: '1000' },
-  
-  // AI Products
-  { id: 'AI_MODEL', name: 'AI Model', price: 2771, category: 'AI', model: 'Standard' },
-];
-
-// Complete employee list with exact credentials
-const getDefaultUsers = (): User[] => [
-  // Admin
-  {
-    id: 'ADMIN001',
-    employeeId: 'ADMIN001',
-    name: 'Manoj Kumar',
-    username: 'manoj.kumar',
-    role: 'admin',
-    department: 'Management',
-    joinDate: '2024-01-01',
-    password: 'admin@123',
-    profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9876543210',
-    designation: 'Sales Director',
-    target: 500000,
-    manager: null,
-    territory: 'All India',
-    isActive: true,
-    lastLogin: new Date().toISOString(),
-  },
-  
-  // Reporting Managers
-  {
-    id: 'BM001',
-    employeeId: 'BM001',
-    name: 'Salim Javed',
-    username: 'salim.javed',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-01-15',
-    password: 'salim@2024',
-    profilePicture: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 7870660333',
-    designation: 'District General Manager (DGM)',
-    target: 300000,
-    manager: 'ADMIN001',
-    territory: 'Bihar/Delhi & West Bengal/Odisha',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-  },
-  {
-    id: 'BM002',
-    employeeId: 'BM002',
-    name: 'Sandeep Bediawala',
-    username: 'sandeep.bediawala',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-01-20',
-    password: 'sandeep@2024',
-    profilePicture: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9876543214',
-    designation: 'Regional Manager (Gujarat)',
-    target: 280000,
-    manager: 'ADMIN001',
-    territory: 'Gujarat & Chhattisgarh',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
-  },
-  {
-    id: 'BM003',
-    employeeId: 'BM003',
-    name: 'Pawan Khanna',
-    username: 'pawan.khanna',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-02-01',
-    password: 'pawan@2024',
-    profilePicture: 'https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9174995813',
-    designation: 'Sales Manager',
-    target: 250000,
-    manager: 'ADMIN001',
-    territory: 'MP & Rajasthan',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
-  },
-  {
-    id: 'BM004',
-    employeeId: 'BM004',
-    name: 'Dhiraj Prakash',
-    username: 'dhiraj.prakash',
-    role: 'manager',
-    department: 'Sales',
-    joinDate: '2024-02-05',
-    password: 'dhiraj@2024',
-    profilePicture: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9174995813',
-    designation: 'Sales Manager',
-    target: 250000,
-    manager: 'ADMIN001',
-    territory: 'MP & Rajasthan',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
-  },
-];
-
-// Export Functions
-export const exportToCSV = (data: any[], filename: string): void => {
-  if (data.length === 0) return;
-  
-  const headers = Object.keys(data[0]);
-  const csvContent = [
-    headers.join(','),
-    ...data.map(row => headers.map(header => `"${row[header] || ''}"`).join(','))
-  ].join('\n');
-  
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', `${filename}.csv`);
-  link.style.visibility = 'hidden';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-
-// Initialize default data if not exists
-export const initializeDefaultData = (): void => {
-  if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
-    saveUsers(getDefaultUsers());
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
-    saveProducts(getDefaultProducts());
-  }
+      {/* Recent Activity */}
+      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+        <div className="space-y-4">
+          {sales.slice(-5).reverse().map((sale, index) => {
+            const employee = users.find(u => u.employeeId === sale.employeeId);
+            return (
+              <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-green-100 rounded-full">
+                    <DollarSign className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {employee?.name || 'Unknown'} made a sale
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {sale.productName} - {new Date(sale.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-green-600">
+                    ₹{sale.amount.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 };
