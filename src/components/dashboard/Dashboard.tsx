@@ -16,8 +16,6 @@ export const Dashboard: React.FC = () => {
     presentToday: 0,
     targetAchievement: 0
   });
-  const [visibleSales, setVisibleSales] = useState<any[]>([]);
-  const [visibleAttendance, setVisibleAttendance] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -43,10 +41,6 @@ export const Dashboard: React.FC = () => {
     // Calculate target achievement
     const totalTarget = visibleUsers.reduce((sum, u) => sum + (u.target || 0), 0);
     const targetAchievement = totalTarget > 0 ? (totalSales / totalTarget) * 100 : 0;
-
-    // Update state with visible data
-    setVisibleSales(visibleSalesRecords);
-    setVisibleAttendance(visibleAttendanceRecords);
 
     setStats({
       totalSales,
@@ -99,17 +93,17 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-lg font-semibold mb-4">Weekly Sales Trend</h2>
-          <WeeklySalesChart sales={visibleSales} />
+          <WeeklySalesChart sales={visibleSalesRecords} />
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-lg font-semibold mb-4">Monthly Sales Overview</h2>
-          <MonthlySalesChart sales={visibleSales} />
+          <MonthlySalesChart sales={visibleSalesRecords} />
         </div>
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-lg font-semibold mb-4">Attendance Overview</h2>
-        <AttendanceChart attendance={visibleAttendance} />
+        <AttendanceChart attendance={visibleAttendanceRecords} />
       </div>
     </div>
   );
