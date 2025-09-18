@@ -292,4 +292,5 @@ export const initializeDefaultData = (): void => {
   if (!localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
     saveProducts(getDefaultProducts());
                       <LogOut className="w-5 h-5" />
-};
+  };
+}
