@@ -11,6 +11,7 @@ import { EmployeeManagement } from './components/admin/EmployeeManagement';
 import { ProfileSettings } from './components/profile/ProfileSettings';
 import { SystemSettings } from './components/settings/SystemSettings';
 import { initializeDefaultData } from './utils/storage';
+import { initializeDefaultData } from './utils/storage';
 
 // Initialize default data on app start
 initializeDefaultData();
@@ -56,15 +57,15 @@ function App() {
       />
       
       <div className="flex">
-        <Sidebar 
-          user={user}
-          currentView={currentView}
-          onViewChange={setCurrentView}
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
+        <div className={`${sidebarOpen ? 'block' : 'hidden'} lg:block fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:transform-none`}>
+          <Sidebar 
+            activeSection={currentView}
+            onSectionChange={setCurrentView}
+            user={user}
+          />
+        </div>
         
-        <main className="flex-1 p-6 lg:ml-64">
+        <main className="flex-1 p-6 lg:ml-0">
           <div className="max-w-7xl mx-auto">
             {renderView()}
           </div>
