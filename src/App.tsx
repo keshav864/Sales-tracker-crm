@@ -11,7 +11,6 @@ import { EmployeeManagement } from './components/admin/EmployeeManagement';
 import { ProfileSettings } from './components/profile/ProfileSettings';
 import { SystemSettings } from './components/settings/SystemSettings';
 import { initializeDefaultData } from './utils/storage';
-import { initializeDefaultData } from './utils/storage';
 
 // Initialize default data on app start
 initializeDefaultData();
