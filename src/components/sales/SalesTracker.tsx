@@ -6,62 +6,26 @@ import { realTimeDataManager } from '../../utils/realTimeData';
 import { SalesRecord, User } from '../../types';
 import { TrendingUp, Users, Target, Calendar } from 'lucide-react';
 
-export const SalesTracker: React.FC = () => {
-  const [salesRecords, setSalesRecords] = useState<SalesRecord[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+interface SalesTrackerProps {
+  users: User[];
+  sales: SalesRecord[];
+  currentUser: User;
+  onSalesUpdate: (sales: SalesRecord[]) => void;
+}
 
-  useEffect(() => {
-    const loadData = () => {
-      try {
-        const records = getSalesRecords();
-        const userList = getUsers();
-        setSalesRecords(records);
-        setUsers(userList);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error loading sales data:', error);
-        setLoading(false);
-      }
-    };
-
-    loadData();
-
-    // Subscribe to real-time updates
-    const unsubscribe = realTimeDataManager.subscribe('sales', loadData);
-    
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  const handleSalesUpdate = () => {
-    // Trigger data reload when sales are updated
-    const records = getSalesRecords();
-    setSalesRecords(records);
-    realTimeDataManager.notifyUpdate('sales');
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="loading-dots">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-      </div>
-    );
-  }
-
-  const totalSales = salesRecords.reduce((sum, record) => sum + record.amount, 0);
-  const todaySales = salesRecords.filter(record => {
+export const SalesTracker: React.FC<SalesTrackerProps> = ({
+  users,
+  sales,
+  currentUser,
+  onSalesUpdate,
+}) => {
+  const totalSales = sales.reduce((sum, record) => sum + record.totalAmount, 0);
+  const todaySales = sales.filter(record => {
     const today = new Date().toDateString();
     return new Date(record.date).toDateString() === today;
-  }).reduce((sum, record) => sum + record.amount, 0);
+  }).reduce((sum, record) => sum + record.totalAmount, 0);
 
-  const activeSalesPersons = new Set(salesRecords.map(record => record.employeeId)).size;
+  const activeSalesPersons = new Set(sales.map(record => record.userId)).size;
 
   return (
     <div className="space-y-6">
@@ -118,7 +82,7 @@ export const SalesTracker: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Records</p>
-              <p className="text-2xl font-bold text-gray-900">{salesRecords.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{sales.length}</p>
             </div>
             <div className="p-3 bg-orange-100 rounded-full">
               <Target className="w-6 h-6 text-orange-600" />
@@ -130,13 +94,21 @@ export const SalesTracker: React.FC = () => {
       {/* Sales Form */}
       <div className="card">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Add New Sale</h2>
-        <SalesForm onSalesAdded={handleSalesUpdate} />
+        <SalesForm 
+          currentUser={currentUser}
+          onSalesAdd={(sale) => onSalesUpdate([...sales, sale])}
+        />
       </div>
 
       {/* Sales Entry Manager */}
       <div className="card">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Manage Sales Records</h2>
-        <SalesEntryManager onSalesUpdated={handleSalesUpdate} />
+        <SalesEntryManager 
+          sales={sales}
+          users={users}
+          currentUser={currentUser}
+          onSalesUpdate={onSalesUpdate}
+        />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { LoginForm } from './components/auth/LoginForm';
 import { Header } from './components/layout/Header';
@@ -10,40 +10,195 @@ import { SalesReports } from './components/sales/SalesReports';
 import { EmployeeManagement } from './components/admin/EmployeeManagement';
 import { ProfileSettings } from './components/profile/ProfileSettings';
 import { SystemSettings } from './components/settings/SystemSettings';
-import { initializeDefaultData } from './utils/storage';
+import { DataExport } from './components/export/DataExport';
+import { getUsers, getSalesRecords, getAttendanceRecords, updateUserProfile } from './utils/storage';
+import { realTimeDataManager } from './utils/realTimeData';
+import { User, SalesRecord, AttendanceRecord } from './types';
 
-// Initialize default data on app start
-initializeDefaultData();
-
-type ViewType = 'dashboard' | 'attendance' | 'sales' | 'reports' | 'employees' | 'profile' | 'settings';
+type ViewType = 'dashboard' | 'attendance' | 'sales' | 'reports' | 'employees' | 'profile' | 'settings' | 'export';
 
 function App() {
   const { user, login, logout } = useAuth();
   const [currentView, setCurrentView] = useState<ViewType>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Global state management
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [allSales, setAllSales] = useState<SalesRecord[]>([]);
+  const [allAttendance, setAllAttendance] = useState<AttendanceRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load initial data
+  useEffect(() => {
+    const loadData = () => {
+      try {
+        const users = getUsers();
+        const sales = getSalesRecords();
+        const attendance = getAttendanceRecords();
+        
+        setAllUsers(users);
+        setAllSales(sales);
+        setAllAttendance(attendance);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading data:', error);
+        setLoading(false);
+      }
+    };
+
+    loadData();
+
+    // Subscribe to real-time updates
+    const unsubscribeUsers = realTimeDataManager.subscribe('users', () => {
+      setAllUsers(getUsers());
+    });
+    
+    const unsubscribeSales = realTimeDataManager.subscribe('sales', () => {
+      setAllSales(getSalesRecords());
+    });
+    
+    const unsubscribeAttendance = realTimeDataManager.subscribe('attendance', () => {
+      setAllAttendance(getAttendanceRecords());
+    });
+
+    return () => {
+      unsubscribeUsers();
+      unsubscribeSales();
+      unsubscribeAttendance();
+    };
+  }, []);
+
+  // Update handlers
+  const handleUsersUpdate = (users: User[]) => {
+    setAllUsers(users);
+    realTimeDataManager.notifyUpdate('users');
+  };
+
+  const handleSalesUpdate = (sales: SalesRecord[]) => {
+    setAllSales(sales);
+    realTimeDataManager.notifyUpdate('sales');
+  };
+
+  const handleAttendanceUpdate = (attendance: AttendanceRecord[]) => {
+    setAllAttendance(attendance);
+    realTimeDataManager.notifyUpdate('attendance');
+  };
+
+  const handleUserUpdate = (updatedUser: User) => {
+    const success = updateUserProfile(updatedUser.id, updatedUser);
+    if (success) {
+      const updatedUsers = allUsers.map(u => u.id === updatedUser.id ? updatedUser : u);
+      handleUsersUpdate(updatedUsers);
+    }
+  };
 
   if (!user) {
     return <LoginForm onLogin={login} />;
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading application...</p>
+        </div>
+      </div>
+    );
+  }
+
   const renderView = () => {
     switch (currentView) {
       case 'dashboard':
-        return <Dashboard />;
+        return (
+          <Dashboard 
+            users={allUsers}
+            attendance={allAttendance}
+            sales={allSales}
+            currentUser={user}
+          />
+        );
       case 'attendance':
-        return <AttendanceTracker />;
+        return (
+          <AttendanceTracker 
+            users={allUsers}
+            attendance={allAttendance}
+            currentUser={user}
+            onAttendanceUpdate={handleAttendanceUpdate}
+          />
+        );
       case 'sales':
-        return <SalesTracker />;
+        return (
+          <SalesTracker 
+            users={allUsers}
+            sales={allSales}
+            currentUser={user}
+            onSalesUpdate={handleSalesUpdate}
+          />
+        );
       case 'reports':
-        return <SalesReports />;
+        return (
+          <SalesReports 
+            sales={allSales}
+            users={allUsers}
+            currentUser={user}
+          />
+        );
       case 'employees':
-        return user.role === 'admin' ? <EmployeeManagement /> : <Dashboard />;
+        return user.role === 'admin' ? (
+          <EmployeeManagement 
+            users={allUsers}
+            currentUser={user}
+            onUsersUpdate={handleUsersUpdate}
+          />
+        ) : (
+          <Dashboard 
+            users={allUsers}
+            attendance={allAttendance}
+            sales={allSales}
+            currentUser={user}
+          />
+        );
       case 'profile':
-        return <ProfileSettings />;
+        return (
+          <ProfileSettings 
+            user={user}
+            onUserUpdate={handleUserUpdate}
+            onClose={() => setCurrentView('dashboard')}
+          />
+        );
       case 'settings':
-        return user.role === 'admin' ? <SystemSettings /> : <Dashboard />;
+        return user.role === 'admin' ? (
+          <SystemSettings 
+            currentUser={user}
+            onSettingsUpdate={() => {}}
+          />
+        ) : (
+          <Dashboard 
+            users={allUsers}
+            attendance={allAttendance}
+            sales={allSales}
+            currentUser={user}
+          />
+        );
+      case 'export':
+        return (
+          <DataExport 
+            users={allUsers}
+            attendance={allAttendance}
+            sales={allSales}
+            currentUser={user}
+          />
+        );
       default:
-        return <Dashboard />;
+        return (
+          <Dashboard 
+            users={allUsers}
+            attendance={allAttendance}
+            sales={allSales}
+            currentUser={user}
+          />
+        );
     }
   };
 
@@ -52,16 +207,16 @@ function App() {
       <Header 
         user={user} 
         onLogout={logout} 
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
+        onUserUpdate={handleUserUpdate}
       />
       
       <div className="flex">
         <Sidebar 
+          activeSection={currentView}
+          onSectionChange={setCurrentView}
           user={user}
-          currentView={currentView}
-          onViewChange={setCurrentView}
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
+          isCollapsed={false}
         />
         
         <main className="flex-1 p-6 lg:ml-64">
