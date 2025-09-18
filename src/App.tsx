@@ -1,73 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import { User } from './types';
-import { getCurrentUser, initializeDefaultData } from './utils/storage';
+import React, { useState } from 'react';
+import { useAuth } from './hooks/useAuth';
 import { LoginForm } from './components/auth/LoginForm';
-import Dashboard from './components/dashboard/Dashboard';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
+import { Dashboard } from './components/dashboard/Dashboard';
+import { AttendanceTracker } from './components/attendance/AttendanceTracker';
+import { SalesTracker } from './components/sales/SalesTracker';
+import { SalesReports } from './components/sales/SalesReports';
+import { EmployeeManagement } from './components/admin/EmployeeManagement';
+import { ProfileSettings } from './components/profile/ProfileSettings';
+import { SystemSettings } from './components/settings/SystemSettings';
+import { initializeDefaultData } from './utils/storage';
 
-export default function App() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+// Initialize default data on app start
+initializeDefaultData();
+
+type ViewType = 'dashboard' | 'attendance' | 'sales' | 'reports' | 'employees' | 'profile' | 'settings';
+
+function App() {
+  const { user, login, logout } = useAuth();
+  const [currentView, setCurrentView] = useState<ViewType>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Initialize default data
-    initializeDefaultData();
-    
-    // Check for existing user session
-    const user = getCurrentUser();
-    setCurrentUser(user);
-    setLoading(false);
-  }, []);
-
-  const handleLogin = (user: User) => {
-    setCurrentUser(user);
-  };
-
-  const handleLogout = () => {
-    setCurrentUser(null);
-    setSidebarOpen(false);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="loading-dots">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-      </div>
-    );
+  if (!user) {
+    return <LoginForm onLogin={login} />;
   }
 
-  if (!currentUser) {
-    return <LoginForm onLogin={handleLogin} />;
-  }
+  const renderView = () => {
+    switch (currentView) {
+      case 'dashboard':
+        return <Dashboard />;
+      case 'attendance':
+        return <AttendanceTracker />;
+      case 'sales':
+        return <SalesTracker />;
+      case 'reports':
+        return <SalesReports />;
+      case 'employees':
+        return user.role === 'admin' ? <EmployeeManagement /> : <Dashboard />;
+      case 'profile':
+        return <ProfileSettings />;
+      case 'settings':
+        return user.role === 'admin' ? <SystemSettings /> : <Dashboard />;
+      default:
+        return <Dashboard />;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-gray-50">
       <Header 
-        user={currentUser} 
-        onLogout={handleLogout}
-        onMenuClick={() => setSidebarOpen(!sidebarOpen)}
+        user={user} 
+        onLogout={logout} 
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
       
       <div className="flex">
         <Sidebar 
-          user={currentUser}
+          user={user}
+          currentView={currentView}
+          onViewChange={setCurrentView}
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
         
-        <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : ''}`}>
-          <div className="p-6">
-            <Dashboard user={currentUser} />
+        <main className="flex-1 p-6 lg:ml-64">
+          <div className="max-w-7xl mx-auto">
+            {renderView()}
           </div>
         </main>
       </div>
     </div>
   );
 }
+
+export default App;
