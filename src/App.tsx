@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User } from './types';
 import { getCurrentUser, initializeDefaultData } from './utils/storage';
-import { LoginForm } from './components/auth/LoginForm';
+import LoginForm from './components/auth/LoginForm';
 import Dashboard from './components/dashboard/Dashboard';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
@@ -48,7 +48,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <Header 
         user={currentUser} 
         onLogout={handleLogout}
@@ -62,8 +62,8 @@ export default function App() {
           onClose={() => setSidebarOpen(false)}
         />
         
-        <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : ''} bg-white`}>
-          <div className="p-6 bg-white">
+        <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : ''}`}>
+          <div className="p-6">
             <Dashboard user={currentUser} />
           </div>
         </main>

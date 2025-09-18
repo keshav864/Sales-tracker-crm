@@ -11,7 +11,7 @@
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
-    background: #ffffff !important;
+    background: #ffffff;
     min-height: 100vh;
   }
 
@@ -38,11 +38,11 @@
   }
   
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-300;
+    @apply bg-white/95 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02];
   }
   
   .input-field {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white/80 backdrop-blur-sm hover:bg-white focus:bg-white shadow-sm;
   }
   
   .status-badge {
@@ -61,6 +61,13 @@
     @apply bg-yellow-100 text-yellow-800 border border-yellow-200;
   }
 
+  .gradient-bg {
+    @apply bg-gradient-to-br from-white to-gray-50;
+  }
+
+  .glass-effect {
+    @apply bg-white/95 backdrop-blur-lg border border-gray-200/50 shadow-xl;
+  }
 }
 
 @layer utilities {
