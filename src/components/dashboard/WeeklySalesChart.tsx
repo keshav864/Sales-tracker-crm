@@ -57,15 +57,34 @@ export const WeeklySalesChart: React.FC<WeeklySalesChartProps> = ({ sales }) => 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    backgroundColor: '#ffffff',
     plugins: {
       legend: {
         position: 'top' as const,
+        labels: {
+          color: '#000000'
+        }
       },
     },
     scales: {
       y: {
         beginAtZero: true,
+        grid: {
+          color: '#e5e7eb'
+        },
         ticks: {
+          color: '#000000',
+          callback: function(value: any) {
+            return '₹' + value.toLocaleString();
+          },
+        },
+      },
+      x: {
+        grid: {
+          color: '#e5e7eb'
+        },
+        ticks: {
+          color: '#000000',
           callback: function(value: any) {
             return '₹' + value.toLocaleString();
           },

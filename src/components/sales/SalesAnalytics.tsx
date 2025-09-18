@@ -118,15 +118,34 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
 
   const chartOptions = {
     responsive: true,
+    backgroundColor: '#ffffff',
     plugins: {
       legend: {
         position: 'top' as const,
+        labels: {
+          color: '#000000'
+        }
       },
     },
     scales: {
       y: {
         beginAtZero: true,
+        grid: {
+          color: '#e5e7eb'
+        },
         ticks: {
+          color: '#000000',
+          callback: function(value: any) {
+            return '₹' + value.toLocaleString();
+          },
+        },
+      },
+      x: {
+        grid: {
+          color: '#e5e7eb'
+        },
+        ticks: {
+          color: '#000000',
           callback: function(value: any) {
             return '₹' + value.toLocaleString();
           },
@@ -137,9 +156,13 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
 
   const pieOptions = {
     responsive: true,
+    backgroundColor: '#ffffff',
     plugins: {
       legend: {
         position: 'right' as const,
+        labels: {
+          color: '#000000'
+        }
       },
     },
   };

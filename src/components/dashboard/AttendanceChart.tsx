@@ -71,15 +71,32 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ attendance }) 
 
   const options = {
     responsive: true,
+    backgroundColor: '#ffffff',
     plugins: {
       legend: {
         position: 'top' as const,
+        labels: {
+          color: '#000000'
+        }
       },
     },
     scales: {
       y: {
         beginAtZero: true,
+        grid: {
+          color: '#e5e7eb'
+        },
         ticks: {
+          color: '#000000',
+          stepSize: 1,
+        },
+      },
+      x: {
+        grid: {
+          color: '#e5e7eb'
+        },
+        ticks: {
+          color: '#000000',
           stepSize: 1,
         },
       },
