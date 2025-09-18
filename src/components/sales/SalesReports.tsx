@@ -131,23 +131,23 @@ export const SalesReports: React.FC<SalesReportsProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="card text-center">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 text-center">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Total Sales</h4>
-          <p className="text-2xl font-bold text-green-600">${totalAmount.toLocaleString()}</p>
+          <p className="text-xl md:text-2xl font-bold text-green-600">₹{totalAmount.toLocaleString()}</p>
         </div>
-        <div className="card text-center">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 text-center">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Number of Sales</h4>
-          <p className="text-2xl font-bold text-blue-600">{filteredSales.length}</p>
+          <p className="text-xl md:text-2xl font-bold text-blue-600">{filteredSales.length}</p>
         </div>
-        <div className="card text-center">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 text-center">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Average Sale</h4>
-          <p className="text-2xl font-bold text-purple-600">${averageAmount.toFixed(2)}</p>
+          <p className="text-xl md:text-2xl font-bold text-purple-600">₹{averageAmount.toFixed(2)}</p>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">Sales Transactions</h4>
+          <h4 className="text-base md:text-lg font-semibold text-gray-900">Sales Transactions</h4>
           <div className="flex items-center space-x-2">
             <Filter className="w-4 h-4 text-gray-400" />
             <select
@@ -157,7 +157,7 @@ export const SalesReports: React.FC<SalesReportsProps> = ({
                 setSortBy(field as 'date' | 'amount' | 'customer');
                 setSortOrder(order as 'asc' | 'desc');
               }}
-              className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs text-sm"
+              className="w-full px-3 md:px-4 py-2 md:py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs text-sm"
             >
               <option value="date-desc">Date (Newest)</option>
               <option value="date-asc">Date (Oldest)</option>
@@ -169,7 +169,7 @@ export const SalesReports: React.FC<SalesReportsProps> = ({
           </div>
         </div>
 
-        <div className="overflow-x-auto bg-white">
+        <div className="overflow-x-auto bg-white rounded-lg">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>

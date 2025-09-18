@@ -63,7 +63,7 @@ export const MonthlySalesChart: React.FC<MonthlySalesChartProps> = ({ sales }) =
       legend: {
         position: 'top' as const,
         labels: {
-          color: '#374151'
+          color: '#000000'
         }
       },
     },
@@ -71,10 +71,10 @@ export const MonthlySalesChart: React.FC<MonthlySalesChartProps> = ({ sales }) =
       y: {
         beginAtZero: true,
         grid: {
-          color: '#f3f4f6'
+          color: '#e5e7eb'
         },
         ticks: {
-          color: '#374151',
+          color: '#000000',
           callback: function(value: any) {
             return '₹' + value.toLocaleString();
           },
@@ -82,17 +82,17 @@ export const MonthlySalesChart: React.FC<MonthlySalesChartProps> = ({ sales }) =
       },
       x: {
         grid: {
-          color: '#f3f4f6'
+          color: '#e5e7eb'
         },
         ticks: {
-          color: '#374151',
+          color: '#000000',
         },
       },
     },
   };
 
   return (
-    <div style={{ height: '300px', backgroundColor: '#ffffff' }}>
+    <div className="h-64 md:h-80 bg-white p-2">
       <Line data={chartData} options={options} />
     </div>
   );

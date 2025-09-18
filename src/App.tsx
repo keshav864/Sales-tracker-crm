@@ -225,10 +225,10 @@ function App() {
           activeSection={currentView}
           onSectionChange={setCurrentView}
           user={user}
-          isCollapsed={sidebarOpen}
+          isCollapsed={!sidebarOpen}
         />
         
-        <main className="flex-1 p-3 md:p-6 md:ml-64 bg-white">
+        <main className="flex-1 p-2 md:p-6 md:ml-64 bg-white min-h-screen">
           <div className="max-w-7xl mx-auto">
             {renderView()}
           </div>

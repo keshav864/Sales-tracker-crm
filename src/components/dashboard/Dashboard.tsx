@@ -383,24 +383,24 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-black mb-4">Weekly Sales Trend</h3>
-          <div style={{ backgroundColor: '#ffffff' }}>
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
+          <h3 className="text-base md:text-lg font-semibold text-black mb-4">Weekly Sales Trend</h3>
+          <div className="bg-white">
             <WeeklySalesChart sales={visibleSales} />
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-black mb-4">Monthly Sales Overview</h3>
-          <div style={{ backgroundColor: '#ffffff' }}>
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
+          <h3 className="text-base md:text-lg font-semibold text-black mb-4">Monthly Sales Overview</h3>
+          <div className="bg-white">
             <MonthlySalesChart sales={visibleSales} />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-black mb-4">Attendance Trends</h3>
-        <div style={{ backgroundColor: '#ffffff' }}>
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
+        <h3 className="text-base md:text-lg font-semibold text-black mb-4">Attendance Trends</h3>
+        <div className="bg-white">
           <AttendanceChart attendance={visibleAttendance} />
         </div>
       </div>

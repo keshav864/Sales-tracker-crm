@@ -118,11 +118,12 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top' as const,
         labels: {
-          color: '#374151'
+          color: '#000000'
         }
       },
     },
@@ -130,10 +131,10 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
       y: {
         beginAtZero: true,
         grid: {
-          color: '#f3f4f6'
+          color: '#e5e7eb'
         },
         ticks: {
-          color: '#374151',
+          color: '#000000',
           callback: function(value: any) {
             return '₹' + value.toLocaleString();
           },
@@ -141,10 +142,10 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
       },
       x: {
         grid: {
-          color: '#f3f4f6'
+          color: '#e5e7eb'
         },
         ticks: {
-          color: '#374151',
+          color: '#000000',
         },
       },
     },
@@ -156,7 +157,7 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
       legend: {
         position: 'right' as const,
         labels: {
-          color: '#374151'
+          color: '#000000'
         }
       },
     },
@@ -176,7 +177,7 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Weekly Sales Trend
           </h3>
-          <div style={{ backgroundColor: '#ffffff' }}>
+          <div className="h-64 md:h-80 bg-white">
             <Bar data={weeklyData} options={chartOptions} />
           </div>
         </div>
@@ -185,7 +186,7 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Sales by Category
           </h3>
-          <div className="h-64" style={{ backgroundColor: '#ffffff' }}>
+          <div className="h-64 bg-white">
             <Pie data={categoryData} options={pieOptions} />
           </div>
         </div>
@@ -196,7 +197,7 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Sales Team Performance
           </h3>
-          <div style={{ backgroundColor: '#ffffff' }}>
+          <div className="h-64 md:h-80 bg-white">
             <Bar data={performanceData} options={chartOptions} />
           </div>
         </div>

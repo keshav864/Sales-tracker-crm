@@ -46,23 +46,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className={`bg-white shadow-xl border-r border-gray-200 transition-all duration-300 fixed md:static inset-y-0 left-0 z-40 ${
+    <aside className={`bg-white shadow-xl border-r border-gray-200 transition-all duration-300 fixed md:static inset-y-0 left-0 z-40 overflow-y-auto ${
       isCollapsed ? 'w-16' : 'w-64'
-    } min-h-screen top-16`}>
+    } min-h-screen top-16 md:top-0`}>
       {/* User Profile Section */}
       {!isCollapsed && (
-        <div className="p-4 md:p-6 border-b border-gray-200">
+        <div className="p-3 md:p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="relative">
               <img
                 src={user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`}
                 alt={user.name}
-                className="w-12 h-12 rounded-xl object-cover border-2 border-gray-200 shadow-sm"
+                className="w-10 md:w-12 h-10 md:h-12 rounded-xl object-cover border-2 border-gray-200 shadow-sm"
               />
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">{user.name}</p>
+              <p className="text-xs md:text-sm font-semibold text-gray-900 truncate">{user.name}</p>
               <p className="text-xs text-gray-500 truncate">{user.designation || user.role}</p>
               <p className="text-xs text-blue-600 font-medium">{user.employeeId}</p>
             </div>
@@ -71,7 +71,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Navigation Menu */}
-      <nav className="mt-4 md:mt-6 px-2 md:px-3">
+      <nav className="mt-3 md:mt-6 px-2 md:px-3">
         <div className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -81,7 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 key={item.id}
                 onClick={() => onSectionChange(item.id)}
-                className={`w-full flex items-center px-2 md:px-3 py-2 md:py-3 rounded-xl text-left transition-all duration-300 group relative overflow-hidden ${
+                className={`w-full flex items-center px-2 md:px-3 py-2 md:py-2.5 rounded-xl text-left transition-all duration-300 group relative overflow-hidden ${
                   isActive
                     ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:scale-105'
@@ -98,7 +98,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 } transition-colors duration-300`} />
                 
                 {!isCollapsed && (
-                  <span className="font-medium relative z-10 transition-colors duration-300 text-sm md:text-base">
+                  <span className="font-medium relative z-10 transition-colors duration-300 text-xs md:text-base">
                     {item.label}
                   </span>
                 )}
@@ -116,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Performance Summary */}
       {!isCollapsed && user.role === 'employee' && (
         <div className="mt-4 md:mt-8 mx-2 md:mx-3 p-3 md:p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200/50">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">This Month</h3>
+          <h3 className="text-xs md:text-sm font-semibold text-gray-900 mb-3">This Month</h3>
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-600">Target</span>

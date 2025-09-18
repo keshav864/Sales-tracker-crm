@@ -40,7 +40,7 @@
   }
   
   .input-field {
-    @apply w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white shadow-sm text-sm md:text-base;
+    @apply w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white shadow-sm text-sm md:text-base text-black;
   }
   
   .status-badge {
@@ -60,7 +60,7 @@
   }
 
   .card {
-    @apply bg-white rounded-2xl shadow-lg border border-gray-200 p-6;
+    @apply bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6;
   }
 
 
@@ -116,18 +116,24 @@
     animation: spin 3s linear infinite;
   }
 
+  /* Mobile responsive improvements */
+  @media (max-width: 768px) {
+    .chart-container {
+      height: 250px !important;
+    }
+    
+    .mobile-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
   /* Force white backgrounds everywhere */
-  .bg-gray-800,
-  .bg-gray-900,
-  .bg-gray-700,
-  .bg-gray-600,
-  [style*="background-color: #1f2937"],
-  [style*="background-color: rgba(31, 41, 55"],
-  [style*="background-color: #374151"],
-  [style*="background-color: #4b5563"],
-  [class*="bg-gray-8"],
-  [class*="bg-gray-7"],
-  [class*="bg-gray-6"] {
+  .bg-gray-800, .bg-gray-900, .bg-gray-700, .bg-gray-600,
+  [style*="background-color: #1f2937"], [style*="background-color: rgba(31, 41, 55"],
+  [style*="background-color: #374151"], [style*="background-color: #4b5563"],
+  [class*="bg-gray-8"], [class*="bg-gray-7"], [class*="bg-gray-6"],
+  [style*="#1f2937f2"], [style*="#1f2937"], .dark-bg {
     background-color: #ffffff !important;
     color: #000000 !important;
   }
@@ -136,14 +142,27 @@
   input, select, textarea {
     background-color: #ffffff !important;
     color: #000000 !important;
+    border-color: #d1d5db !important;
   }
 
   /* Force white backgrounds for all containers */
-  .chart-container,
-  canvas,
-  .card,
-  [class*="bg-"] {
+  .chart-container, canvas, .card, [class*="bg-gray"] {
     background-color: #ffffff !important;
+  }
+
+  /* Ensure chart backgrounds are white */
+  canvas {
+    background-color: #ffffff !important;
+  }
+
+  /* Mobile responsive text */
+  @media (max-width: 640px) {
+    h1 { font-size: 1.5rem !important; }
+    h2 { font-size: 1.25rem !important; }
+    h3 { font-size: 1.125rem !important; }
+    .text-3xl { font-size: 1.5rem !important; }
+    .text-2xl { font-size: 1.25rem !important; }
+    .text-xl { font-size: 1.125rem !important; }
   }
 }
 
