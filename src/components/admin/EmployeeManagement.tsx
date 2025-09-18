@@ -1,718 +1,295 @@
-import React, { useState } from 'react';
-import { UserPlus, Edit, Trash2, Search, Users, Shield, User, AlertTriangle } from 'lucide-react';
-import { User as UserType } from '../../types';
-import { addNewEmployee, getUsers, saveUsers } from '../../utils/storage';
-import { SearchAndFilter } from '../common/SearchAndFilter';
-import { hashPassword } from '../../utils/auth';
-import { DataIntegrityChecker } from './DataIntegrityChecker';
+import { User, AttendanceRecord, SalesRecord, SalesTarget, Product } from '../types';
 
-interface EmployeeManagementProps {
-  users: UserType[];
-  sales: any[];
-  attendance: any[];
-  onUsersUpdate: (users: UserType[]) => void;
-  onDataUpdate: (users: UserType[], sales: any[], attendance: any[]) => void;
-}
+const STORAGE_KEYS = {
+  USERS: 'crm_users',
+  ATTENDANCE: 'crm_attendance',
+  SALES: 'crm_sales',
+  TARGETS: 'crm_targets',
+  CURRENT_USER: 'crm_current_user',
+  PRODUCTS: 'crm_products',
+};
 
-export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
-  users,
-  sales,
-  attendance,
-  onUsersUpdate,
-  onDataUpdate,
-}) => {
-  const [activeTab, setActiveTab] = useState<'employees' | 'integrity'>('employees');
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'manager' | 'employee'>('all');
-  const [editingUser, setEditingUser] = useState<UserType | null>(null);
-  const [filterDepartment, setFilterDepartment] = useState('all');
+// User Management
+export const getUsers = (): User[] => {
+  const users = localStorage.getItem(STORAGE_KEYS.USERS);
+  return users ? JSON.parse(users) : getDefaultUsers();
+};
 
-  const [newEmployee, setNewEmployee] = useState({
-    employeeId: '',
-    name: '',
-    username: '',
-    role: 'employee' as 'admin' | 'manager' | 'employee',
+export const saveUsers = (users: User[]): void => {
+  localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+};
+
+export const getCurrentUser = (): User | null => {
+  const user = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+  return user ? JSON.parse(user) : null;
+};
+
+export const setCurrentUser = (user: User | null): void => {
+  if (user) {
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+  } else {
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+  }
+};
+
+// Password Reset
+export const resetUserPassword = (employeeId: string, newPassword: string): boolean => {
+  const users = getUsers();
+  const userIndex = users.findIndex(u => u.employeeId === employeeId);
+  
+  if (userIndex !== -1) {
+    users[userIndex].password = newPassword;
+    saveUsers(users);
+    return true;
+  }
+  return false;
+};
+
+// Update User Profile
+export const updateUserProfile = (userId: string, updates: Partial<User>): boolean => {
+  const users = getUsers();
+  const userIndex = users.findIndex(u => u.id === userId);
+  
+  if (userIndex !== -1) {
+    users[userIndex] = { ...users[userIndex], ...updates };
+    saveUsers(users);
+    
+    // Update current user if it's the same user
+    const currentUser = getCurrentUser();
+    if (currentUser && currentUser.id === userId) {
+      setCurrentUser(users[userIndex]);
+    }
+    
+    return true;
+  }
+  return false;
+};
+
+// Add New Employee (Admin only)
+export const addNewEmployee = (userData: Omit<User, 'id'>): User => {
+  const users = getUsers();
+  const newUser: User = {
+    ...userData,
+    id: userData.employeeId,
+  };
+  
+  users.push(newUser);
+  saveUsers(users);
+  return newUser;
+};
+
+// Products Management
+export const getProducts = (): Product[] => {
+  const products = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
+  return products ? JSON.parse(products) : getDefaultProducts();
+};
+
+export const saveProducts = (products: Product[]): void => {
+  localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+};
+
+// Attendance Management
+export const getAttendanceRecords = (): AttendanceRecord[] => {
+  const records = localStorage.getItem(STORAGE_KEYS.ATTENDANCE);
+  return records ? JSON.parse(records) : [];
+};
+
+export const saveAttendanceRecords = (records: AttendanceRecord[]): void => {
+  localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify(records));
+};
+
+// Sales Management
+export const getSalesRecords = (): SalesRecord[] => {
+  const records = localStorage.getItem(STORAGE_KEYS.SALES);
+  return records ? JSON.parse(records) : [];
+};
+
+export const saveSalesRecords = (records: SalesRecord[]): void => {
+  localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(records));
+};
+
+// Sales Targets
+export const getSalesTargets = (): SalesTarget[] => {
+  const targets = localStorage.getItem(STORAGE_KEYS.TARGETS);
+  return targets ? JSON.parse(targets) : [];
+};
+
+export const saveSalesTargets = (targets: SalesTarget[]): void => {
+  localStorage.setItem(STORAGE_KEYS.TARGETS, JSON.stringify(targets));
+};
+
+// Default Products from the image
+const getDefaultProducts = (): Product[] => [
+  // Projector Products (from screenshot)
+  { id: 'PROJ_GALAXY', name: 'Galaxy Projector', price: 11513, category: 'Projector', model: 'Galaxy' },
+  { id: 'PROJ_PLAY', name: 'Play Projector', price: 10073, category: 'Projector', model: 'Play' },
+  { id: 'PROJ_EPIC', name: 'Epic Projector', price: 6473, category: 'Projector', model: 'Epic' },
+  { id: 'PROJ_JOY', name: 'Joy Projector', price: 5039, category: 'Projector', model: 'Joy' },
+  { id: 'PROJ_PIXA', name: 'Pixa Projector', price: 7199, category: 'Projector', model: 'Pixa' },
+  { id: 'PROJ_SCREEN_M65', name: 'Screen M65 Projector', price: 11513, category: 'Projector', model: 'M65' },
+  
+  // Mobile Products (existing)
+  { id: 'GALAXY', name: 'Galaxy', price: 11513, category: 'Mobile', model: 'Galaxy' },
+  { id: 'PLAY', name: 'Play', price: 10073, category: 'Mobile', model: 'Play' },
+  { id: 'EPIC', name: 'Epic', price: 6473, category: 'Mobile', model: 'Epic' },
+  { id: 'JOY', name: 'Joy', price: 5039, category: 'Mobile', model: 'Joy' },
+  { id: 'PIXA', name: 'Pixa', price: 7199, category: 'Mobile', model: 'Pixa' },
+  
+  // Screen Products
+  { id: 'SCREEN_M65', name: 'Screen M65', price: 11513, category: 'Screen', model: 'M65' },
+  { id: 'SCREEN_M80', name: 'Screen M80', price: 12951, category: 'Screen', model: 'M80' },
+  { id: 'SCREEN_M100', name: 'Screen M100', price: 14393, category: 'Screen', model: 'M100' },
+  { id: 'SCREEN_FR140', name: 'Screen FR140', price: 40111, category: 'Screen', model: 'FR140' },
+  { id: 'SCREEN_FR160', name: 'Screen FR160', price: 50291, category: 'Screen', model: 'FR160' },
+  
+  // Extension Board Products
+  { id: 'EXT_BOARD_331', name: 'Extension Board 331', price: 791, category: 'Extension', model: '331' },
+  { id: 'EXT_BOARD_411', name: 'Extension Board 411', price: 719, category: 'Extension', model: '411' },
+  { id: 'EXT_BOARD_422', name: 'Extension Board 422', price: 863, category: 'Extension', model: '422' },
+  { id: 'EXT_BOARD_524', name: 'Extension Board 524', price: 1079, category: 'Extension', model: '524' },
+  { id: 'EXT_BOARD_522', name: 'Extension Board 522', price: 935, category: 'Extension', model: '522' },
+  
+  // SMPS Products
+  { id: 'SMPS_450', name: 'SMPS 450', price: 633, category: 'SMPS', model: '450' },
+  { id: 'SMPS_500', name: 'SMPS 500', price: 950, category: 'SMPS', model: '500' },
+  { id: 'SMPS_550', name: 'SMPS 550', price: 1108, category: 'SMPS', model: '550' },
+  { id: 'SMPS_650', name: 'SMPS 650', price: 1266, category: 'SMPS', model: '650' },
+  { id: 'SMPS_700', name: 'SMPS 700', price: 1425, category: 'SMPS', model: '700' },
+  { id: 'SMPS_750', name: 'SMPS 750', price: 1583, category: 'SMPS', model: '750' },
+  { id: 'SMPS_800', name: 'SMPS 800', price: 1900, category: 'SMPS', model: '800' },
+  { id: 'SMPS_850', name: 'SMPS 850', price: 1900, category: 'SMPS', model: '850' },
+  { id: 'SMPS_1000', name: 'SMPS 1000', price: 2374, category: 'SMPS', model: '1000' },
+  
+  // AI Products
+  { id: 'AI_MODEL', name: 'AI Model', price: 2771, category: 'AI', model: 'Standard' },
+];
+
+// Complete employee list with exact credentials
+const getDefaultUsers = (): User[] => [
+  // Admin
+  {
+    id: 'ADMIN001',
+    employeeId: 'ADMIN001',
+    name: 'Manoj Kumar',
+    username: 'manoj.kumar',
+    role: 'admin',
+    department: 'Management',
+    joinDate: '2024-01-01',
+    password: 'admin@123',
+    profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9876543210',
+    designation: 'Sales Director',
+    target: 500000,
+    manager: null,
+    territory: 'All India',
+    isActive: true,
+    lastLogin: new Date().toISOString(),
+  },
+  
+  // Reporting Managers
+  {
+    id: 'BM001',
+    employeeId: 'BM001',
+    name: 'Salim Javed',
+    username: 'salim.javed',
+    role: 'manager',
     department: 'Sales',
-    password: '',
-    phone: '',
-    designation: '',
-    target: 0,
-    manager: '',
-    territory: '',
-  });
+    joinDate: '2024-01-15',
+    password: 'salim@2024',
+    profilePicture: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 7870660333',
+    designation: 'District General Manager (DGM)',
+    target: 300000,
+    manager: 'ADMIN001',
+    territory: 'Bihar/Delhi & West Bengal/Odisha',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+  },
+  {
+    id: 'BM002',
+    employeeId: 'BM002',
+    name: 'Sandeep Bediawala',
+    username: 'sandeep.bediawala',
+    role: 'manager',
+    department: 'Sales',
+    joinDate: '2024-01-20',
+    password: 'sandeep@2024',
+    profilePicture: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9876543214',
+    designation: 'Regional Manager (Gujarat)',
+    target: 280000,
+    manager: 'ADMIN001',
+    territory: 'Gujarat & Chhattisgarh',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
+  },
+  {
+    id: 'BM003',
+    employeeId: 'BM003',
+    name: 'Pawan Khanna',
+    username: 'pawan.khanna',
+    role: 'manager',
+    department: 'Sales',
+    joinDate: '2024-02-01',
+    password: 'pawan@2024',
+    profilePicture: 'https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9174995813',
+    designation: 'Sales Manager',
+    target: 250000,
+    manager: 'ADMIN001',
+    territory: 'MP & Rajasthan',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
+  },
+  {
+    id: 'BM004',
+    employeeId: 'BM004',
+    name: 'Dhiraj Prakash',
+    username: 'dhiraj.prakash',
+    role: 'manager',
+    department: 'Sales',
+    joinDate: '2024-02-05',
+    password: 'dhiraj@2024',
+    profilePicture: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9174995813',
+    designation: 'Sales Manager',
+    target: 250000,
+    manager: 'ADMIN001',
+    territory: 'MP & Rajasthan',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
+  },
+];
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.username.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = filterRole === 'all' || user.role === filterRole;
-    const matchesDepartment = filterDepartment === 'all' || user.department === filterDepartment;
-    return matchesSearch && matchesRole && matchesDepartment;
-  });
+// Export Functions
+export const exportToCSV = (data: any[], filename: string): void => {
+  if (data.length === 0) return;
+  
+  const headers = Object.keys(data[0]);
+  const csvContent = [
+    headers.join(','),
+    ...data.map(row => headers.map(header => `"${row[header] || ''}"`).join(','))
+  ].join('\n');
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${filename}.csv`);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
-  const departments = [...new Set(users.map(u => u.department))];
-
-  const handleAddEmployee = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Check if employee ID already exists
-    if (users.some(u => u.employeeId === newEmployee.employeeId)) {
-      alert('Employee ID already exists!');
-      return;
-    }
-
-    const userData = {
-      ...newEmployee,
-      joinDate: new Date().toISOString().split('T')[0],
-      profilePicture: `https://ui-avatars.com/api/?name=${encodeURIComponent(newEmployee.name)}&background=6366f1&color=fff`,
-      password: hashPassword(newEmployee.password), // Hash password before saving
-    };
-
-    const addedUser = addNewEmployee(userData);
-    const updatedUsers = [...users, addedUser];
-    onUsersUpdate(updatedUsers);
-
-    // Reset form
-    setNewEmployee({
-      employeeId: '',
-      name: '',
-      username: '',
-      role: 'employee',
-      department: 'Sales',
-      password: '',
-      phone: '',
-      designation: '',
-      target: 0,
-      manager: '',
-      territory: '',
-    });
-    setShowAddForm(false);
-
-    alert('Employee added successfully!');
-  };
-
-  const handleEditEmployee = (user: UserType) => {
-    setEditingUser(user);
-  };
-
-  const handleUpdateEmployee = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingUser) return;
-
-    const updatedUsers = users.map(u => 
-      u.id === editingUser.id ? editingUser : u
-    );
-    
-    saveUsers(updatedUsers);
-    onUsersUpdate(updatedUsers);
-    setEditingUser(null);
-    alert('Employee updated successfully!');
-  };
-
-  const handleDeleteEmployee = (userId: string) => {
-    const userToDelete = users.find(u => u.id === userId);
-    if (!userToDelete) return;
-
-    // Prevent deletion of admin users
-    if (userToDelete.role === 'admin') {
-      alert('Cannot delete admin users for security reasons.');
-      return;
-    }
-
-    if (window.confirm(`Are you sure you want to delete ${userToDelete.name}? This action cannot be undone.`)) {
-      const updatedUsers = users.filter(u => u.id !== userId);
-      saveUsers(updatedUsers);
-      onUsersUpdate(updatedUsers);
-      alert('Employee deleted successfully!');
-    }
-  };
-
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'admin': return <Shield className="w-4 h-4 text-red-500" />;
-      case 'manager': return <Users className="w-4 h-4 text-blue-500" />;
-      default: return <User className="w-4 h-4 text-green-500" />;
-    }
-  };
-
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case 'admin': return 'bg-red-100 text-red-800 border-red-200';
-      case 'manager': return 'bg-blue-100 text-blue-800 border-blue-200';
-      default: return 'bg-green-100 text-green-800 border-green-200';
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold text-gray-900">Employee Management</h2>
-        {activeTab === 'employees' && (
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="btn-primary flex items-center space-x-2"
-          >
-            <UserPlus className="w-5 h-5" />
-            <span>Add Employee</span>
-          </button>
-        )}
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
-          <nav className="flex space-x-8 px-6">
-            <button
-              onClick={() => setActiveTab('employees')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'employees'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Employee List
-            </button>
-            <button
-              onClick={() => setActiveTab('integrity')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'integrity'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Data Integrity
-            </button>
-          </nav>
-        </div>
-
-        <div className="p-6">
-          {activeTab === 'employees' && (
-            <div className="space-y-6">
-              {/* Filters */}
-              <SearchAndFilter
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                placeholder="Search employees..."
-                filters={[
-                  {
-                    label: 'Role',
-                    value: filterRole,
-                    options: [
-                      { value: 'all', label: 'All Roles' },
-                      { value: 'admin', label: 'Admin' },
-                      { value: 'manager', label: 'Manager' },
-                      { value: 'employee', label: 'Employee' },
-                    ],
-                    onChange: (value) => setFilterRole(value as any),
-                  },
-                  {
-                    label: 'Department',
-                    value: filterDepartment,
-                    options: [
-                      { value: 'all', label: 'All Departments' },
-                      ...departments.map(dept => ({ value: dept, label: dept })),
-                    ],
-                    onChange: setFilterDepartment,
-                  },
-                ]}
-              />
-
-              {/* Employee List */}
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Employee
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Role
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Department
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Territory
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Target
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredUsers.map(user => (
-                      <tr key={user.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <img
-                              src={user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`}
-                              alt={user.name}
-                              className="w-10 h-10 rounded-full mr-3"
-                            />
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                              <div className="text-sm text-gray-500">{user.employeeId}</div>
-                              <div className="text-sm text-gray-500">@{user.username}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center space-x-2">
-                            {getRoleIcon(user.role)}
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
-                              {user.role}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {user.department}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {user.territory || 'N/A'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {user.target ? `₹${user.target.toLocaleString()}` : 'N/A'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            user.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {user.isActive !== false ? 'Active' : 'Inactive'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                          <button
-                            onClick={() => handleEditEmployee(user)}
-                            className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          {user.role !== 'admin' && (
-                            <button
-                              onClick={() => handleDeleteEmployee(user.id)}
-                              className="text-red-600 hover:text-red-900 transition-colors duration-200"
-                              title="Delete Employee"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                          {user.role === 'admin' && (
-                            <div className="text-gray-400" title="Admin users cannot be deleted">
-                              <Shield className="w-4 h-4" />
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'integrity' && (
-            <DataIntegrityChecker
-              users={users}
-              sales={sales}
-              attendance={attendance}
-              onDataFixed={(fixedUsers, fixedSales, fixedAttendance) => {
-                onDataUpdate(fixedUsers, fixedSales, fixedAttendance);
-              }}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Add Employee Modal */}
-      {showAddForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Add New Employee</h3>
-            
-            <form onSubmit={handleAddEmployee} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Employee ID *
-                  </label>
-                  <input
-                    type="text"
-                    value={newEmployee.employeeId}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, employeeId: e.target.value.toUpperCase() })}
-                    className="input-field"
-                    placeholder="BM001"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={newEmployee.name}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
-                    className="input-field"
-                    placeholder="John Doe"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Username *
-                  </label>
-                  <input
-                    type="text"
-                    value={newEmployee.username}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, username: e.target.value.toLowerCase().replace(/\s+/g, '.') })}
-                    className="input-field"
-                    placeholder="john.doe"
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Username will be converted to lowercase with dots</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    value={newEmployee.phone}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, phone: e.target.value })}
-                    className="input-field"
-                    placeholder="+91 9876543210"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Role *
-                  </label>
-                  <select
-                    value={newEmployee.role}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value as any })}
-                    className="input-field"
-                    required
-                  >
-                    <option value="employee">Employee</option>
-                    <option value="manager">Manager</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Department *
-                  </label>
-                  <select
-                    value={newEmployee.department}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })}
-                    className="input-field"
-                    required
-                  >
-                    <option value="Sales">Sales</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Management">Management</option>
-                    <option value="Operations">Operations</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Designation
-                  </label>
-                  <input
-                    type="text"
-                    value={newEmployee.designation}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, designation: e.target.value })}
-                    className="input-field"
-                    placeholder="Sales Executive"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Territory
-                  </label>
-                  <input
-                    type="text"
-                    value={newEmployee.territory}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, territory: e.target.value })}
-                    className="input-field"
-                    placeholder="North India"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Monthly Target (₹)
-                  </label>
-                  <input
-                    type="number"
-                    value={newEmployee.target}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, target: parseInt(e.target.value) })}
-                    className="input-field"
-                    placeholder="150000"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Manager
-                  </label>
-                  <select
-                    value={newEmployee.manager}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, manager: e.target.value })}
-                    className="input-field"
-                  >
-                    <option value="">Select Manager</option>
-                    {users.filter(u => u.role === 'manager' || u.role === 'admin').map(manager => (
-                      <option key={manager.id} value={manager.id}>
-                        {manager.name} ({manager.employeeId})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Password *
-                  </label>
-                  <input
-                    type="password"
-                    value={newEmployee.password}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })}
-                    className="input-field"
-                    placeholder="Minimum 6 characters"
-                    required
-                    minLength={6}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Password will be securely encrypted</p>
-                </div>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <div className="flex items-start">
-                  <AlertTriangle className="w-5 h-5 text-blue-600 mr-2 mt-0.5" />
-                  <div className="text-sm text-blue-800">
-                    <p className="font-medium mb-1">Important Notes:</p>
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>Employee ID cannot be changed after creation</li>
-                      <li>Password will be securely encrypted</li>
-                      <li>Employee will be able to change their password after first login</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-4 pt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowAddForm(false)}
-                  className="btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn-primary"
-                >
-                  Add Employee
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Employee Modal */}
-      {editingUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Edit Employee</h3>
-            
-            <form onSubmit={handleUpdateEmployee} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Employee ID
-                  </label>
-                  <input
-                    type="text"
-                    value={editingUser.employeeId}
-                    className="input-field bg-gray-100"
-                    disabled
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Employee ID cannot be changed</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingUser.name}
-                    onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
-                    className="input-field"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Username *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingUser.username}
-                    onChange={(e) => setEditingUser({ ...editingUser, username: e.target.value.toLowerCase().replace(/\s+/g, '.') })}
-                    className="input-field"
-                    placeholder="john.doe"
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Username will be converted to lowercase with dots</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    value={editingUser.phone || ''}
-                    onChange={(e) => setEditingUser({ ...editingUser, phone: e.target.value })}
-                    className="input-field"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Role *
-                  </label>
-                  <select
-                    value={editingUser.role}
-                    onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value as any })}
-                    className="input-field"
-                    required
-                  >
-                    <option value="employee">Employee</option>
-                    <option value="manager">Manager</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Department *
-                  </label>
-                  <select
-                    value={editingUser.department}
-                    onChange={(e) => setEditingUser({ ...editingUser, department: e.target.value })}
-                    className="input-field"
-                    required
-                  >
-                    <option value="Sales">Sales</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Management">Management</option>
-                    <option value="Operations">Operations</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Designation
-                  </label>
-                  <input
-                    type="text"
-                    value={editingUser.designation || ''}
-                    onChange={(e) => setEditingUser({ ...editingUser, designation: e.target.value })}
-                    className="input-field"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Territory
-                  </label>
-                  <input
-                    type="text"
-                    value={editingUser.territory || ''}
-                    onChange={(e) => setEditingUser({ ...editingUser, territory: e.target.value })}
-                    className="input-field"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Monthly Target (₹)
-                  </label>
-                  <input
-                    type="number"
-                    value={editingUser.target || 0}
-                    onChange={(e) => setEditingUser({ ...editingUser, target: parseInt(e.target.value) })}
-                    className="input-field"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Manager
-                  </label>
-                  <select
-                    value={editingUser.manager || ''}
-                    onChange={(e) => setEditingUser({ ...editingUser, manager: e.target.value })}
-                    className="input-field"
-                  >
-                    <option value="">Select Manager</option>
-                    {users.filter(u => u.role === 'manager' || u.role === 'admin').map(manager => (
-                      <option key={manager.id} value={manager.id}>
-                        {manager.name} ({manager.employeeId})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                <div className="flex items-start">
-                  <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" />
-                  <div className="text-sm text-yellow-800">
-                    <p className="font-medium mb-1">Security Note:</p>
-                    <p>To change password, the employee should use the "Change Password" option in their profile settings.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-4 pt-6">
-                <button
-                  type="button"
-                  onClick={() => setEditingUser(null)}
-                  className="btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn-primary"
-                >
-                  Update Employee
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+// Initialize default data if not exists
+export const initializeDefaultData = (): void => {
+  if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
+    saveUsers(getDefaultUsers());
+  }
+  if (!localStorage.getItem(STORAGE_KEYS.PRODUCTS)) {
+    saveProducts(getDefaultProducts());
+  }
 };
