@@ -7,6 +7,7 @@ import { Dashboard } from './components/dashboard/Dashboard';
 import { AttendanceTracker } from './components/attendance/AttendanceTracker';
 import { SalesTracker } from './components/sales/SalesTracker';
 import { SalesReports } from './components/sales/SalesReports';
+import { SalesAnalytics } from './components/sales/SalesAnalytics';
 import { EmployeeManagement } from './components/admin/EmployeeManagement';
 import { ProfileSettings } from './components/profile/ProfileSettings';
 import { SystemSettings } from './components/settings/SystemSettings';
