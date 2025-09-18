@@ -49,39 +49,39 @@ function App() {
     loadData();
 
     // Subscribe to real-time updates
-    const unsubscribeUsers = realTimeDataManager.subscribe('users', () => {
+    const usersCallback = () => {
       setAllUsers(getUsers());
-    });
+    };
+    realTimeDataManager.addListener('users', usersCallback);
     
-    const unsubscribeSales = realTimeDataManager.subscribe('sales', () => {
+    const salesCallback = () => {
       setAllSales(getSalesRecords());
-    });
+    };
+    realTimeDataManager.addListener('sales', salesCallback);
     
-    const unsubscribeAttendance = realTimeDataManager.subscribe('attendance', () => {
+    const attendanceCallback = () => {
       setAllAttendance(getAttendanceRecords());
-    });
+    };
+    realTimeDataManager.addListener('attendance', attendanceCallback);
 
     return () => {
-      unsubscribeUsers();
-      unsubscribeSales();
-      unsubscribeAttendance();
+      realTimeDataManager.removeListener('users', usersCallback);
+      realTimeDataManager.removeListener('sales', salesCallback);
+      realTimeDataManager.removeListener('attendance', attendanceCallback);
     };
   }, []);
 
   // Update handlers
   const handleUsersUpdate = (users: User[]) => {
     setAllUsers(users);
-    realTimeDataManager.notifyUpdate('users');
   };
 
   const handleSalesUpdate = (sales: SalesRecord[]) => {
     setAllSales(sales);
-    realTimeDataManager.notifyUpdate('sales');
   };
 
   const handleAttendanceUpdate = (attendance: AttendanceRecord[]) => {
     setAllAttendance(attendance);
-    realTimeDataManager.notifyUpdate('attendance');
   };
 
   const handleUserUpdate = (updatedUser: User) => {
