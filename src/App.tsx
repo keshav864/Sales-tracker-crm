@@ -48,7 +48,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-white">
       <Header 
         user={currentUser} 
         onLogout={handleLogout}
@@ -62,8 +62,8 @@ export default function App() {
           onClose={() => setSidebarOpen(false)}
         />
         
-        <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : ''}`}>
-          <div className="p-6">
+        <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : ''} bg-white`}>
+          <div className="p-6 bg-white">
             <Dashboard user={currentUser} />
           </div>
         </main>
