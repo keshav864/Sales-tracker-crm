@@ -71,12 +71,11 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ attendance }) 
 
   const options = {
     responsive: true,
-    backgroundColor: '#ffffff',
     plugins: {
       legend: {
         position: 'top' as const,
         labels: {
-          color: '#000000'
+          color: '#374151'
         }
       },
     },
@@ -84,24 +83,28 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({ attendance }) 
       y: {
         beginAtZero: true,
         grid: {
-          color: '#e5e7eb'
+          color: '#f3f4f6'
         },
         ticks: {
-          color: '#000000',
+          color: '#374151',
           stepSize: 1,
         },
       },
       x: {
         grid: {
-          color: '#e5e7eb'
+          color: '#f3f4f6'
         },
         ticks: {
-          color: '#000000',
+          color: '#374151',
           stepSize: 1,
         },
       },
     },
   };
 
-  return <Line data={chartData} options={options} />;
+  return (
+    <div style={{ backgroundColor: '#ffffff' }}>
+      <Line data={chartData} options={options} />
+    </div>
+  );
 };

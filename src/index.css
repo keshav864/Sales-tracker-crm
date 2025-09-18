@@ -60,7 +60,7 @@
   }
 
   .card {
-    @apply bg-white rounded-2xl shadow-lg border border-gray-200 p-6;
+    @apply bg-white rounded-2xl shadow-lg border border-gray-200 p-6 !important;
   }
 
 
@@ -114,6 +114,25 @@
 
   .animate-spin-slow {
     animation: spin 3s linear infinite;
+  }
+
+  /* Force white backgrounds for all chart containers */
+  .chart-container,
+  canvas {
+    background-color: #ffffff !important;
+  }
+
+  /* Remove any dark backgrounds */
+  * {
+    background-color: inherit;
+  }
+
+  /* Ensure all cards are white */
+  .bg-gray-800,
+  .bg-gray-900,
+  [style*="background-color: #1f2937"],
+  [style*="background-color: rgba(31, 41, 55"] {
+    background-color: #ffffff !important;
   }
 }
 

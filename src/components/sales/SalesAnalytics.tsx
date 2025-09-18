@@ -118,12 +118,11 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
 
   const chartOptions = {
     responsive: true,
-    backgroundColor: '#ffffff',
     plugins: {
       legend: {
         position: 'top' as const,
         labels: {
-          color: '#000000'
+          color: '#374151'
         }
       },
     },
@@ -131,10 +130,10 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
       y: {
         beginAtZero: true,
         grid: {
-          color: '#e5e7eb'
+          color: '#f3f4f6'
         },
         ticks: {
-          color: '#000000',
+          color: '#374151',
           callback: function(value: any) {
             return '₹' + value.toLocaleString();
           },
@@ -142,13 +141,10 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
       },
       x: {
         grid: {
-          color: '#e5e7eb'
+          color: '#f3f4f6'
         },
         ticks: {
-          color: '#000000',
-          callback: function(value: any) {
-            return '₹' + value.toLocaleString();
-          },
+          color: '#374151',
         },
       },
     },
@@ -156,12 +152,11 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
 
   const pieOptions = {
     responsive: true,
-    backgroundColor: '#ffffff',
     plugins: {
       legend: {
         position: 'right' as const,
         labels: {
-          color: '#000000'
+          color: '#374151'
         }
       },
     },
@@ -177,40 +172,44 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Weekly Sales Trend
           </h3>
-          <Bar data={weeklyData} options={chartOptions} />
+          <div style={{ backgroundColor: '#ffffff' }}>
+            <Bar data={weeklyData} options={chartOptions} />
+          </div>
         </div>
 
-        <div className="card">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Sales by Category
           </h3>
-          <div className="h-64">
+          <div className="h-64" style={{ backgroundColor: '#ffffff' }}>
             <Pie data={categoryData} options={pieOptions} />
           </div>
         </div>
       </div>
 
       {canViewAll && performanceData && (
-        <div className="card">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Sales Team Performance
           </h3>
-          <Bar data={performanceData} options={chartOptions} />
+          <div style={{ backgroundColor: '#ffffff' }}>
+            <Bar data={performanceData} options={chartOptions} />
+          </div>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="card text-center">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 text-center">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Total Revenue</h4>
           <p className="text-xl font-bold text-green-600">
             ₹{relevantSales.reduce((sum, sale) => sum + sale.totalAmount, 0).toLocaleString()}
           </p>
         </div>
-        <div className="card text-center">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 text-center">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Average Sale</h4>
           <p className="text-xl font-bold text-blue-600">
             ₹{relevantSales.length > 0 
@@ -219,7 +218,7 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
             }
           </p>
         </div>
-        <div className="card text-center">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 text-center">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Top Category</h4>
           <p className="text-xl font-bold text-purple-600 capitalize">
             {Object.entries(
@@ -230,7 +229,7 @@ export const SalesAnalytics: React.FC<SalesAnalyticsProps> = ({
             ).sort(([,a], [,b]) => b - a)[0]?.[0] || 'N/A'}
           </p>
         </div>
-        <div className="card text-center">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 text-center">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Total Transactions</h4>
           <p className="text-xl font-bold text-orange-600">{relevantSales.length}</p>
         </div>

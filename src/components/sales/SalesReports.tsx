@@ -145,7 +145,7 @@ export const SalesReports: React.FC<SalesReportsProps> = ({
         </div>
       </div>
 
-      <div className="card">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <h4 className="text-lg font-semibold text-gray-900">Sales Transactions</h4>
           <div className="flex items-center space-x-2">
@@ -169,7 +169,7 @@ export const SalesReports: React.FC<SalesReportsProps> = ({
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto bg-white">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -228,7 +228,7 @@ export const SalesReports: React.FC<SalesReportsProps> = ({
         </div>
 
         {filteredSales.length === 0 && (
-          <div className="text-center py-12">
+          <div className="text-center py-12 bg-white">
             <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500">No sales records found for the selected criteria.</p>
           </div>
