@@ -176,7 +176,7 @@ const getDefaultUsers = (): User[] => [
     department: 'Management',
     joinDate: '2024-01-01',
     password: 'admin@123',
-    profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
+    profilePicture: 'https://cdn.shopify.com/s/files/1/0752/8084/3005/files/Manoj_Sir_web_Image.webp?v=1748955358',
     phone: '+91 9876543210',
     designation: 'Sales Director',
     target: 500000,
