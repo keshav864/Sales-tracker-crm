@@ -153,22 +153,22 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
             Welcome back, {currentUser.name}!
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-sm md:text-base text-gray-600 mt-1">
             Here's what's happening with your {currentUser.role === 'admin' ? 'organization' : 'team'} today.
           </p>
         </div>
         
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
           {currentUser.role === 'admin' && (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 w-full sm:w-auto">
               <Filter className="w-5 h-5 text-gray-600" />
               <select
                 value={selectedManager}
                 onChange={(e) => setSelectedManager(e.target.value)}
-                className="input-field max-w-xs"
+                className="input-field w-full sm:max-w-xs text-sm"
               >
                 <option value="all">All Teams</option>
                 {managers.map(manager => (
@@ -182,7 +182,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           
           <button
             onClick={() => handleExportTeamData()}
-            className="btn-secondary flex items-center space-x-2"
+            className="btn-secondary flex items-center space-x-2 text-sm px-3 py-2"
           >
             <Download className="w-5 h-5" />
             <span>Export Data</span>
@@ -191,7 +191,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <div className="card hover-lift">
           <div className="flex items-center">
             <div className="bg-blue-500 rounded-xl p-3 mr-4 shadow-lg">
@@ -199,9 +199,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-medium text-gray-500 mb-1">Total Employees</h3>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalEmployees}</p>
-              <p className="text-sm text-blue-600 mt-1">
-                {currentUser.role === 'admin' ? 'All employees' : 'Your team'}
+              <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalEmployees}</p>
+              <p className="text-xs md:text-sm text-blue-600 mt-1">
+                {currentUser.role === 'admin' ? 'All' : 'Team'}
               </p>
             </div>
           </div>
@@ -214,9 +214,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-medium text-gray-500 mb-1">Present Today</h3>
-              <p className="text-2xl font-bold text-gray-900">{stats.presentToday}</p>
-              <p className="text-sm text-green-600 mt-1">
-                {stats.lateToday > 0 && `+${stats.lateToday} late`}
+              <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.presentToday}</p>
+              <p className="text-xs md:text-sm text-green-600 mt-1">
+                {stats.lateToday > 0 ? `+${stats.lateToday} late` : 'On time'}
               </p>
             </div>
           </div>
@@ -229,9 +229,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-medium text-gray-500 mb-1">Sales Today</h3>
-              <p className="text-2xl font-bold text-gray-900">₹{stats.totalSalesToday.toLocaleString()}</p>
-              <p className="text-sm text-purple-600 mt-1">
-                This month: ₹{stats.totalSalesThisMonth.toLocaleString()}
+              <p className="text-lg md:text-2xl font-bold text-gray-900">₹{stats.totalSalesToday.toLocaleString()}</p>
+              <p className="text-xs md:text-sm text-purple-600 mt-1">
+                Month: ₹{(stats.totalSalesThisMonth / 1000).toFixed(0)}K
               </p>
             </div>
           </div>
@@ -244,9 +244,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-medium text-gray-500 mb-1">Achievement</h3>
-              <p className="text-2xl font-bold text-gray-900">{stats.achievementRate.toFixed(1)}%</p>
-              <p className="text-sm text-orange-600 mt-1">
-                Target: ₹{stats.totalTarget.toLocaleString()}
+              <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.achievementRate.toFixed(1)}%</p>
+              <p className="text-xs md:text-sm text-orange-600 mt-1">
+                Target: ₹{(stats.totalTarget / 1000).toFixed(0)}K
               </p>
             </div>
           </div>
@@ -255,7 +255,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Team Structure - Only for Admin and Managers */}
       {(currentUser.role === 'admin' || currentUser.role === 'manager') && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-semibold text-gray-900">Team Structure</h3>
             <div className="text-sm text-gray-600">
@@ -269,7 +269,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <div key={manager.id} className="mb-6 bg-white border border-gray-200 rounded-xl overflow-hidden">
               {/* Manager Header */}
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 border-b border-gray-200">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 lg:space-y-0">
                   <div className="flex items-center space-x-4">
                     <button
                       onClick={() => toggleManagerExpansion(manager.id)}
@@ -295,7 +295,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-6">
+                  <div className="flex flex-wrap items-center gap-4 lg:space-x-6">
                     <div className="text-center">
                       <p className="text-sm text-gray-600">Team Size</p>
                       <p className="font-bold text-blue-600 text-xl">{teamStructure[manager.id]?.length || 0}</p>
@@ -311,7 +311,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     {currentUser.role === 'admin' && (
                       <button
                         onClick={() => handleExportTeamData(manager.id)}
-                        className="btn-secondary text-sm py-2 px-3 flex items-center space-x-1"
+                        className="btn-secondary text-xs py-1 px-2 flex items-center space-x-1"
                       >
                         <Download className="w-4 h-4" />
                         <span>Export</span>
@@ -324,8 +324,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
               {/* Team Members */}
               {expandedManagers.has(manager.id) && teamStructure[manager.id] && (
                 <div className="p-4 bg-gray-50">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {teamStructure[manager.id].map(employee => (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
+                    {teamStructure[manager.id].slice(0, 12).map(employee => (
                       <div key={employee.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow duration-200">
                         <div className="flex items-center space-x-3 mb-3">
                           <img
@@ -335,7 +335,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           />
                           <div className="flex-1">
                             <h5 className="font-medium text-gray-900">{employee.name}</h5>
-                            <p className="text-sm text-gray-600">{employee.designation}</p>
+                            <p className="text-xs text-gray-600">{employee.designation}</p>
                           </div>
                         </div>
                         
@@ -346,11 +346,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">Territory:</span>
-                            <span className="font-medium text-xs">{employee.territory}</span>
+                            <span className="font-medium text-xs truncate ml-1">{employee.territory}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">Target:</span>
-                            <span className="font-medium text-green-600">₹{employee.target?.toLocaleString()}</span>
+                            <span className="font-medium text-green-600">₹{(employee.target || 0) > 1000 ? ((employee.target || 0) / 1000).toFixed(0) + 'K' : (employee.target || 0)}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">Phone:</span>
@@ -368,7 +368,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           </span>
                           
                           <div className="text-xs text-gray-500">
-                            Last login: {employee.lastLogin ? new Date(employee.lastLogin).toLocaleDateString() : 'Never'}
+                            {employee.lastLogin ? new Date(employee.lastLogin).toLocaleDateString() : 'Never'}
                           </div>
                         </div>
                       </div>
@@ -382,7 +382,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       )}
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div className="card">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Weekly Sales Trend</h3>
           <WeeklySalesChart sales={visibleSales} />
@@ -400,7 +400,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <div className="card text-center hover-lift">
           <Clock className="w-12 h-12 text-blue-600 mx-auto mb-4" />
           <h4 className="font-semibold text-gray-900 mb-2">Mark Attendance</h4>

@@ -107,52 +107,52 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
   const totalAmount = selectedProduct ? (selectedProduct.price * formData.quantity) - formData.discount : 0;
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-blue-600 mb-2">Sales Report Submission</h2>
-        <p className="text-gray-600">Complete CRM form for sales tracking and analysis</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-2">Sales Report Submission</h2>
+        <p className="text-sm md:text-base text-gray-600">Complete CRM form for sales tracking and analysis</p>
       </div>
 
       {/* Progress Steps */}
-      <div className="flex items-center justify-center mb-8">
-        <div className="flex items-center space-x-4">
+      <div className="flex items-center justify-center mb-8 overflow-x-auto">
+        <div className="flex items-center space-x-2 md:space-x-4 min-w-max px-4">
           <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
             currentStep === 1 ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
           }`}>
             <Package className="w-5 h-5" />
-            <span className="font-medium">Product Selection</span>
+            <span className="font-medium text-sm md:text-base">Product</span>
           </div>
-          <div className="w-8 h-0.5 bg-gray-300"></div>
+          <div className="w-4 md:w-8 h-0.5 bg-gray-300"></div>
           <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
             currentStep === 2 ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
           }`}>
             <DollarSign className="w-5 h-5" />
-            <span className="font-medium">Customer Info</span>
+            <span className="font-medium text-sm md:text-base">Customer</span>
           </div>
-          <div className="w-8 h-0.5 bg-gray-300"></div>
+          <div className="w-4 md:w-8 h-0.5 bg-gray-300"></div>
           <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
             currentStep === 3 ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
           }`}>
             <ShoppingCart className="w-5 h-5" />
-            <span className="font-medium">Sale Details</span>
+            <span className="font-medium text-sm md:text-base">Details</span>
           </div>
-          <div className="w-8 h-0.5 bg-gray-300"></div>
+          <div className="w-4 md:w-8 h-0.5 bg-gray-300"></div>
           <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
             currentStep === 4 ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
           }`}>
             <Plus className="w-5 h-5" />
-            <span className="font-medium">Review & Submit</span>
+            <span className="font-medium text-sm md:text-base">Review</span>
           </div>
         </div>
       </div>
 
       {/* Step 1: Product Selection */}
       {currentStep === 1 && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-8">
           <div className="flex items-center mb-6">
             <Package className="w-6 h-6 text-blue-600 mr-3" />
-            <h3 className="text-2xl font-bold text-gray-900">Product Selection</h3>
+            <h3 className="text-xl md:text-2xl font-bold text-gray-900">Product Selection</h3>
           </div>
 
           {/* Search Products */}
@@ -167,7 +167,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
                 placeholder="Search by product name, category, or model..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base"
               />
             </div>
           </div>
@@ -177,19 +177,19 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
             <label className="block text-sm font-medium text-gray-700 mb-4">
               Select Product *
             </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 max-h-96 overflow-y-auto">
               {filteredProducts.map(product => (
                 <div
                   key={product.id}
                   onClick={() => handleProductSelect(product)}
-                  className="border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all duration-200 bg-white"
+                  className="border border-gray-200 rounded-xl p-3 md:p-4 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all duration-200 bg-white"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-semibold text-gray-900">{product.name}</h4>
-                    <span className="text-lg font-bold text-green-600">₹{product.price.toLocaleString()}</span>
+                    <h4 className="font-semibold text-gray-900 text-sm md:text-base">{product.name}</h4>
+                    <span className="text-sm md:text-lg font-bold text-green-600">₹{product.price.toLocaleString()}</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-1">Category: {product.category}</p>
-                  <p className="text-sm text-gray-600">Model: {product.model}</p>
+                  <p className="text-xs md:text-sm text-gray-600 mb-1">Category: {product.category}</p>
+                  <p className="text-xs md:text-sm text-gray-600">Model: {product.model}</p>
                 </div>
               ))}
             </div>
@@ -199,10 +199,10 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
 
       {/* Step 2: Customer Information */}
       {currentStep === 2 && selectedProduct && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-8">
           <div className="flex items-center mb-6">
             <DollarSign className="w-6 h-6 text-blue-600 mr-3" />
-            <h3 className="text-2xl font-bold text-gray-900">Customer Information</h3>
+            <h3 className="text-xl md:text-2xl font-bold text-gray-900">Customer Information</h3>
           </div>
 
           {/* Selected Product Summary */}
@@ -211,9 +211,9 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
             <div className="flex justify-between items-center">
               <div>
                 <p className="font-medium text-blue-800">{selectedProduct.name}</p>
-                <p className="text-sm text-blue-600">{selectedProduct.category} - {selectedProduct.model}</p>
+                <p className="text-xs md:text-sm text-blue-600">{selectedProduct.category} - {selectedProduct.model}</p>
               </div>
-              <p className="text-xl font-bold text-blue-600">₹{selectedProduct.price.toLocaleString()}</p>
+              <p className="text-lg md:text-xl font-bold text-blue-600">₹{selectedProduct.price.toLocaleString()}</p>
             </div>
           </div>
 
@@ -288,14 +288,14 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
           <div className="flex justify-between mt-8">
             <button
               onClick={() => setCurrentStep(1)}
-              className="btn-secondary"
+              className="btn-secondary text-sm md:text-base px-4 md:px-6"
             >
               Previous
             </button>
             <button
               onClick={() => setCurrentStep(3)}
               disabled={!formData.customer}
-              className="btn-primary disabled:opacity-50"
+              className="btn-primary disabled:opacity-50 text-sm md:text-base px-4 md:px-6"
             >
               Next Step
             </button>
@@ -305,10 +305,10 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
 
       {/* Step 3: Sale Details */}
       {currentStep === 3 && selectedProduct && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-8">
           <div className="flex items-center mb-6">
             <ShoppingCart className="w-6 h-6 text-blue-600 mr-3" />
-            <h3 className="text-2xl font-bold text-gray-900">Sale Details</h3>
+            <h3 className="text-xl md:text-2xl font-bold text-gray-900">Sale Details</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -450,12 +450,12 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
           {/* Total Amount */}
           <div className="bg-green-50 border border-green-200 rounded-xl p-4 mt-6">
             <div className="flex justify-between items-center">
-              <span className="text-lg font-medium text-green-900">Total Amount:</span>
-              <span className="text-3xl font-bold text-green-600">
+              <span className="text-base md:text-lg font-medium text-green-900">Total Amount:</span>
+              <span className="text-2xl md:text-3xl font-bold text-green-600">
                 ₹{totalAmount.toLocaleString()}
               </span>
             </div>
-            <div className="text-sm text-green-700 mt-2">
+            <div className="text-xs md:text-sm text-green-700 mt-2">
               ({formData.quantity} × ₹{selectedProduct.price.toLocaleString()}) - ₹{formData.discount.toLocaleString()} discount
             </div>
           </div>
@@ -463,13 +463,13 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
           <div className="flex justify-between mt-8">
             <button
               onClick={() => setCurrentStep(2)}
-              className="btn-secondary"
+              className="btn-secondary text-sm md:text-base px-4 md:px-6"
             >
               Previous
             </button>
             <button
               onClick={() => setCurrentStep(4)}
-              className="btn-primary"
+              className="btn-primary text-sm md:text-base px-4 md:px-6"
             >
               Review & Submit
             </button>
@@ -479,17 +479,17 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
 
       {/* Step 4: Review & Submit */}
       {currentStep === 4 && selectedProduct && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-8">
           <div className="flex items-center mb-6">
             <Plus className="w-6 h-6 text-blue-600 mr-3" />
-            <h3 className="text-2xl font-bold text-gray-900">Review & Submit</h3>
+            <h3 className="text-xl md:text-2xl font-bold text-gray-900">Review & Submit</h3>
           </div>
 
           <div className="space-y-6">
             {/* Product Summary */}
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
               <h4 className="font-semibold text-blue-900 mb-4">Product Details</h4>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-blue-600">Product</p>
                   <p className="font-medium text-blue-800">{selectedProduct.name}</p>
@@ -512,7 +512,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
             {/* Customer Summary */}
             <div className="bg-green-50 border border-green-200 rounded-xl p-6">
               <h4 className="font-semibold text-green-900 mb-4">Customer Information</h4>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-green-600">Name</p>
                   <p className="font-medium text-green-800">{formData.customer}</p>
@@ -535,7 +535,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
             {/* Sale Summary */}
             <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
               <h4 className="font-semibold text-purple-900 mb-4">Sale Summary</h4>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-purple-600">Quantity</p>
                   <p className="font-medium text-purple-800">{formData.quantity}</p>
@@ -558,8 +558,8 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
             {/* Total Amount */}
             <div className="bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-xl p-6">
               <div className="flex justify-between items-center">
-                <span className="text-xl font-medium">Final Total Amount:</span>
-                <span className="text-4xl font-bold">
+                <span className="text-lg md:text-xl font-medium">Final Total Amount:</span>
+                <span className="text-2xl md:text-4xl font-bold">
                   ₹{totalAmount.toLocaleString()}
                 </span>
               </div>
@@ -571,13 +571,13 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
               <button
                 type="button"
                 onClick={() => setCurrentStep(3)}
-                className="btn-secondary"
+                className="btn-secondary text-sm md:text-base px-4 md:px-6"
               >
                 Previous
               </button>
               <button
                 type="submit"
-                className="btn-success flex items-center space-x-2 px-8 py-3 text-lg"
+                className="btn-success flex items-center space-x-2 px-4 md:px-8 py-2 md:py-3 text-sm md:text-lg"
               >
                 <Plus className="w-6 h-6" />
                 <span>Submit Sale</span>
