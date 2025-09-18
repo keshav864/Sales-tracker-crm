@@ -15,8 +15,10 @@ import { User, AttendanceRecord, SalesRecord } from '../../types';
 import { StatsCard } from './StatsCard';
 import { AttendanceChart } from './AttendanceChart';
 import { SalesChart } from './SalesChart';
-import { realTimeDataManager } from '../../utils/realTimeData';
+import { WeeklySalesChart } from './WeeklySalesChart';
+import { MonthlySalesChart } from './MonthlySalesChart';
 import { formatDate } from '../../utils/dateUtils';
+import { getVisibleUsers, getVisibleSalesRecords, getVisibleAttendanceRecords } from '../../utils/dataPrivacy';
 
 interface DashboardProps {
   users: User[];
@@ -33,17 +35,22 @@ export const Dashboard: React.FC<DashboardProps> = ({
   currentUser,
   lastSyncTime,
 }) => {
+  // Apply data privacy filters
+  const visibleUsers = useMemo(() => getVisibleUsers(currentUser, users), [currentUser, users]);
+  const visibleSales = useMemo(() => getVisibleSalesRecords(currentUser, sales, users), [currentUser, sales, users]);
+  const visibleAttendance = useMemo(() => getVisibleAttendanceRecords(currentUser, attendance, users), [currentUser, attendance, users]);
+
   const stats = useMemo(() => {
     const today = formatDate(new Date());
-    const todayAttendance = attendance.filter(record => record.date === today);
-    const todaySales = sales.filter(record => record.date === today);
+    const todayAttendance = visibleAttendance.filter(record => record.date === today);
+    const todaySales = visibleSales.filter(record => record.date === today);
     
     const currentMonth = new Date().toISOString().slice(0, 7);
-    const monthSales = sales.filter(record => record.date.startsWith(currentMonth));
+    const monthSales = visibleSales.filter(record => record.date.startsWith(currentMonth));
     const userMonthSales = monthSales.filter(record => record.userId === currentUser.id);
 
     // Calculate user-specific stats
-    const userTotalSales = sales.filter(record => record.userId === currentUser.id)
+    const userTotalSales = visibleSales.filter(record => record.userId === currentUser.id)
       .reduce((sum, sale) => sum + sale.totalAmount, 0);
     
     const userTodaySales = todaySales.filter(record => record.userId === currentUser.id)
@@ -53,7 +60,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     const targetAchievement = currentUser.target ? (userMonthTotal / currentUser.target) * 100 : 0;
 
     return {
-      totalEmployees: users.length,
+      totalEmployees: visibleUsers.length,
       presentToday: todayAttendance.filter(r => r.status === 'present').length,
       absentToday: todayAttendance.filter(r => r.status === 'absent').length,
       lateToday: todayAttendance.filter(r => r.status === 'late').length,
@@ -63,12 +70,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
       userTodaySales,
       userMonthTotal,
       targetAchievement,
-      totalDeals: sales.length,
+      totalDeals: visibleSales.length,
       conversionRate: 85.5,
     };
-  }, [users, attendance, sales, currentUser]);
+  }, [visibleUsers, visibleAttendance, visibleSales, currentUser]);
 
   const isAdmin = currentUser.role === 'admin';
+  const isManager = currentUser.role === 'manager';
 
   return (
     <div className="space-y-8 p-6">
@@ -82,7 +90,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 Welcome back, {currentUser.name}! 👋
               </h1>
               <p className="text-blue-100 text-lg">
-                {isAdmin ? 'Admin Dashboard - Complete System Overview' : 'Your Performance Dashboard'}
+                {isAdmin ? 'Admin Dashboard - Complete System Overview' : 
+                 isManager ? `Manager Dashboard - ${currentUser.territory} Team Overview` : 
+                 'Your Performance Dashboard'}
               </p>
               <p className="text-blue-200 text-sm mt-1">
                 {new Date().toLocaleDateString('en-US', { 
@@ -104,18 +114,22 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Real-time Data Status */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Real-time Data Status</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">
+          {isAdmin ? 'System Overview' : isManager ? 'Team Overview' : 'Personal Overview'}
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{users.length}</div>
-            <div className="text-sm text-gray-600">Total Employees</div>
+            <div className="text-2xl font-bold text-green-600">{visibleUsers.length}</div>
+            <div className="text-sm text-gray-600">
+              {isAdmin ? 'Total Employees' : isManager ? 'Team Members' : 'You'}
+            </div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{sales.length}</div>
+            <div className="text-2xl font-bold text-blue-600">{visibleSales.length}</div>
             <div className="text-sm text-gray-600">Sales Records</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">{attendance.length}</div>
+            <div className="text-2xl font-bold text-purple-600">{visibleAttendance.length}</div>
             <div className="text-sm text-gray-600">Attendance Records</div>
           </div>
           <div className="text-center">
@@ -133,10 +147,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </div>
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {isAdmin ? (
+        {isAdmin || isManager ? (
           <>
             <StatsCard
-              title="Total Employees"
+              title={isAdmin ? "Total Employees" : "Team Members"}
               value={stats.totalEmployees}
               icon={Users}
               color="blue"
@@ -150,14 +164,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
               trend={{ value: 25, isPositive: true }}
             />
             <StatsCard
-              title="Total Sales Today"
+              title={isAdmin ? "Total Sales Today" : "Team Sales Today"}
               value={`₹${stats.totalSalesToday.toLocaleString()}`}
               icon={DollarSign}
               color="purple"
               trend={{ value: 15, isPositive: true }}
             />
             <StatsCard
-              title="Monthly Revenue"
+              title={isAdmin ? "Monthly Revenue" : "Team Monthly Revenue"}
               value={`₹${stats.totalSalesThisMonth.toLocaleString()}`}
               icon={TrendingUp}
               color="green"
@@ -199,7 +213,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-gray-900 flex items-center">
@@ -211,20 +225,33 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
             </div>
           </div>
-          <AttendanceChart attendance={attendance} />
+          <AttendanceChart attendance={visibleAttendance} />
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-gray-900 flex items-center">
               <TrendingUp className="w-6 h-6 mr-2 text-purple-500" />
-              Sales Performance
+              Weekly Sales Performance
             </h3>
             <div className="flex space-x-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
             </div>
           </div>
-          <SalesChart sales={isAdmin ? sales : sales.filter(s => s.userId === currentUser.id)} />
+          <WeeklySalesChart sales={visibleSales} />
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-gray-900 flex items-center">
+              <BarChart3 className="w-6 h-6 mr-2 text-green-500" />
+              Monthly Sales Trend
+            </h3>
+            <div className="flex space-x-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            </div>
+          </div>
+          <MonthlySalesChart sales={visibleSales} />
         </div>
       </div>
 

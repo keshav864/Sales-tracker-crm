@@ -1,50 +1,48 @@
 # Complete Employee Login Credentials
 
-## 🔐 All 35 Employees Can Login With These Credentials:
+## 🔐 All 21 Employees Can Login With These Credentials:
 
 ### **ADMIN (1)**
 - **ADMIN001** / `admin@123` - Manoj Kumar (Admin)
 
-### **MANAGERS (3)**
+### **REPORTING MANAGERS (4)**
 - **BM001** / `salim@2024` - Salim Javed (Manager)
 - **BM002** / `sandeep@2024` - Sandeep Bediawala (Manager) 
 - **BM003** / `pawan@2024` - Pawan Khanna (Manager)
+- **BM004** / `dhiraj@2024` - Dhiraj Prakash (Manager)
 
-### **EMPLOYEES (31)**
-- **BM178** / `manoj@178` - Manoj Kumar Singh
-- **BM200** / `bm200@123` - Dheeraj Prakash
-- **BM214** / `bm214@123` - Pramod Nair
-- **BM212** / `bm212@123` - Sandeep Bediawala
-- **BM220** / `bm220@123` - Salim Javed
-- **BM227** / `bm227@123` - Pawan Khanna
+### **TEAM MEMBERS (16)**
+
+#### **Under Salim Javed (DGM) - Bihar/Delhi & West Bengal/Odisha:**
 - **BM222** / `bm222@123` - Sonu Mehta
-- **BM223** / `bm223@123` - Sumir Ashokkbhai Yadav
-- **BM234** / `bm234@123` - Zameer Khan
-- **BM235** / `bm235@123` - Hitesh Joshi
-- **BM236** / `bm236@123` - Manish Kumar
-- **BM240** / `bm240@123` - Nitin Mamtrao Ruikar
-- **BM241** / `bm241@123` - Sanjib Bose
-- **BM250** / `bm250@123` - Sabir Sahoo
-- **BM251** / `bm251@123` - Biswajit Chowdhury
-- **BM252** / `bm252@123` - Kailash Khileri
-- **BM254** / `bm254@123` - Nitin Jaiswal
-- **BM255** / `bm255@123` - Inderjith Kumar
+- **BM223** / `bm223@123` - Manish Yadav
+- **BM224** / `bm224@123` - Indrajeet Kumar
+- **BM241** / `bm241@123` - Sajib Bose
 - **BM258** / `bm258@123` - Asim Pal
-- **BM259** / `bm259@123` - Shejin Mathew
-- **BM264** / `bm264@123` - Nikhil Choukikar
-- **BM265** / `bm265@123` - Dhiraj Bhosekar
+- **BM259** / `bm259@123` - Amit Singh
+- **BM260** / `bm260@123` - Pradip Hela
+- **BM261** / `bm261@123` - Shrawan Kumar Sheth
+- **BM262** / `bm262@123` - Biswajit Chowdhary
+- **BM263** / `bm263@123` - Sabirgoutam Sahoo
+
+#### **Under Sandeep Bediawala (Gujarat) - Gujarat & Chhattisgarh:**
+- **BM234** / `bm234@123` - Zameer Khan
+- **BM240** / `bm240@123` - Nitin Mamtrao Ruikar
+- **BM264** / `bm264@123` - Sumit Yadav
+- **BM265** / `bm265@123` - Vibore Ahirwar
+
+#### **Under Pawan Khanna & Dhiraj Prakash (Sales Managers) - MP & Rajasthan:**
+- **BM252** / `bm252@123` - Kailash Khileri
+- **BM235** / `bm235@123` - Hitesh Joshi
 - **BM268** / `bm268@123` - Surendra Singh
-- **BM272** / `bm272@123` - Amruta Shinde
-- **BM275** / `bm275@123` - Pradip Hela
-- **BM280** / `bm280@123` - Rajesh Kumar
-- **BM285** / `bm285@123` - Priya Sharma
-- **BM290** / `bm290@123` - Vikash Singh
+- **BM254** / `bm254@123` - Nitin Jaiswal
+- **BM272** / `bm272@123` - Nikhil Chaudhary
 
 ## 🎯 **How to Test:**
 
 1. **Select Role** in the dropdown (Admin/Manager/Employee)
-2. **Enter Employee ID** (e.g., BM178)
-3. **Enter Password** (e.g., manoj@178)
+2. **Enter Employee ID** (e.g., BM222)
+3. **Enter Password** (e.g., bm222@123)
 4. **Click Sign In**
 
 ## 🔍 **Features by Role:**
@@ -56,16 +54,22 @@
 - Complete dashboard access
 
 ### **Manager Access:**
-- View team members
-- Attendance management
-- Sales reports
-- Team analytics
+- View ONLY their team members
+- Team attendance management
+- Team sales reports
+- Team analytics (privacy protected)
 
 ### **Employee Access:**
 - Personal dashboard
 - Own attendance tracking
 - Sales entry
 - Personal reports
+
+## 🔒 **Data Privacy:**
+- **Managers can ONLY see their direct team members' data**
+- **Employees can ONLY see their own data**
+- **Admin can see all data**
+- **Cross-team data is completely hidden**
 
 ## ✅ **All credentials are working!**
 Try any employee ID and password combination from the list above.
