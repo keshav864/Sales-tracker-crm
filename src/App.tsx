@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User } from './types';
 import { getCurrentUser, initializeDefaultData } from './utils/storage';
-import LoginForm from './components/auth/LoginForm';
+import { LoginForm } from './components/auth/LoginForm';
 import Dashboard from './components/dashboard/Dashboard';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
