@@ -149,7 +149,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
 
       {/* Step 1: Product Selection */}
       {currentStep === 1 && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-8">
+        <div className="card">
           <div className="flex items-center mb-6">
             <Package className="w-6 h-6 text-blue-600 mr-3" />
             <h3 className="text-xl md:text-2xl font-bold text-gray-900">Product Selection</h3>
@@ -199,7 +199,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
 
       {/* Step 2: Customer Information */}
       {currentStep === 2 && selectedProduct && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-8">
+        <div className="card">
           <div className="flex items-center mb-6">
             <DollarSign className="w-6 h-6 text-blue-600 mr-3" />
             <h3 className="text-xl md:text-2xl font-bold text-gray-900">Customer Information</h3>
@@ -305,7 +305,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
 
       {/* Step 3: Sale Details */}
       {currentStep === 3 && selectedProduct && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-8">
+        <div className="card">
           <div className="flex items-center mb-6">
             <ShoppingCart className="w-6 h-6 text-blue-600 mr-3" />
             <h3 className="text-xl md:text-2xl font-bold text-gray-900">Sale Details</h3>
@@ -479,7 +479,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
 
       {/* Step 4: Review & Submit */}
       {currentStep === 4 && selectedProduct && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-8">
+        <div className="card">
           <div className="flex items-center mb-6">
             <Plus className="w-6 h-6 text-blue-600 mr-3" />
             <h3 className="text-xl md:text-2xl font-bold text-gray-900">Review & Submit</h3>

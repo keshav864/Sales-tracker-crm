@@ -255,7 +255,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Team Structure - Only for Admin and Managers */}
       {(currentUser.role === 'admin' || currentUser.role === 'manager') && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
+        <div className="card">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-semibold text-black">Team Structure</h3>
             <div className="text-sm text-gray-600">
@@ -383,25 +383,25 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
+        <div className="card">
           <h3 className="text-lg font-semibold text-black mb-4">Weekly Sales Trend</h3>
           <WeeklySalesChart sales={visibleSales} />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
+        <div className="card">
           <h3 className="text-lg font-semibold text-black mb-4">Monthly Sales Overview</h3>
           <MonthlySalesChart sales={visibleSales} />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
+      <div className="card">
         <h3 className="text-lg font-semibold text-black mb-4">Attendance Trends</h3>
         <AttendanceChart attendance={visibleAttendance} />
       </div>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 text-center hover:shadow-xl transition-all duration-300">
+        <div className="card text-center hover:shadow-xl transition-all duration-300">
           <Clock className="w-12 h-12 text-blue-600 mx-auto mb-4" />
           <h4 className="font-semibold text-black mb-2">Mark Attendance</h4>
           <p className="text-gray-600 text-sm mb-4">Quick check-in/out for today</p>
@@ -410,7 +410,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 text-center hover:shadow-xl transition-all duration-300">
+        <div className="card text-center hover:shadow-xl transition-all duration-300">
           <TrendingUp className="w-12 h-12 text-green-600 mx-auto mb-4" />
           <h4 className="font-semibold text-black mb-2">Add Sale</h4>
           <p className="text-gray-600 text-sm mb-4">Record a new sales transaction</p>
@@ -419,7 +419,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 text-center hover:shadow-xl transition-all duration-300">
+        <div className="card text-center hover:shadow-xl transition-all duration-300">
           <BarChart3 className="w-12 h-12 text-purple-600 mx-auto mb-4" />
           <h4 className="font-semibold text-black mb-2">View Reports</h4>
           <p className="text-gray-600 text-sm mb-4">Detailed analytics and insights</p>
