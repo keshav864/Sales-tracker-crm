@@ -331,7 +331,6 @@
     @apply bg-gray-800/80 border-gray-600 text-white;
   }
 }
-}
 
 /* Print Styles */
 @media print {
