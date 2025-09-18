@@ -98,7 +98,7 @@ export const SalesReports: React.FC<SalesReportsProps> = ({
               placeholder="Search sales..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 input-field max-w-xs"
+              className="pl-10 w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs"
             />
           </div>
 
@@ -106,7 +106,7 @@ export const SalesReports: React.FC<SalesReportsProps> = ({
             <select
               value={filterUser}
               onChange={(e) => setFilterUser(e.target.value)}
-              className="input-field max-w-xs"
+              className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs"
             >
               <option value="all">All Salespeople</option>
               {users.map(user => (
@@ -120,7 +120,7 @@ export const SalesReports: React.FC<SalesReportsProps> = ({
           <select
             value={filterPeriod}
             onChange={(e) => setFilterPeriod(e.target.value)}
-            className="input-field max-w-xs"
+            className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs"
           >
             <option value="all">All Time</option>
             <option value="today">Today</option>
@@ -157,7 +157,7 @@ export const SalesReports: React.FC<SalesReportsProps> = ({
                 setSortBy(field as 'date' | 'amount' | 'customer');
                 setSortOrder(order as 'asc' | 'desc');
               }}
-              className="input-field max-w-xs text-sm"
+              className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs text-sm"
             >
               <option value="date-desc">Date (Newest)</option>
               <option value="date-asc">Date (Oldest)</option>

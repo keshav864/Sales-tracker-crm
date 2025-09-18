@@ -413,14 +413,14 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
                 placeholder="Search employees..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 input-field max-w-xs"
+                className="pl-10 w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs"
               />
             </div>
 
             <select
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
-              className="input-field max-w-xs"
+              className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs"
             >
               <option value="all">All Roles</option>
               <option value="admin">Admin</option>
@@ -431,7 +431,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
             <select
               value={filterManager}
               onChange={(e) => setFilterManager(e.target.value)}
-              className="input-field max-w-xs"
+              className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs"
             >
               <option value="all">All Managers</option>
               {managers.map(manager => (
@@ -450,7 +450,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
               <select
                 value={bulkAction}
                 onChange={(e) => setBulkAction(e.target.value)}
-                className="input-field max-w-xs"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs"
               >
                 <option value="">Bulk Actions</option>
                 <option value="export">Export Selected</option>
@@ -633,7 +633,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
                     type="text"
                     value={newEmployee.employeeId}
                     onChange={(e) => setNewEmployee({ ...newEmployee, employeeId: e.target.value.toUpperCase() })}
-                    className={`input-field ${errors.employeeId ? 'border-red-500' : ''}`}
+                    className={`w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${errors.employeeId ? 'border-red-500' : ''}`}
                     placeholder="EMP001"
                   />
                   {errors.employeeId && <p className="text-red-500 text-xs mt-1">{errors.employeeId}</p>}
@@ -647,7 +647,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({
                     type="text"
                     value={newEmployee.name}
                     onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
-                    className={`input-field ${errors.name ? 'border-red-500' : ''}`}
+                    className={`w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${errors.name ? 'border-red-500' : ''}`}
                     placeholder="John Doe"
                   />
                   {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}

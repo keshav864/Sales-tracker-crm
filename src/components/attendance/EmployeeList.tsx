@@ -64,7 +64,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
             placeholder="Search employees..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 input-field max-w-xs"
+            className="pl-10 w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs"
           />
         </div>
       </div>

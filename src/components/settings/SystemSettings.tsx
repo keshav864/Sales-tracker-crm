@@ -182,7 +182,7 @@ export const SystemSettings: React.FC<SystemSettingsProps> = ({
                     type="text"
                     value={settings.companyName}
                     onChange={(e) => setSettings({ ...settings, companyName: e.target.value })}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   />
                 </div>
 
@@ -193,7 +193,7 @@ export const SystemSettings: React.FC<SystemSettingsProps> = ({
                   <select
                     value={settings.timezone}
                     onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   >
                     <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
                     <option value="America/New_York">America/New_York (EST)</option>
@@ -209,7 +209,7 @@ export const SystemSettings: React.FC<SystemSettingsProps> = ({
                   <select
                     value={settings.dateFormat}
                     onChange={(e) => setSettings({ ...settings, dateFormat: e.target.value })}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   >
                     <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                     <option value="MM/DD/YYYY">MM/DD/YYYY</option>
@@ -224,7 +224,7 @@ export const SystemSettings: React.FC<SystemSettingsProps> = ({
                   <select
                     value={settings.currency}
                     onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   >
                     <option value="INR">INR (₹)</option>
                     <option value="USD">USD ($)</option>

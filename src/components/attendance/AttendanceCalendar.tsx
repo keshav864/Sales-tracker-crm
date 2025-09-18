@@ -67,7 +67,7 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
           <select
             value={selectedUser}
             onChange={(e) => setSelectedUser(e.target.value)}
-            className="input-field max-w-xs"
+            className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs"
           >
             {users.map(user => (
               <option key={user.id} value={user.id}>

@@ -40,7 +40,7 @@
   }
   
   .input-field {
-    @apply w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white backdrop-blur-sm hover:bg-white focus:bg-white shadow-sm text-sm md:text-base;
+    @apply w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-white shadow-sm text-sm md:text-base;
   }
   
   .status-badge {
@@ -60,7 +60,7 @@
   }
 
   .card {
-    @apply bg-white rounded-2xl shadow-lg border border-gray-200 p-6 !important;
+    @apply bg-white rounded-2xl shadow-lg border border-gray-200 p-6;
   }
 
 
@@ -116,22 +116,33 @@
     animation: spin 3s linear infinite;
   }
 
-  /* Force white backgrounds for all chart containers */
-  .chart-container,
-  canvas {
-    background-color: #ffffff !important;
-  }
-
-  /* Remove any dark backgrounds */
-  * {
-    background-color: inherit;
-  }
-
-  /* Ensure all cards are white */
+  /* Force white backgrounds everywhere */
   .bg-gray-800,
   .bg-gray-900,
+  .bg-gray-700,
+  .bg-gray-600,
   [style*="background-color: #1f2937"],
-  [style*="background-color: rgba(31, 41, 55"] {
+  [style*="background-color: rgba(31, 41, 55"],
+  [style*="background-color: #374151"],
+  [style*="background-color: #4b5563"],
+  [class*="bg-gray-8"],
+  [class*="bg-gray-7"],
+  [class*="bg-gray-6"] {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Force white backgrounds for all form elements */
+  input, select, textarea {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Force white backgrounds for all containers */
+  .chart-container,
+  canvas,
+  .card,
+  [class*="bg-"] {
     background-color: #ffffff !important;
   }
 }

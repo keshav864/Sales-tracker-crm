@@ -89,7 +89,7 @@ export const SalesEntryManager: React.FC<SalesEntryManagerProps> = ({
             placeholder="Search sales records..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 input-field max-w-xs"
+            className="pl-10 w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 max-w-xs"
           />
         </div>
       </div>
@@ -206,7 +206,7 @@ export const SalesEntryManager: React.FC<SalesEntryManagerProps> = ({
                     type="text"
                     value={editingRecord.productName}
                     onChange={(e) => setEditingRecord({ ...editingRecord, productName: e.target.value })}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   />
                 </div>
                 
@@ -218,7 +218,7 @@ export const SalesEntryManager: React.FC<SalesEntryManagerProps> = ({
                     type="text"
                     value={editingRecord.customer}
                     onChange={(e) => setEditingRecord({ ...editingRecord, customer: e.target.value })}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   />
                 </div>
                 
@@ -239,7 +239,7 @@ export const SalesEntryManager: React.FC<SalesEntryManagerProps> = ({
                         totalAmount 
                       });
                     }}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   />
                 </div>
                 
@@ -261,7 +261,7 @@ export const SalesEntryManager: React.FC<SalesEntryManagerProps> = ({
                         totalAmount 
                       });
                     }}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   />
                 </div>
                 
@@ -272,7 +272,7 @@ export const SalesEntryManager: React.FC<SalesEntryManagerProps> = ({
                   <select
                     value={editingRecord.paymentStatus || 'paid'}
                     onChange={(e) => setEditingRecord({ ...editingRecord, paymentStatus: e.target.value as any })}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   >
                     <option value="paid">Paid</option>
                     <option value="pending">Pending</option>
@@ -288,7 +288,7 @@ export const SalesEntryManager: React.FC<SalesEntryManagerProps> = ({
                   <input
                     type="number"
                     value={editingRecord.totalAmount}
-                    className="input-field bg-gray-100"
+                    className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                     disabled
                   />
                 </div>
@@ -301,7 +301,7 @@ export const SalesEntryManager: React.FC<SalesEntryManagerProps> = ({
                 <textarea
                   value={editingRecord.notes || ''}
                   onChange={(e) => setEditingRecord({ ...editingRecord, notes: e.target.value })}
-                  className="input-field"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                   rows={3}
                   placeholder="Additional notes..."
                 />

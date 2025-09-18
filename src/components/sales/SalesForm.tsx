@@ -167,7 +167,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
                 placeholder="Search by product name, category, or model..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base"
+                className="w-full pl-10 pr-4 py-2 md:py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm md:text-base"
               />
             </div>
           </div>
@@ -226,7 +226,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
                 type="text"
                 value={formData.customer}
                 onChange={(e) => setFormData({ ...formData, customer: e.target.value })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 placeholder="Enter customer name"
                 required
               />
@@ -240,7 +240,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
                 type="email"
                 value={formData.customerEmail}
                 onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 placeholder="customer@example.com"
               />
             </div>
@@ -253,7 +253,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
                 type="tel"
                 value={formData.customerPhone}
                 onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 placeholder="+91 9876543210"
               />
             </div>
@@ -266,7 +266,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
                 type="text"
                 value={formData.customerCompany}
                 onChange={(e) => setFormData({ ...formData, customerCompany: e.target.value })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 placeholder="Company name"
               />
             </div>
@@ -278,7 +278,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
               <textarea
                 value={formData.customerAddress}
                 onChange={(e) => setFormData({ ...formData, customerAddress: e.target.value })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 rows={3}
                 placeholder="Complete address"
               />
@@ -321,7 +321,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
                 min="1"
                 value={formData.quantity}
                 onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 required
               />
             </div>
@@ -333,7 +333,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
               <input
                 type="number"
                 value={selectedProduct.price}
-                className="input-field bg-gray-100"
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 disabled
               />
             </div>
@@ -347,7 +347,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
                 min="0"
                 value={formData.discount}
                 onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 placeholder="0"
               />
             </div>
@@ -359,7 +359,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
               <select
                 value={formData.paymentMethod}
                 onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
               >
                 <option value="cash">Cash</option>
                 <option value="card">Card</option>
@@ -376,7 +376,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
               <select
                 value={formData.paymentStatus}
                 onChange={(e) => setFormData({ ...formData, paymentStatus: e.target.value as any })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
               >
                 <option value="paid">Paid</option>
                 <option value="pending">Pending</option>
@@ -392,7 +392,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
               <select
                 value={formData.leadSource}
                 onChange={(e) => setFormData({ ...formData, leadSource: e.target.value })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
               >
                 <option value="">Select source</option>
                 <option value="website">Website</option>
@@ -411,7 +411,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
               <select
                 value={formData.priority}
                 onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -428,7 +428,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 required
               />
             </div>
@@ -440,7 +440,7 @@ export const SalesForm: React.FC<SalesFormProps> = ({ currentUser, onSalesAdd })
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="input-field"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 rows={3}
                 placeholder="Additional notes about the sale..."
               />
