@@ -155,13 +155,13 @@ const getDefaultProducts = (): Product[] => [
   { id: 'SMPS_550', name: 'SMPS 550', price: 1108, category: 'SMPS', model: '550' },
   { id: 'SMPS_650', name: 'SMPS 650', price: 1266, category: 'SMPS', model: '650' },
   { id: 'SMPS_700', name: 'SMPS 700', price: 1425, category: 'SMPS', model: '700' },
-  { id: 'SMPS_750', name: 'SMPS 750', price: 1583, category: 'SMPS', model: '750' },
+  { id: 'SMPS_750', name: 'SMPS 750', price: 1900, category: 'SMPS', model: '750' },
   { id: 'SMPS_800', name: 'SMPS 800', price: 1900, category: 'SMPS', model: '800' },
-  { id: 'SMPS_850', name: 'SMPS 850', price: 1900, category: 'SMPS', model: '850' },
-  { id: 'SMPS_1000', name: 'SMPS 1000', price: 2374, category: 'SMPS', model: '1000' },
+  { id: 'SMPS_850', name: 'SMPS 850', price: 2375, category: 'SMPS', model: '850' },
+  { id: 'SMPS_1000', name: 'SMPS 1000', price: 2771, category: 'SMPS', model: '1000' },
   
   // AI Products
-  { id: 'AI_MODEL', name: 'AI Model', price: 2771, category: 'AI', model: 'Standard' },
+  { id: 'AI_MOUSE', name: 'AI Mouse', price: 3599, category: 'AI', model: 'Standard' },
 ];
 
 // Complete employee list with exact credentials
