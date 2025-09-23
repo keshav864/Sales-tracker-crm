@@ -62,6 +62,8 @@
   .card {
     @apply bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6;
   }
+
+
 }
 
 @layer utilities {
@@ -161,33 +163,6 @@
     .text-3xl { font-size: 1.5rem !important; }
     .text-2xl { font-size: 1.25rem !important; }
     .text-xl { font-size: 1.125rem !important; }
-  }
-
-  /* Enhanced mobile responsiveness */
-  @media (max-width: 480px) {
-    .card {
-      @apply p-3 rounded-xl;
-    }
-    
-    .btn-primary, .btn-secondary, .btn-success, .btn-danger {
-      @apply py-2 px-3 text-sm;
-    }
-    
-    .input-field {
-      @apply py-2 px-3 text-sm;
-    }
-  }
-
-  /* Improved touch targets for mobile */
-  @media (max-width: 768px) {
-    button, .btn-primary, .btn-secondary, .btn-success, .btn-danger {
-      min-height: 44px;
-      min-width: 44px;
-    }
-    
-    input, select, textarea {
-      min-height: 44px;
-    }
   }
 }
 
@@ -351,6 +326,31 @@
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
 }
 
+/* Responsive Design */
+@media (max-width: 768px) {
+  .card {
+    @apply p-3;
+  }
+  
+  .btn-primary,
+  .btn-secondary,
+  .btn-success,
+  .btn-danger {
+    @apply py-2 px-3 text-sm;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .card {
+    @apply bg-gray-800/95 border-gray-700/50;
+  }
+  
+  .input-field {
+    @apply bg-gray-800/80 border-gray-600 text-white;
+  }
+}
+
 /* Print Styles */
 @media print {
   .no-print {
@@ -359,47 +359,5 @@
   
   .card {
     @apply shadow-none border border-gray-300;
-  }
-}
-
-/* Enhanced accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .animate-blob,
-  .animate-slideDown,
-  .animate-slideUp,
-  .animate-fadeIn,
-  .animate-shake,
-  .animate-pulse-slow,
-  .animate-bounce-slow,
-  .animate-spin-slow {
-    animation: none;
-  }
-  
-  .transform,
-  .hover\\:scale-105 {
-    transform: none !important;
-  }
-}
-
-/* Focus styles for better accessibility */
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .card {
-    border-width: 2px;
-  }
-  
-  .btn-primary,
-  .btn-secondary,
-  .btn-success,
-  .btn-danger {
-    border: 2px solid currentColor;
   }
 }

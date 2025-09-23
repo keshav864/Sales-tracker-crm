@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogIn, Eye, EyeOff, User, Lock, Building2, UserPlus, RefreshCw, AlertCircle } from 'lucide-react';
+import { LogIn, Eye, EyeOff, User, Lock, Building2, UserPlus, RefreshCw } from 'lucide-react';
 
 interface LoginFormProps {
   onLogin: (employeeId: string, password: string) => boolean;
@@ -22,34 +22,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setError('');
     setIsLoading(true);
 
-    // Input validation
-    if (!employeeId.trim()) {
-      setError('Employee ID is required');
-      setIsLoading(false);
-      return;
-    }
-
-    if (!password.trim()) {
-      setError('Password is required');
-      setIsLoading(false);
-      return;
-    }
-
     console.log('🚀 Login attempt:', { employeeId, password });
 
     try {
-      // Add a small delay to show loading state
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const success = onLogin(employeeId.trim(), password.trim());
+      const success = onLogin(employeeId, password);
       console.log('🚀 Login result:', success);
-      
       if (!success) {
-        setError('Invalid Employee ID or Password. Please check your credentials and try again.');
+        setError('Invalid Employee ID or Password');
       }
     } catch (err) {
       console.error('🚀 Login error:', err);
-      setError('An error occurred during login. Please try again.');
+      setError('An error occurred during login');
     } finally {
       setIsLoading(false);
     }
@@ -57,11 +40,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!resetEmployeeId.trim()) {
-      setError('Employee ID is required');
-      return;
-    }
     
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match');
@@ -80,7 +58,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setResetEmployeeId('');
     setNewPassword('');
     setConfirmPassword('');
-    setError('');
   };
 
   const getRoleCredentials = () => {
@@ -90,7 +67,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       case 'manager':
         return { id: 'BM001', password: 'salim@2024', name: 'Salim Javed (Manager)', username: 'salim.javed' };
       case 'employee':
-        return { id: 'BM222', password: 'bm222@123', name: 'Sonu Mehta (Employee)', username: 'sonu.mehta' };
+        return { id: 'BM178', password: 'manoj@178', name: 'Manoj Kumar Singh (Employee)', username: 'manoj.singh' };
       default:
         return { id: '', password: '', name: '', username: '' };
     }
@@ -152,7 +129,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                       className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                       placeholder="Enter your Employee ID"
                       required
-                      autoComplete="username"
                     />
                   </div>
                 </div>
@@ -171,7 +147,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                       className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                       placeholder="Enter your password"
                       required
-                      autoComplete="current-password"
                     />
                     <button
                       type="button"
@@ -190,17 +165,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
               {error && (
                 <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3 animate-shake">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5 text-red-200 flex-shrink-0" />
-                    <p className="text-red-200 text-sm">{error}</p>
-                  </div>
+                  <p className="text-red-200 text-sm text-center">{error}</p>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 {isLoading ? (
                   <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -241,7 +213,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                     id="resetEmployeeId"
                     type="text"
                     value={resetEmployeeId}
-                    onChange={(e) => setResetEmployeeId(e.target.value.toUpperCase())}
+                    onChange={(e) => setEmployeeId(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                     placeholder="Enter your Employee ID"
                     required
@@ -263,7 +235,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                     className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                     placeholder="Enter new password"
                     required
-                    minLength={6}
                   />
                 </div>
               </div>
@@ -282,17 +253,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                     className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                     placeholder="Confirm new password"
                     required
-                    minLength={6}
                   />
                 </div>
               </div>
 
               {error && (
                 <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5 text-red-200 flex-shrink-0" />
-                    <p className="text-red-200 text-sm">{error}</p>
-                  </div>
+                  <p className="text-red-200 text-sm text-center">{error}</p>
                 </div>
               )}
 
@@ -326,35 +293,29 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
             <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
               <h3 className="font-medium text-white mb-3 text-center">Demo Credentials</h3>
               <div className="space-y-2 text-sm text-gray-300">
-                <div className="p-3 bg-white/5 rounded-lg">
-                  <div className="flex justify-between items-center mb-2">
+                <div className="p-2 bg-white/5 rounded-lg">
+                  <div className="flex justify-between items-center">
                     <span className="font-medium text-blue-300">{selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}:</span>
                     <button
                       onClick={() => {
                         setEmployeeId(credentials.id);
                         setPassword(credentials.password);
                       }}
-                      className="text-xs bg-blue-500/20 hover:bg-blue-500/30 px-3 py-1 rounded-full transition-colors duration-200 font-medium"
+                      className="text-xs bg-blue-500/20 hover:bg-blue-500/30 px-2 py-1 rounded transition-colors duration-200"
                     >
-                      Use Credentials
+                      Use
                     </button>
                   </div>
-                  <div className="text-xs text-gray-400 mb-1">
+                  <div className="text-xs text-gray-400 mt-1">
                     {credentials.name}
                   </div>
-                  <div className="text-xs text-gray-300 mb-2">
+                  <div className="text-xs text-gray-300 mt-1">
                     Username: {credentials.username}
                   </div>
-                  <div className="text-xs font-mono text-gray-300 bg-black/20 p-2 rounded">
-                    ID: {credentials.id} | Password: {credentials.password}
+                  <div className="text-xs font-mono text-gray-300">
+                    {credentials.id} / {credentials.password}
                   </div>
                 </div>
-              </div>
-              
-              <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                <p className="text-xs text-yellow-200 text-center">
-                  💡 Click "Use Credentials" to auto-fill login details
-                </p>
               </div>
             </div>
           )}
