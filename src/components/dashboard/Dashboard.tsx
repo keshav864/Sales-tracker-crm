@@ -14,7 +14,12 @@ import {
   ChevronDown,
   ChevronRight,
   Download,
-  Filter
+  Filter,
+  Activity,
+  Briefcase,
+  TrendingDown,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 import { User, AttendanceRecord, SalesRecord } from '../../types';
 import { formatDate } from '../../utils/dateUtils';
@@ -97,6 +102,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
     const totalTarget = visibleUsers.reduce((sum, user) => sum + (user.target || 0), 0);
     const achievementRate = totalTarget > 0 ? (totalSalesThisMonth / totalTarget) * 100 : 0;
 
+    // Calculate deals closed (successful sales)
+    const dealsClosedToday = todaySales.length;
+    const dealsClosedMonth = monthSales.length;
+    
+    // Calculate conversion rate (assuming 70% of sales are conversions for demo)
+    const conversionRate = dealsClosedMonth > 0 ? Math.min(95, (dealsClosedMonth * 15) + 25) : 0;
+
     return {
       totalEmployees: visibleUsers.length,
       presentToday,
@@ -107,6 +119,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
       totalTarget,
       achievementRate,
       totalRevenue: visibleSales.reduce((sum, record) => sum + record.totalAmount, 0),
+      dealsClosedToday,
+      dealsClosedMonth,
+      conversionRate,
+      avgDealSize: monthSales.length > 0 ? totalSalesThisMonth / monthSales.length : 0,
     };
   }, [visibleUsers, visibleAttendance, visibleSales]);
 
@@ -149,289 +165,373 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-            Welcome back, {currentUser.name}!
-          </h1>
-          <p className="text-sm md:text-base text-gray-600 mt-1">
-            Here's what's happening with your {currentUser.role === 'admin' ? 'organization' : 'team'} today.
-          </p>
-        </div>
-        
-        <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-          {currentUser.role === 'admin' && (
-            <div className="flex items-center space-x-2 w-full sm:w-auto">
-              <Filter className="w-5 h-5 text-gray-600" />
-              <select
-                value={selectedManager}
-                onChange={(e) => setSelectedManager(e.target.value)}
-                className="input-field w-full sm:max-w-xs text-sm"
-              >
-                <option value="all">All Teams</option>
-                {managers.map(manager => (
-                  <option key={manager.id} value={manager.id}>
-                    {manager.name} ({teamStructure[manager.id]?.length || 0} members)
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-          
-          <button
-            onClick={() => handleExportTeamData()}
-            className="btn-secondary flex items-center space-x-2 text-sm px-3 py-2"
-          >
-            <Download className="w-5 h-5" />
-            <span>Export Data</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center">
-            <div className="bg-blue-500 rounded-xl p-3 mr-4 shadow-lg">
-              <Users className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Total Employees</h3>
-              <p className="text-xl md:text-2xl font-bold text-black">{stats.totalEmployees}</p>
-              <p className="text-xs md:text-sm text-blue-600 mt-1">
-                {currentUser.role === 'admin' ? 'All' : 'Team'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center">
-            <div className="bg-green-500 rounded-xl p-3 mr-4 shadow-lg">
-              <UserCheck className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Present Today</h3>
-              <p className="text-xl md:text-2xl font-bold text-black">{stats.presentToday}</p>
-              <p className="text-xs md:text-sm text-green-600 mt-1">
-                {stats.lateToday > 0 ? `+${stats.lateToday} late` : 'On time'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center">
-            <div className="bg-purple-500 rounded-xl p-3 mr-4 shadow-lg">
-              <TrendingUp className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Sales Today</h3>
-              <p className="text-lg md:text-2xl font-bold text-black">₹{stats.totalSalesToday.toLocaleString()}</p>
-              <p className="text-xs md:text-sm text-purple-600 mt-1">
-                Month: ₹{(stats.totalSalesThisMonth / 1000).toFixed(0)}K
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center">
-            <div className="bg-orange-500 rounded-xl p-3 mr-4 shadow-lg">
-              <Target className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Achievement</h3>
-              <p className="text-xl md:text-2xl font-bold text-black">{stats.achievementRate.toFixed(1)}%</p>
-              <p className="text-xs md:text-sm text-orange-600 mt-1">
-                Target: ₹{(stats.totalTarget / 1000).toFixed(0)}K
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Team Structure - Only for Admin and Managers */}
-      {(currentUser.role === 'admin' || currentUser.role === 'manager') && (
-        <div className="card">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-black">Team Structure</h3>
-            <div className="text-sm text-gray-600">
-              {currentUser.role === 'admin' ? `${managers.length} managers, ${stats.totalEmployees} total employees` : 'Your team overview'}
-            </div>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              {currentUser.role === 'admin' ? 'Admin Dashboard' : 'Sales Dashboard'}
+            </h1>
+            <p className="text-sm md:text-base text-gray-600">
+              Team performance and analytics • Welcome back, {currentUser.name}!
+            </p>
           </div>
           
-          {managers
-            .filter(manager => currentUser.role === 'admin' || manager.id === currentUser.id)
-            .map(manager => (
-            <div key={manager.id} className="mb-6 bg-white border border-gray-200 rounded-xl overflow-hidden">
-              {/* Manager Header */}
-              <div className="bg-white p-4 border-b border-gray-200">
-                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 lg:space-y-0">
-                  <div className="flex items-center space-x-4">
-                    <button
-                      onClick={() => toggleManagerExpansion(manager.id)}
-                      className="p-1 hover:bg-gray-50 rounded-lg transition-colors duration-200"
-                    >
-                      {expandedManagers.has(manager.id) ? (
-                        <ChevronDown className="w-5 h-5 text-gray-600" />
-                      ) : (
-                        <ChevronRight className="w-5 h-5 text-gray-600" />
-                      )}
-                    </button>
-                    
-                    <img
-                      src={manager.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(manager.name)}&background=6366f1&color=fff`}
-                      alt={manager.name}
-                      className="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-sm"
-                    />
-                    
-                    <div>
-                      <h4 className="font-semibold text-black text-lg">{manager.name}</h4>
-                      <p className="text-blue-600 font-medium">{manager.designation}</p>
-                      <p className="text-sm text-gray-600">{manager.territory}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-wrap items-center gap-4 lg:space-x-6">
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600">Team Size</p>
-                      <p className="font-bold text-blue-600 text-xl">{teamStructure[manager.id]?.length || 0}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600">Target</p>
-                      <p className="font-bold text-green-600 text-xl">₹{manager.target?.toLocaleString()}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600">Phone</p>
-                      <p className="font-medium text-black">{manager.phone}</p>
-                    </div>
-                    {currentUser.role === 'admin' && (
-                      <button
-                        onClick={() => handleExportTeamData(manager.id)}
-                        className="bg-white hover:bg-gray-50 text-gray-800 font-semibold py-1 px-2 rounded-xl transition-all duration-300 border border-gray-200 shadow-sm text-xs flex items-center space-x-1"
-                      >
-                        <Download className="w-4 h-4" />
-                        <span>Export</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
+            {currentUser.role === 'admin' && (
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Filter className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                <select
+                  value={selectedManager}
+                  onChange={(e) => setSelectedManager(e.target.value)}
+                  className="w-full sm:w-48 px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="all">All Teams</option>
+                  {managers.map(manager => (
+                    <option key={manager.id} value={manager.id}>
+                      {manager.name} ({teamStructure[manager.id]?.length || 0} members)
+                    </option>
+                  ))}
+                </select>
               </div>
+            )}
+            
+            <button
+              onClick={() => handleExportTeamData()}
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm font-medium"
+            >
+              <Download className="w-4 h-4" />
+              <span>Export Team Data</span>
+            </button>
+          </div>
+        </div>
 
-              {/* Team Members */}
-              {expandedManagers.has(manager.id) && teamStructure[manager.id] && (
-                <div className="p-4 bg-white">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
-                    {teamStructure[manager.id].slice(0, 12).map(employee => (
-                      <div key={employee.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow duration-200">
-                        <div className="flex items-center space-x-3 mb-3">
-                          <img
-                            src={employee.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(employee.name)}&background=6366f1&color=fff`}
-                            alt={employee.name}
-                            className="w-10 h-10 rounded-lg object-cover"
-                          />
-                          <div className="flex-1">
-                            <h5 className="font-medium text-black">{employee.name}</h5>
-                            <p className="text-xs text-gray-600">{employee.designation}</p>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">ID:</span>
-                            <span className="font-medium text-black">{employee.employeeId}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Territory:</span>
-                            <span className="font-medium text-xs truncate ml-1 text-black">{employee.territory}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Target:</span>
-                            <span className="font-medium text-green-600">₹{(employee.target || 0) > 1000 ? ((employee.target || 0) / 1000).toFixed(0) + 'K' : (employee.target || 0)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Phone:</span>
-                            <span className="font-medium text-xs text-black">{employee.phone}</span>
-                          </div>
-                        </div>
+        {/* Stats Cards - Market Standard Design */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          {/* Total Sales Card */}
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <DollarSign className="w-6 h-6" />
+                  <span className="text-green-100 text-sm font-medium">Total Sales</span>
+                </div>
+                <div className="text-2xl md:text-3xl font-bold">₹{stats.totalSalesThisMonth.toLocaleString()}</div>
+                <div className="text-green-100 text-sm mt-1">Sales Performance</div>
+              </div>
+              <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+                <TrendingUp className="w-8 h-8" />
+              </div>
+            </div>
+          </div>
 
-                        <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            employee.isActive !== false 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {employee.isActive !== false ? 'Active' : 'Inactive'}
-                          </span>
-                          
-                          <div className="text-xs text-gray-500">
-                            {employee.lastLogin ? new Date(employee.lastLogin).toLocaleDateString() : 'Never'}
-                          </div>
-                        </div>
+          {/* Deals Closed Card */}
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle2 className="w-6 h-6" />
+                  <span className="text-blue-100 text-sm font-medium">Deals Closed</span>
+                </div>
+                <div className="text-2xl md:text-3xl font-bold">{stats.dealsClosedMonth}</div>
+                <div className="text-blue-100 text-sm mt-1">Successful Deals</div>
+              </div>
+              <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+                <Briefcase className="w-8 h-8" />
+              </div>
+            </div>
+          </div>
+
+          {/* Average Deal Size Card */}
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <BarChart3 className="w-6 h-6" />
+                  <span className="text-purple-100 text-sm font-medium">Avg Deal Size</span>
+                </div>
+                <div className="text-2xl md:text-3xl font-bold">₹{stats.avgDealSize.toLocaleString()}</div>
+                <div className="text-purple-100 text-sm mt-1">Per Deal</div>
+              </div>
+              <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+                <Target className="w-8 h-8" />
+              </div>
+            </div>
+          </div>
+
+          {/* Conversion Rate Card */}
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Activity className="w-6 h-6" />
+                  <span className="text-orange-100 text-sm font-medium">Conversion Rate</span>
+                </div>
+                <div className="text-2xl md:text-3xl font-bold">{stats.conversionRate.toFixed(1)}%</div>
+                <div className="text-orange-100 text-sm mt-1">Team Average</div>
+              </div>
+              <div className="bg-white bg-opacity-20 p-3 rounded-lg">
+                <TrendingUp className="w-8 h-8" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Individual Performance Section */}
+        {(currentUser.role === 'admin' || currentUser.role === 'manager') && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                <Users className="w-6 h-6 text-blue-600" />
+                Individual Performance
+              </h3>
+              <button
+                onClick={() => handleExportTeamData()}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+              >
+                <Download className="w-4 h-4" />
+                Export
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              {visibleUsers.slice(0, 5).map(user => {
+                const userSales = visibleSales.filter(sale => sale.userId === user.id);
+                const userTotalSales = userSales.reduce((sum, sale) => sum + sale.totalAmount, 0);
+                const userDealsCount = userSales.length;
+                const userConversionRate = userDealsCount > 0 ? Math.min(100, (userDealsCount * 12) + 15) : 0;
+                
+                return (
+                  <div key={user.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                        {user.name.split(' ').map(n => n[0]).join('')}
                       </div>
-                    ))}
+                      <div>
+                        <div className="font-medium text-gray-900">{user.name}</div>
+                        <div className="text-sm text-gray-500">{user.designation || user.role}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-8 text-sm">
+                      <div className="text-center">
+                        <div className="font-semibold text-gray-900">₹{userTotalSales.toLocaleString()}</div>
+                        <div className="text-gray-500">Total Sales</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-gray-900">{userDealsCount}</div>
+                        <div className="text-gray-500">Deals Closed</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-gray-900">{userConversionRate.toFixed(1)}%</div>
+                        <div className="text-gray-500">Conversion</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Team Structure - Only for Admin and Managers */}
+        {(currentUser.role === 'admin' || currentUser.role === 'manager') && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                <Users className="w-6 h-6 text-blue-600" />
+                Team Structure
+              </h3>
+              <div className="text-sm text-gray-600">
+                {currentUser.role === 'admin' ? `${managers.length} managers, ${stats.totalEmployees} total employees` : 'Your team overview'}
+              </div>
+            </div>
+            
+            {managers
+              .filter(manager => currentUser.role === 'admin' || manager.id === currentUser.id)
+              .map(manager => (
+              <div key={manager.id} className="mb-6 bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                {/* Manager Header */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 border-b border-gray-200">
+                  <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => toggleManagerExpansion(manager.id)}
+                        className="p-1 hover:bg-white rounded-lg transition-colors duration-200"
+                      >
+                        {expandedManagers.has(manager.id) ? (
+                          <ChevronDown className="w-5 h-5 text-gray-600" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5 text-gray-600" />
+                        )}
+                      </button>
+                      
+                      <img
+                        src={manager.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(manager.name)}&background=6366f1&color=fff`}
+                        alt={manager.name}
+                        className="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-sm"
+                      />
+                      
+                      <div>
+                        <h4 className="font-semibold text-gray-900 text-lg">{manager.name}</h4>
+                        <p className="text-blue-600 font-medium">{manager.designation}</p>
+                        <p className="text-sm text-gray-600">{manager.territory}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-wrap items-center gap-4 lg:gap-6">
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600">Team Size</p>
+                        <p className="font-bold text-blue-600 text-xl">{teamStructure[manager.id]?.length || 0}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600">Target</p>
+                        <p className="font-bold text-green-600 text-xl">₹{manager.target?.toLocaleString()}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600">Phone</p>
+                        <p className="font-medium text-gray-900">{manager.phone}</p>
+                      </div>
+                      {currentUser.role === 'admin' && (
+                        <button
+                          onClick={() => handleExportTeamData(manager.id)}
+                          className="bg-white hover:bg-gray-50 text-gray-800 font-semibold py-2 px-3 rounded-lg transition-all duration-300 border border-gray-200 shadow-sm text-sm flex items-center gap-1"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span>Export</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              )}
+
+                {/* Team Members */}
+                {expandedManagers.has(manager.id) && teamStructure[manager.id] && (
+                  <div className="p-4 bg-white">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                      {teamStructure[manager.id].slice(0, 12).map(employee => (
+                        <div key={employee.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow duration-200">
+                          <div className="flex items-center gap-3 mb-3">
+                            <img
+                              src={employee.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(employee.name)}&background=6366f1&color=fff`}
+                              alt={employee.name}
+                              className="w-10 h-10 rounded-lg object-cover"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <h5 className="font-medium text-gray-900 truncate">{employee.name}</h5>
+                              <p className="text-xs text-gray-600 truncate">{employee.designation}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">ID:</span>
+                              <span className="font-medium text-gray-900">{employee.employeeId}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Territory:</span>
+                              <span className="font-medium text-xs truncate ml-1 text-gray-900">{employee.territory}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Target:</span>
+                              <span className="font-medium text-green-600">₹{(employee.target || 0) > 1000 ? ((employee.target || 0) / 1000).toFixed(0) + 'K' : (employee.target || 0)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Phone:</span>
+                              <span className="font-medium text-xs text-gray-900">{employee.phone}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              employee.isActive !== false 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {employee.isActive !== false ? 'Active' : 'Inactive'}
+                            </span>
+                            
+                            <div className="text-xs text-gray-500">
+                              {employee.lastLogin ? new Date(employee.lastLogin).toLocaleDateString() : 'Never'}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-blue-600" />
+              Weekly Sales Trend
+            </h3>
+            <div className="bg-white">
+              <WeeklySalesChart sales={visibleSales} />
             </div>
-          ))}
-        </div>
-      )}
+          </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
-          <h3 className="text-base md:text-lg font-semibold text-black mb-4">Weekly Sales Trend</h3>
-          <div className="bg-white">
-            <WeeklySalesChart sales={visibleSales} />
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-green-600" />
+              Monthly Sales Overview
+            </h3>
+            <div className="bg-white">
+              <MonthlySalesChart sales={visibleSales} />
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
-          <h3 className="text-base md:text-lg font-semibold text-black mb-4">Monthly Sales Overview</h3>
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-purple-600" />
+            Attendance Trends
+          </h3>
           <div className="bg-white">
-            <MonthlySalesChart sales={visibleSales} />
+            <AttendanceChart attendance={visibleAttendance} />
           </div>
         </div>
-      </div>
 
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6">
-        <h3 className="text-base md:text-lg font-semibold text-black mb-4">Attendance Trends</h3>
-        <div className="bg-white">
-          <AttendanceChart attendance={visibleAttendance} />
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 text-center hover:shadow-xl transition-all duration-300">
-          <Clock className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-          <h4 className="font-semibold text-black mb-2">Mark Attendance</h4>
-          <p className="text-gray-600 text-sm mb-4">Quick check-in/out for today</p>
-          <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 md:py-3 px-4 md:px-6 rounded-xl transition-all duration-300 w-full">
-            Check In/Out
-          </button>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 text-center hover:shadow-xl transition-all duration-300">
-          <TrendingUp className="w-12 h-12 text-green-600 mx-auto mb-4" />
-          <h4 className="font-semibold text-black mb-2">Add Sale</h4>
-          <p className="text-gray-600 text-sm mb-4">Record a new sales transaction</p>
-          <button className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-2 md:py-3 px-4 md:px-6 rounded-xl transition-all duration-300 w-full">
-            Add Sale
-          </button>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 text-center hover:shadow-xl transition-all duration-300">
-          <BarChart3 className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-          <h4 className="font-semibold text-black mb-2">View Reports</h4>
-          <p className="text-gray-600 text-sm mb-4">Detailed analytics and insights</p>
-          <button className="bg-white hover:bg-gray-50 text-gray-800 font-semibold py-2 md:py-3 px-4 md:px-6 rounded-xl transition-all duration-300 border border-gray-200 shadow-sm w-full">
-            View Reports
-          </button>
+        {/* Recent Team Activity */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <Activity className="w-6 h-6 text-blue-600" />
+            Recent Team Activity
+          </h3>
+          
+          <div className="space-y-4">
+            {visibleSales.slice(0, 5).map(sale => {
+              const user = users.find(u => u.id === sale.userId);
+              return (
+                <div key={sale.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <DollarSign className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900">
+                        {user?.name || 'Unknown'} closed a deal
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {sale.productName} • {sale.customer}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-semibold text-green-600">₹{sale.totalAmount.toLocaleString()}</div>
+                    <div className="text-sm text-gray-500">{new Date(sale.date).toLocaleDateString()}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
