@@ -60,10 +60,8 @@
   }
 
   .card {
-    @apply bg-white rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6;
+    @apply bg-white rounded-xl md:rounded-2xl shadow-lg border border-gray-200 p-4 md:p-6;
   }
-
-
 }
 
 @layer utilities {
@@ -119,7 +117,7 @@
   /* Mobile responsive improvements */
   @media (max-width: 768px) {
     .chart-container {
-      height: 250px !important;
+      height: 200px !important;
     }
     
     .mobile-scroll {
@@ -157,12 +155,50 @@
 
   /* Mobile responsive text */
   @media (max-width: 640px) {
-    h1 { font-size: 1.5rem !important; }
-    h2 { font-size: 1.25rem !important; }
-    h3 { font-size: 1.125rem !important; }
+    h1 { font-size: 1.25rem !important; }
+    h2 { font-size: 1.125rem !important; }
+    h3 { font-size: 1rem !important; }
     .text-3xl { font-size: 1.5rem !important; }
     .text-2xl { font-size: 1.25rem !important; }
     .text-xl { font-size: 1.125rem !important; }
+  }
+
+  /* Responsive grid improvements */
+  @media (max-width: 640px) {
+    .grid-cols-2 > * {
+      min-width: 0;
+    }
+    
+    .grid-cols-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* Better mobile spacing */
+  @media (max-width: 768px) {
+    .space-y-6 > * + * {
+      margin-top: 1rem;
+    }
+    
+    .gap-6 {
+      gap: 0.75rem;
+    }
+    
+    .p-6 {
+      padding: 1rem;
+    }
+  }
+
+  /* Improved mobile sidebar */
+  @media (max-width: 768px) {
+    .sidebar-mobile {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    
+    .sidebar-mobile.open {
+      transform: translateX(0);
+    }
   }
 }
 

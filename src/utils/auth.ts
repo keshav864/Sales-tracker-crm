@@ -5,12 +5,7 @@ import { getUsers, saveUsers, getCurrentUser, setCurrentUser } from './storage';
 export const authenticateUser = (employeeId: string, password: string): User | null => {
   const users = getUsers();
   console.log('🔍 Authenticating user:', employeeId);
-  console.log('🔍 Available users:', users.map(u => ({ 
-    employeeId: u.employeeId, 
-    name: u.name, 
-    password: u.password,
-    role: u.role 
-  })));
+  console.log('🔍 Available users count:', users.length);
   
   // Find user by employee ID (case insensitive)
   const user = users.find(u => 

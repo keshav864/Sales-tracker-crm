@@ -164,7 +164,7 @@ const getDefaultProducts = (): Product[] => [
   { id: 'AI_MODEL', name: 'AI Model', price: 2771, category: 'AI', model: 'Standard' },
 ];
 
-// Complete employee list with exact credentials
+// Complete employee list with exact credentials - ALL 32 EMPLOYEES
 const getDefaultUsers = (): User[] => [
   // Admin
   {
@@ -186,7 +186,7 @@ const getDefaultUsers = (): User[] => [
     lastLogin: new Date().toISOString(),
   },
   
-  // Reporting Managers
+  // Reporting Managers (4)
   {
     id: 'BM001',
     employeeId: 'BM001',
@@ -203,7 +203,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'ADMIN001',
     territory: 'Bihar/Delhi & West Bengal/Odisha',
     isActive: true,
-    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: 'BM002',
@@ -221,7 +221,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'ADMIN001',
     territory: 'Gujarat & Chhattisgarh',
     isActive: true,
-    lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
+    lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: 'BM003',
@@ -239,7 +239,7 @@ const getDefaultUsers = (): User[] => [
     manager: 'ADMIN001',
     territory: 'MP & Rajasthan',
     isActive: true,
-    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
+    lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: 'BM004',
@@ -257,11 +257,10 @@ const getDefaultUsers = (): User[] => [
     manager: 'ADMIN001',
     territory: 'MP & Rajasthan',
     isActive: true,
-    lastLogin: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
+    lastLogin: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
   },
 
   // Team Members under Salim Javed (DGM) - Bihar/Delhi & West Bengal/Odisha (12 members)
-  // Bihar Team
   {
     id: 'BM222',
     employeeId: 'BM222',
@@ -316,8 +315,6 @@ const getDefaultUsers = (): User[] => [
     isActive: true,
     lastLogin: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(),
   },
-
-  // West Bengal, Odisha Team
   {
     id: 'BM241',
     employeeId: 'BM241',
@@ -461,6 +458,24 @@ const getDefaultUsers = (): User[] => [
     territory: 'Delhi',
     isActive: true,
     lastLogin: new Date(Date.now() - 15 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'BM178',
+    employeeId: 'BM178',
+    name: 'Manoj Kumar Singh',
+    username: 'manoj.singh',
+    role: 'employee',
+    department: 'Sales',
+    joinDate: '2024-04-10',
+    password: 'manoj@178',
+    profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+91 9876543226',
+    designation: 'Territory Sales Manager (TSM)',
+    target: 85000,
+    manager: 'BM001',
+    territory: 'Bihar',
+    isActive: true,
+    lastLogin: new Date(Date.now() - 30 * 60 * 60 * 1000).toISOString(),
   },
 
   // Team Members under Sandeep Bediawala (Gujarat) - Gujarat & Chhattisgarh (6 members)
@@ -722,24 +737,6 @@ const getDefaultUsers = (): User[] => [
   },
 
   // Additional employees to reach 32 total
-  {
-    id: 'BM178',
-    employeeId: 'BM178',
-    name: 'Manoj Kumar Singh',
-    username: 'manoj.singh',
-    role: 'employee',
-    department: 'Sales',
-    joinDate: '2024-04-10',
-    password: 'manoj@178',
-    profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
-    phone: '+91 9876543226',
-    designation: 'Territory Sales Manager (TSM)',
-    target: 85000,
-    manager: 'BM001',
-    territory: 'Bihar',
-    isActive: true,
-    lastLogin: new Date(Date.now() - 30 * 60 * 60 * 1000).toISOString(),
-  },
   {
     id: 'BM275',
     employeeId: 'BM275',

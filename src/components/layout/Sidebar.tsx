@@ -95,10 +95,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 
                 <Icon className={`w-5 h-5 ${isCollapsed ? 'mx-auto' : 'mr-3'} relative z-10 ${
                   isActive ? 'text-white' : item.color
-                } transition-colors duration-300`} />
+                } transition-colors duration-300 flex-shrink-0`} />
                 
                 {!isCollapsed && (
-                  <span className="font-medium relative z-10 transition-colors duration-300 text-xs md:text-base">
+                  <span className="font-medium relative z-10 transition-colors duration-300 text-xs md:text-sm truncate">
                     {item.label}
                   </span>
                 )}

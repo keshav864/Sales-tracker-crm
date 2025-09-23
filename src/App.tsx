@@ -12,11 +12,11 @@ import { EmployeeManagement } from './components/admin/EmployeeManagement';
 import { ProfileSettings } from './components/profile/ProfileSettings';
 import { SystemSettings } from './components/settings/SystemSettings';
 import { DataExport } from './components/export/DataExport';
-import { getUsers, getSalesRecords, getAttendanceRecords, updateUserProfile } from './utils/storage';
+import { getUsers, getSalesRecords, getAttendanceRecords, updateUserProfile, initializeDefaultData } from './utils/storage';
 import { realTimeDataManager } from './utils/realTimeData';
 import { User, SalesRecord, AttendanceRecord } from './types';
 
-type ViewType = 'dashboard' | 'attendance' | 'sales' | 'analytics' | 'reports' | 'employees' | 'profile' | 'settings' | 'export';
+type ViewType = 'dashboard' | 'attendance' | 'sales' | 'analytics' | 'reports' | 'employees' | 'profile' | 'settings' | 'export' | 'calendar' | 'targets';
 
 function App() {
   const { user, login, logout } = useAuth();
@@ -29,6 +29,11 @@ function App() {
   const [allAttendance, setAllAttendance] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Initialize data on app start
+  useEffect(() => {
+    initializeDefaultData();
+  }, []);
+
   // Load initial data
   useEffect(() => {
     const loadData = () => {
@@ -36,6 +41,12 @@ function App() {
         const users = getUsers();
         const sales = getSalesRecords();
         const attendance = getAttendanceRecords();
+        
+        console.log('📊 Loaded data:', {
+          users: users.length,
+          sales: sales.length,
+          attendance: attendance.length
+        });
         
         setAllUsers(users);
         setAllSales(sales);
@@ -102,7 +113,8 @@ function App() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading application...</p>
+          <p className="text-gray-600">Loading SalesTracker CRM...</p>
+          <p className="text-sm text-gray-500 mt-2">Initializing {allUsers.length} employees</p>
         </div>
       </div>
     );
@@ -199,6 +211,27 @@ function App() {
             currentUser={user}
           />
         );
+      case 'calendar':
+        return (
+          <div className="card">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Calendar View</h2>
+            <p className="text-gray-600">Calendar functionality coming soon...</p>
+          </div>
+        );
+      case 'targets':
+        return user.role === 'admin' ? (
+          <div className="card">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Sales Targets</h2>
+            <p className="text-gray-600">Sales targets management coming soon...</p>
+          </div>
+        ) : (
+          <Dashboard 
+            users={allUsers}
+            attendance={allAttendance}
+            sales={allSales}
+            currentUser={user}
+          />
+        );
       default:
         return (
           <Dashboard 
@@ -221,19 +254,29 @@ function App() {
       />
       
       <div className="flex">
-        <Sidebar 
-          activeSection={currentView}
-          onSectionChange={setCurrentView}
-          user={user}
-          isCollapsed={!sidebarOpen}
-        />
+        <div className={`${sidebarOpen ? 'block' : 'hidden'} md:block`}>
+          <Sidebar 
+            activeSection={currentView}
+            onSectionChange={setCurrentView}
+            user={user}
+            isCollapsed={false}
+          />
+        </div>
         
-        <main className="flex-1 p-2 md:p-6 md:ml-64 bg-white min-h-screen">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 md:ml-64 bg-white min-h-screen">
+          <div className="max-w-7xl mx-auto p-2 md:p-6">
             {renderView()}
           </div>
         </main>
       </div>
+
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 }
