@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { SalesForm } from './SalesForm';
 import { SalesEntryManager } from './SalesEntryManager';
-import { getSalesRecords, getUsers } from '../../utils/storage';
-import { realTimeDataManager } from '../../utils/realTimeData';
 import { SalesRecord, User } from '../../types';
+import { salesService } from '../../services/salesService';
 import { TrendingUp, Users, Target, Calendar } from 'lucide-react';
 
 interface SalesTrackerProps {

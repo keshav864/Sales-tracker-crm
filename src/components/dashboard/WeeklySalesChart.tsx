@@ -57,7 +57,6 @@ export const WeeklySalesChart: React.FC<WeeklySalesChartProps> = ({ sales }) => 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top' as const,
